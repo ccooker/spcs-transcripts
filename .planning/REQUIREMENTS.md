@@ -88,37 +88,35 @@
 
 ## Traceability
 
-*Populated during roadmap creation.*
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | — | Pending |
-| AUTH-02 | — | Pending |
-| AUTH-03 | — | Pending |
-| STU-01 | — | Pending |
-| STU-02 | — | Pending |
-| STU-03 | — | Pending |
-| STU-04 | — | Pending |
-| STU-05 | — | Pending |
-| STU-06 | — | Pending |
-| STU-07 | — | Pending |
-| STU-08 | — | Pending |
-| DOC-01 | — | Pending |
-| DOC-02 | — | Pending |
-| DOC-03 | — | Pending |
-| DOC-04 | — | Pending |
-| TRN-01 | — | Pending |
-| TRN-02 | — | Pending |
-| TRN-03 | — | Pending |
-| NAV-01 | — | Pending |
-| NAV-02 | — | Pending |
-| NAV-03 | — | Pending |
+| AUTH-01 | Phase 1: Infrastructure & Auth | Pending |
+| AUTH-02 | Phase 1: Infrastructure & Auth | Pending |
+| AUTH-03 | Phase 1: Infrastructure & Auth | Pending |
+| STU-01 | Phase 2: Student Profiles & Search | Pending |
+| STU-02 | Phase 2: Student Profiles & Search | Pending |
+| STU-03 | Phase 3: Student Records UI | Pending |
+| STU-04 | Phase 3: Student Records UI | Pending |
+| STU-05 | Phase 3: Student Records UI | Pending |
+| STU-06 | Phase 3: Student Records UI | Pending |
+| STU-07 | Phase 3: Student Records UI | Pending |
+| STU-08 | Phase 3: Student Records UI | Pending |
+| DOC-01 | Phase 4: Document Management | Pending |
+| DOC-02 | Phase 4: Document Management | Pending |
+| DOC-03 | Phase 4: Document Management | Pending |
+| DOC-04 | Phase 4: Document Management | Pending |
+| TRN-01 | Phase 5: Transcript Assembly & Export | Pending |
+| TRN-02 | Phase 5: Transcript Assembly & Export | Pending |
+| TRN-03 | Phase 5: Transcript Assembly & Export | Pending |
+| NAV-01 | Phase 2: Student Profiles & Search | Pending |
+| NAV-02 | Phase 2: Student Profiles & Search | Pending |
+| NAV-03 | Phase 2: Student Profiles & Search | Pending |
 
 **Coverage:**
 - v1 requirements: 21 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 21 ⚠️
+- Mapped to phases: 21 ✓
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-11*
-*Last updated: 2026-06-11 after initial definition*
+*Last updated: 2026-06-11 after roadmap creation (traceability populated)*
