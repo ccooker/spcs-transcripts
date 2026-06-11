@@ -35,7 +35,7 @@ Plans:
 - [x] 01-02-PLAN.md — Vite + React + shadcn init, MSAL config (sessionStorage, API scope), Login/Home/Unauthorized pages
 - [x] 01-03-PLAN.md — Express auth middleware (validateJwt, resolveUser, requireRole), audit service (logAudit), /api/auth/me route; tests turn GREEN
 - [x] 01-04-PLAN.md — apiFetch client (acquireTokenSilent), /api/auth/me call in App.tsx, role-gated HomePage
-- [ ] 01-05-PLAN.md — PM2 ecosystem.config.js, IIS web.config, DEPLOYMENT-RUNBOOK.md; human checkpoint for HTTPS verification
+- [~] 01-05-PLAN.md — PM2 ecosystem.config.js, IIS web.config, DEPLOYMENT-RUNBOOK.md; human checkpoint for HTTPS verification (Tasks 1+2 complete, Task 3 awaiting human verify)
 
 ### Phase 2: Student Profiles & Search
 **Goal:** Staff can manage a complete student directory and quickly locate any student or survey the cohort.
@@ -98,7 +98,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure & Auth | 4/5 | In Progress | — |
+| 1. Infrastructure & Auth | 5/5 (checkpoint pending) | In Progress | — |
 | 2. Student Profiles & Search | 0/? | Not started | — |
 | 3. Student Records UI | 0/? | Not started | — |
 | 4. Document Management | 0/? | Not started | — |
@@ -136,4 +136,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-06-11*
-*Last updated: 2026-06-11 after Plan 01-04 (wire) completion*
+*Last updated: 2026-06-11 after Plan 01-05 Tasks 1+2 complete; checkpoint:human-verify pending*

@@ -9,8 +9,8 @@ progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 5
-  completed_plans: 4
-  percent: 16
+  completed_plans: 5
+  percent: 20
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 ## Current Status
 
 - Roadmap: created
-- Active phase: Phase 1 (executing — Plans 01-04 complete, Plan 05 next)
-- Last action: Plan 01-04 (wire) completed 2026-06-11
+- Active phase: Phase 1 (executing — Plans 01-05 Tasks 1+2 complete; Plan 05 Task 3 awaiting checkpoint:human-verify)
+- Last action: Plan 01-05 (deploy) Tasks 1+2 completed 2026-06-11; halted at checkpoint:human-verify
 
 ## Phase History
 
@@ -37,6 +37,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | 01-infrastructure-auth | 02 (client-scaffold) | Vite 8 + React + MSAL PKCE client, shadcn/zinc theme, Login/Home/Unauthorized pages | 2026-06-11 |
 | 01-infrastructure-auth | 03 (auth) | Express JWT auth stack (HS256 test/RS256 JWKS), resolveUser upsert, requireRole, logAudit, GET /api/auth/me — all 8 tests GREEN | 2026-06-11 |
 | 01-infrastructure-auth | 04 (wire) | MSAL acquireTokenSilent apiFetch client, App.tsx /api/auth/me integration, role-gated HomePage with loading skeleton | 2026-06-11 |
+| 01-infrastructure-auth | 05 (deploy) | PM2 ecosystem.config.js + IIS web.config (ARR proxy + SPA fallback) + 389-line DEPLOYMENT-RUNBOOK.md; Tasks 1+2 committed; Task 3 awaiting checkpoint:human-verify | 2026-06-11 |
 
 ---
 
@@ -61,6 +62,9 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | API_SCOPE derived from VITE_CLIENT_ID env var | Prevents Pitfall 2 (wrong audience) — Graph tokens rejected by Express aud validation | 01-04 |
 | UserInfo type exported from App.tsx | Avoids circular dependency; HomePage imports from @/App without a separate types file | 01-04 |
 | Session-expired shows 3 s alert then loginRedirect | Gives user visual feedback before redirect; 401 and network errors both treated as session-expired | 01-04 |
+| ecosystem.config.js at workspace root — __dirname resolves correctly for script path ./server/dist/index.js | Placed at workspace root (not server/) so relative script path is valid from PM2 cwd | 01-05 |
+| PM2_HOME set to C:/ProgramData/pm2 machine-level — required for Windows service compatibility | User-profile PM2_HOME fails when running as Local Service account; machine-level path required (Pitfall 4) | 01-05 |
+| DATABASE_URL uses 127.0.0.1 not localhost in ecosystem.config.js | Prevents IPv6 resolution issues on Windows Server (Pitfall 6) | 01-05 |
 
 ### Todos
 
@@ -72,4 +76,4 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 ---
 *State initialised: 2026-06-11*
-*Last updated: 2026-06-11 after Plan 01-04 (wire) completion*
+*Last updated: 2026-06-11 after Plan 01-05 (deploy) Tasks 1+2 completion; halted at checkpoint:human-verify*
