@@ -31,11 +31,11 @@
 **Plans:** 5 plans
 
 Plans:
-- [ ] 01-PLAN-server-scaffold.md — Server npm project, Prisma schema (User + AuditLog), first migration, failing test suite (RED)
-- [ ] 01-PLAN-client-scaffold.md — Vite + React + shadcn init, MSAL config (sessionStorage, API scope), Login/Home/Unauthorized pages
-- [ ] 01-PLAN-auth.md — Express auth middleware (validateJwt, resolveUser, requireRole), audit service (logAudit), /api/auth/me route; tests turn GREEN
-- [ ] 01-PLAN-wire.md — apiFetch client (acquireTokenSilent), /api/auth/me call in App.tsx, role-gated HomePage
-- [ ] 01-PLAN-deploy.md — PM2 ecosystem.config.js, IIS web.config, DEPLOYMENT-RUNBOOK.md; human checkpoint for HTTPS verification
+- [x] 01-01-PLAN.md — Server npm project, Prisma schema (User + AuditLog), first migration, failing test suite (RED)
+- [ ] 01-02-PLAN.md — Vite + React + shadcn init, MSAL config (sessionStorage, API scope), Login/Home/Unauthorized pages
+- [ ] 01-03-PLAN.md — Express auth middleware (validateJwt, resolveUser, requireRole), audit service (logAudit), /api/auth/me route; tests turn GREEN
+- [ ] 01-04-PLAN.md — apiFetch client (acquireTokenSilent), /api/auth/me call in App.tsx, role-gated HomePage
+- [ ] 01-05-PLAN.md — PM2 ecosystem.config.js, IIS web.config, DEPLOYMENT-RUNBOOK.md; human checkpoint for HTTPS verification
 
 ### Phase 2: Student Profiles & Search
 **Goal:** Staff can manage a complete student directory and quickly locate any student or survey the cohort.
@@ -98,7 +98,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Infrastructure & Auth | 0/? | Not started | — |
+| 1. Infrastructure & Auth | 1/5 | In Progress | — |
 | 2. Student Profiles & Search | 0/? | Not started | — |
 | 3. Student Records UI | 0/? | Not started | — |
 | 4. Document Management | 0/? | Not started | — |
