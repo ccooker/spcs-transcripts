@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { logAudit } from '../../services/audit.js'
+import { logAudit } from '../services/audit.js'
 import { clearDb, prisma } from './helpers/testDb.js'
 
 beforeEach(clearDb)

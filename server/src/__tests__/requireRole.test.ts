@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
-import { requireRole } from '../../middleware/requireRole.js'
-import { Role } from '../../generated/prisma/client.js'
+import { requireRole } from '../middleware/requireRole.js'
+import { Role } from '../generated/prisma/client.js'
 import type { Request, Response, NextFunction } from 'express'
 
 describe('requireRole middleware', () => {

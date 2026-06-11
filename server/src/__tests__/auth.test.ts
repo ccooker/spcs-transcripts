@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import request from 'supertest'
-import { app } from '../../app.js'
+import { app } from '../app.js'
 import { makeTestToken } from './helpers/makeTestToken.js'
 import { clearDb, prisma } from './helpers/testDb.js'
 
