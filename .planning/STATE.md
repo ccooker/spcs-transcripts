@@ -9,8 +9,8 @@ progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
-  percent: 12
+  completed_plans: 4
+  percent: 16
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 ## Current Status
 
 - Roadmap: created
-- Active phase: Phase 1 (executing — Plans 01-03 complete, Plan 04 next)
-- Last action: Plan 01-03 (auth) completed 2026-06-11
+- Active phase: Phase 1 (executing — Plans 01-04 complete, Plan 05 next)
+- Last action: Plan 01-04 (wire) completed 2026-06-11
 
 ## Phase History
 
@@ -36,6 +36,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | 01-infrastructure-auth | 01 (server-scaffold) | Express 5 ESM server, Prisma 7 schema+migration, 8 RED tests | 2026-06-11 |
 | 01-infrastructure-auth | 02 (client-scaffold) | Vite 8 + React + MSAL PKCE client, shadcn/zinc theme, Login/Home/Unauthorized pages | 2026-06-11 |
 | 01-infrastructure-auth | 03 (auth) | Express JWT auth stack (HS256 test/RS256 JWKS), resolveUser upsert, requireRole, logAudit, GET /api/auth/me — all 8 tests GREEN | 2026-06-11 |
+| 01-infrastructure-auth | 04 (wire) | MSAL acquireTokenSilent apiFetch client, App.tsx /api/auth/me integration, role-gated HomePage with loading skeleton | 2026-06-11 |
 
 ---
 
@@ -57,6 +58,9 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | index.ts placed at server/src/index.ts, not server/index.ts | Matches tsconfig rootDir:src and dev script `tsx watch src/index.ts` | 01-03 |
 | shadcn v4 CLI requires manual component setup for Vite projects | Interactive prompts in v4 not fully suppressible; components.json, tailwind.config.js, and UI primitives created directly matching v3 format | 01-02 |
 | MSAL v5.13.0 removed storeAuthStateInCookie | CacheOptions type in v5 only has cacheLocation; omitted property; sessionStorage cache still enforced | 01-02 |
+| API_SCOPE derived from VITE_CLIENT_ID env var | Prevents Pitfall 2 (wrong audience) — Graph tokens rejected by Express aud validation | 01-04 |
+| UserInfo type exported from App.tsx | Avoids circular dependency; HomePage imports from @/App without a separate types file | 01-04 |
+| Session-expired shows 3 s alert then loginRedirect | Gives user visual feedback before redirect; 401 and network errors both treated as session-expired | 01-04 |
 
 ### Todos
 
@@ -68,4 +72,4 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 ---
 *State initialised: 2026-06-11*
-*Last updated: 2026-06-11 after Plan 01-03 (auth) completion*
+*Last updated: 2026-06-11 after Plan 01-04 (wire) completion*
