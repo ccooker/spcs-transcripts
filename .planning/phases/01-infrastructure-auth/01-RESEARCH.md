@@ -765,22 +765,25 @@ describe('GET /api/auth/me', () => {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Does the school IT team have the Entra ID tenant already configured to allow a new app registration?**
    - What we know: School is on M365 (from CONTEXT.md specifics)
    - What's unclear: Whether Global Admin access is available, and whether conditional access policies apply
    - Recommendation: Create a "Pre-Flight Checklist" task in the plan — list what IT needs to configure before the app can be tested (app registration, SPA redirect URI, "Expose an API" scope, admin consent grant)
+   - RESOLVED: Plan 05 (`01-PLAN-deploy.md`) includes a `user_setup` pre-flight checklist block and DEPLOYMENT-RUNBOOK.md Pre-Flight section covering all IT prerequisites.
 
 2. **Should the Node.js API and the React SPA be separate npm projects or a monorepo?**
    - What we know: Vite builds the client; Express is the API
    - What's unclear: Whether the planner should create `server/` and `client/` sub-packages (recommended for Phase 1 simplicity) or a workspace monorepo
    - Recommendation: Separate `server/` and `client/` directories with their own `package.json` files; no monorepo tooling needed for a 5-phase project
+   - RESOLVED: Plans 01 and 02 use separate `server/` and `client/` directories with independent `package.json` files. No monorepo tooling.
 
 3. **What PostgreSQL version and Windows service configuration does the school have?**
    - What we know: PostgreSQL is not installed on the dev machine (not found in environment check); it will be on the production Windows Server
    - What's unclear: Whether PostgreSQL is already installed on the target server
    - Recommendation: Plan includes a "verify PostgreSQL installation and create database/user" step in the deployment runbook
+   - RESOLVED: Plan 05 DEPLOYMENT-RUNBOOK.md includes PostgreSQL installation/verification step with instructions for Windows Server setup and `pg_hba.conf` configuration.
 
 ---
 
