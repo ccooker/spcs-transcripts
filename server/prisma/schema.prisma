@@ -1,0 +1,44 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+model User {
+  id          String     @id @default(uuid())
+  email       String     @unique
+  displayName String
+  role        Role       @default(STAFF)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  auditLogs   AuditLog[] @relation("ActingUser")
+}
+
+model AuditLog {
+  id           String      @id @default(uuid())
+  actingUserId String
+  actingUser   User        @relation("ActingUser", fields: [actingUserId], references: [id])
+  action       AuditAction
+  model        String
+  recordId     String
+  details      String?
+  timestamp    DateTime    @default(now())
+
+  @@index([actingUserId])
+  @@index([model, recordId])
+  @@index([timestamp])
+}
