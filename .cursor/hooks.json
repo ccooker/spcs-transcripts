@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "command": "\"C:/Program Files/nodejs/node.exe\" \"C:/@code/spcs-transcripts/.cursor/hooks/gsd-cursor-session-start.js\"",
+        "gsd-managed": true
+      }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "command": "\"C:/Program Files/nodejs/node.exe\" \"C:/@code/spcs-transcripts/.cursor/hooks/gsd-cursor-post-tool.js\"",
+        "gsd-managed": true
+      }
+    ]
+  },
+  "version": 1
+}
