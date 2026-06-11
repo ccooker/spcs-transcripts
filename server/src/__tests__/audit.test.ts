@@ -6,6 +6,15 @@ beforeEach(clearDb)
 
 describe('logAudit', () => {
   it('auth-03-audit: logAudit writes exactly one AuditLog record with matching fields', async () => {
+    // AuditLog.actingUserId is a FK to User.id — create the user first
+    await prisma.user.create({
+      data: {
+        id: 'test-user-id',
+        email: 'audit-test@school.edu',
+        displayName: 'Audit Test User',
+      },
+    })
+
     await logAudit(prisma, {
       userId: 'test-user-id',
       action: 'CREATE',

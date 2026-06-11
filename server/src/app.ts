@@ -1,11 +1,33 @@
 import express from 'express'
+import helmet from 'helmet'
+import cors from 'cors'
+import { validateJwt, resolveUser } from './middleware/auth.js'
 import { requireRole } from './middleware/requireRole.js'
 import { Role } from './generated/prisma/client.js'
+import authRouter from './routes/auth.js'
 
 export const app = express()
 
+app.use(helmet())
 app.use(express.json())
 
-// Temporary admin-only test route for auth-02-admin-route test (RED phase)
-// requireRole import will fail until Plan 03 implements the middleware
+if (process.env.NODE_ENV !== 'production') {
+  app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:5173' }))
+}
+
+app.use('/api', validateJwt)
+app.use('/api', resolveUser)
+
+app.use('/api/auth', authRouter)
+
+// Admin-only test route used by auth-02-admin-route integration test
 app.get('/api/admin/test', requireRole(Role.ADMIN), (_req, res) => res.json({ ok: true }))
+
+// Global error handler for JWT validation failures
+app.use((err: unknown, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (err && typeof err === 'object' && (err as { name?: string }).name === 'UnauthorizedError') {
+    res.status(401).json({ error: 'Invalid or missing token' })
+    return
+  }
+  next(err)
+})
