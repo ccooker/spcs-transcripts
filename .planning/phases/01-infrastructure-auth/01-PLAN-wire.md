@@ -33,10 +33,10 @@ must_haves:
       to: "client/src/auth/msalConfig.ts"
       via: "msalInstance.acquireTokenSilent({ scopes: [API_SCOPE], account })"
       pattern: "acquireTokenSilent"
-    - from: "client/src/pages/HomePage.tsx"
+    - from: "client/src/App.tsx"
       to: "client/src/api/apiClient.ts"
-      via: "apiFetch('/auth/me') in useEffect"
-      pattern: "apiFetch.*auth/me"
+      via: "apiGet('/auth/me') in useEffect"
+      pattern: "apiGet.*auth/me"
 ---
 
 ## Phase Goal

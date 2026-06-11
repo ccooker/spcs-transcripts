@@ -214,7 +214,7 @@ Output: ecosystem.config.js; web.config; DEPLOYMENT-RUNBOOK.md with full Windows
     - DEPLOYMENT-RUNBOOK.md contains local dev run command (`npm run dev` in both server/ and client/)
     - DEPLOYMENT-RUNBOOK.md contains Troubleshooting section covering P1001, 401, and PM2 reboot issues
     - DEPLOYMENT-RUNBOOK.md does NOT mention iisnode
-    - `wc -l DEPLOYMENT-RUNBOOK.md` → ≥ 100 lines
+    - `node -e "const l=require('fs').readFileSync('DEPLOYMENT-RUNBOOK.md','utf8').split('\n').length; process.exit(l>=100?0:1)"` exits 0 (≥ 100 lines)
   </acceptance_criteria>
   <done>Comprehensive deployment runbook written covering all Windows Server + IIS + PM2 + PostgreSQL steps. Local dev run command documented. Troubleshooting section covers known pitfalls.</done>
 </task>
@@ -268,7 +268,7 @@ After Tasks 1 and 2 complete:
 2. `cat ecosystem.config.js | grep CHANGE_ME` → returns ≥ 5 matches (no real credentials committed)
 3. `cat web.config | grep "localhost:3001"` → returns API Proxy rule
 4. `cat web.config | grep "iisnode"` → returns empty (iisnode not mentioned)
-5. `wc -l DEPLOYMENT-RUNBOOK.md` → ≥ 100 lines
+5. `node -e "const l=require('fs').readFileSync('DEPLOYMENT-RUNBOOK.md','utf8').split('\n').length; console.log(l + ' lines'); process.exit(l>=100?0:1)"` → exits 0
 6. `cat DEPLOYMENT-RUNBOOK.md | grep "migrate deploy"` → returns prisma migrate deploy instruction
 7. Human checkpoint: HTTPS deployment verified per how-to-verify steps
 </verification>
