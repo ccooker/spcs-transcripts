@@ -200,7 +200,7 @@ Output: server/ npm project with all dependencies installed; Prisma schema + fir
     All three test files will report import/module-not-found errors or test failures — this is the RED phase. Do NOT fix the failing tests here; they are intentionally failing.
   </action>
   <verify>
-    <automated>cd server && npx vitest run --reporter=verbose 2>&1 | tail -20</automated>
+    <automated>cd server && npx vitest run --reporter=verbose</automated>
   </verify>
   <acceptance_criteria>
     - server/vitest.config.ts exists and contains `environment: 'node'` and `globals: true`

@@ -112,7 +112,7 @@ Output: Complete Express auth middleware stack; full app.ts replacing Plan 01 st
     3. **server/src/services/user.ts** — export `upsertUserOnLogin` as a thin wrapper (may be used in future for pre-login hooks). For Phase 1, the logic lives in `resolveUser` directly; create this file as a placeholder with an exported type `LoginClaims = { preferred_username?: string; upn?: string; email?: string; name?: string }` for use in auth.ts typing.
   </action>
   <verify>
-    <automated>cd server && npx vitest run --reporter=dot src/__tests__/requireRole.test.ts 2>&1 | tail -5</automated>
+    <automated>cd server && npx vitest run --reporter=dot src/__tests__/requireRole.test.ts</automated>
   </verify>
   <acceptance_criteria>
     - server/src/middleware/auth.ts exports `validateJwt` and `resolveUser`
@@ -154,7 +154,7 @@ Output: Complete Express auth middleware stack; full app.ts replacing Plan 01 st
     After writing all files, run the full test suite to confirm GREEN.
   </action>
   <verify>
-    <automated>cd server && npx vitest run --reporter=verbose 2>&1 | tail -20</automated>
+    <automated>cd server && npx vitest run --reporter=verbose</automated>
   </verify>
   <acceptance_criteria>
     - server/src/services/audit.ts exports `logAudit` and contains `prisma.auditLog.create`

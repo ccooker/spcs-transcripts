@@ -202,7 +202,7 @@ Output: ecosystem.config.js; web.config; DEPLOYMENT-RUNBOOK.md with full Windows
     - IIS 502 Bad Gateway → PM2 process not running; check `pm2 list`; check PORT matches 3001 in web.config proxy
   </action>
   <verify>
-    <automated>test -f DEPLOYMENT-RUNBOOK.md && wc -l DEPLOYMENT-RUNBOOK.md | awk '{print ($1 >= 100) ? "OK" : "TOO_SHORT"}'</automated>
+    <automated>node -e "const l=require('fs').readFileSync('DEPLOYMENT-RUNBOOK.md','utf8').split('\n').length; process.exit(l>=100?0:1)"</automated>
   </verify>
   <acceptance_criteria>
     - DEPLOYMENT-RUNBOOK.md exists at workspace root
