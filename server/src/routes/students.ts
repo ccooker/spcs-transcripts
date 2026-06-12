@@ -5,6 +5,7 @@ import { requireRole } from '../middleware/requireRole.js'
 import {
   createStudentSchema,
   listStudentsQuerySchema,
+  studentIdParamSchema,
   updateStudentSchema,
 } from '../schemas/student.js'
 import {
@@ -20,6 +21,18 @@ import {
 } from '../services/student.js'
 
 const router = Router()
+
+function parseStudentId(
+  id: string,
+  res: import('express').Response,
+): string | null {
+  const parsed = studentIdParamSchema.safeParse(id)
+  if (!parsed.success) {
+    res.status(404).json({ error: 'Student not found' })
+    return null
+  }
+  return parsed.data
+}
 
 function handleStudentError(err: unknown, res: import('express').Response, next: import('express').NextFunction) {
   if (err instanceof StudentNotFoundError) {
@@ -59,7 +72,10 @@ router.get('/', async (req, res, next) => {
 
 router.get('/:id', async (req, res, next) => {
   try {
-    const student = await getStudentById(prisma, req.params.id)
+    const id = parseStudentId(req.params.id, res)
+    if (!id) return
+
+    const student = await getStudentById(prisma, id)
     res.json(student)
   } catch (err) {
     handleStudentError(err, res, next)
@@ -68,13 +84,16 @@ router.get('/:id', async (req, res, next) => {
 
 router.patch('/:id', async (req, res, next) => {
   try {
+    const id = parseStudentId(req.params.id, res)
+    if (!id) return
+
     const parsed = updateStudentSchema.safeParse(req.body)
     if (!parsed.success) {
       res.status(400).json({ error: 'Invalid request body' })
       return
     }
 
-    const student = await updateStudent(prisma, req.params.id, parsed.data, req.user!.id)
+    const student = await updateStudent(prisma, id, parsed.data, req.user!.id)
     res.json(student)
   } catch (err) {
     handleStudentError(err, res, next)
@@ -83,7 +102,10 @@ router.patch('/:id', async (req, res, next) => {
 
 router.delete('/:id', async (req, res, next) => {
   try {
-    const student = await archiveStudent(prisma, req.params.id, req.user!.id)
+    const id = parseStudentId(req.params.id, res)
+    if (!id) return
+
+    const student = await archiveStudent(prisma, id, req.user!.id)
     res.json(student)
   } catch (err) {
     handleStudentError(err, res, next)
@@ -92,7 +114,10 @@ router.delete('/:id', async (req, res, next) => {
 
 router.post('/:id/restore', requireRole(Role.ADMIN), async (req, res, next) => {
   try {
-    const student = await restoreStudent(prisma, req.params.id, req.user!.id)
+    const id = parseStudentId(req.params.id, res)
+    if (!id) return
+
+    const student = await restoreStudent(prisma, id, req.user!.id)
     res.json(student)
   } catch (err) {
     handleStudentError(err, res, next)

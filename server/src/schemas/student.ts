@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+export const studentIdParamSchema = z.string().uuid()
+
 export const FORM_LEVELS = [
   'FORM_1',
   'FORM_2',
