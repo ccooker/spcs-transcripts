@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import { AcademicResultsSection } from '@/components/records/AcademicResultsSection';
 import { ActivitiesSection } from '@/components/records/ActivitiesSection';
 import { AwardsSection } from '@/components/records/AwardsSection';
+import { CareerGoalsSection } from '@/components/records/CareerGoalsSection';
+import { NotesSection } from '@/components/records/NotesSection';
 import { WorkExperienceSection } from '@/components/records/WorkExperienceSection';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
@@ -273,7 +275,8 @@ export function StudentDetailPage({ userInfo }: StudentDetailPageProps) {
             <ActivitiesSection studentId={student.id} />
             <AwardsSection studentId={student.id} />
             <WorkExperienceSection studentId={student.id} />
-            {/* CareerGoals and Notes sections added in Plan 03-03b */}
+            <CareerGoalsSection studentId={student.id} />
+            <NotesSection studentId={student.id} />
           </div>
 
           <ArchiveStudentDialog
