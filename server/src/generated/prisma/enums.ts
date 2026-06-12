@@ -24,3 +24,24 @@ export const AuditAction = {
 } as const
 
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]
+
+
+export const FormLevel = {
+  FORM_1: 'FORM_1',
+  FORM_2: 'FORM_2',
+  FORM_3: 'FORM_3',
+  FORM_4: 'FORM_4',
+  FORM_5: 'FORM_5',
+  FORM_6: 'FORM_6'
+} as const
+
+export type FormLevel = (typeof FormLevel)[keyof typeof FormLevel]
+
+
+export const TranscriptStatus = {
+  DRAFT: 'DRAFT',
+  FINALISED: 'FINALISED',
+  NONE: 'NONE'
+} as const
+
+export type TranscriptStatus = (typeof TranscriptStatus)[keyof typeof TranscriptStatus]

@@ -18,6 +18,21 @@ enum AuditAction {
   DELETE
 }
 
+enum FormLevel {
+  FORM_1
+  FORM_2
+  FORM_3
+  FORM_4
+  FORM_5
+  FORM_6
+}
+
+enum TranscriptStatus {
+  DRAFT
+  FINALISED
+  NONE
+}
+
 model User {
   id          String     @id @default(uuid())
   email       String     @unique
@@ -41,4 +56,25 @@ model AuditLog {
   @@index([actingUserId])
   @@index([model, recordId])
   @@index([timestamp])
+}
+
+model Student {
+  id              String           @id @default(uuid())
+  fullName        String
+  formLevel       FormLevel
+  graduationYear  Int
+  schoolStudentId String           @unique
+  studentEmail    String?
+  studentPhone    String?
+  parentEmail     String?
+  parentPhone     String?
+  transcriptStatus TranscriptStatus @default(NONE)
+  archivedAt      DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([fullName])
+  @@index([formLevel, archivedAt])
+  @@index([transcriptStatus])
+  @@index([archivedAt])
 }
