@@ -6,13 +6,28 @@ import { msalInstance } from '../auth/msalConfig';
 // and will be rejected with 401 by Express.
 const API_SCOPE = `api://${import.meta.env.VITE_CLIENT_ID}/access_as_user`;
 
+export class AuthRedirectInProgressError extends Error {
+  constructor() {
+    super('Authentication redirect in progress');
+    this.name = 'AuthRedirectInProgressError';
+  }
+}
+
+function getAccount() {
+  return msalInstance.getActiveAccount() ?? msalInstance.getAllAccounts()[0] ?? null;
+}
+
 export async function apiFetch(
   path: string,
   options: RequestInit = {},
 ): Promise<Response> {
-  const account = msalInstance.getActiveAccount();
+  const account = getAccount();
   if (!account) {
     throw new Error('No active account — user must sign in first');
+  }
+
+  if (!msalInstance.getActiveAccount()) {
+    msalInstance.setActiveAccount(account);
   }
 
   let tokenResponse;
@@ -24,8 +39,8 @@ export async function apiFetch(
   } catch (err) {
     if (err instanceof InteractionRequiredAuthError) {
       // Consent expired or MFA challenge — redirect triggers a full re-auth
-      await msalInstance.acquireTokenRedirect({ scopes: [API_SCOPE] });
-      return new Response(null, { status: 0 }); // unreachable; page redirects
+      await msalInstance.acquireTokenRedirect({ scopes: [API_SCOPE], account });
+      throw new AuthRedirectInProgressError();
     }
     throw err;
   }

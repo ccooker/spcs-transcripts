@@ -7,10 +7,12 @@ import { Role } from '../generated/prisma/client.js'
 const TENANT_ID = process.env.AZURE_TENANT_ID!
 const CLIENT_ID = process.env.AZURE_CLIENT_ID!
 
-const issuers = [
+const issuers: [string, ...string[]] = [
   `https://sts.windows.net/${TENANT_ID}/`,
   `https://login.microsoftonline.com/${TENANT_ID}/v2.0`,
 ]
+
+const audience: [string, ...string[]] = [`api://${CLIENT_ID}`, CLIENT_ID]
 
 function createValidateJwt() {
   if (process.env.NODE_ENV === 'test') {
@@ -18,7 +20,7 @@ function createValidateJwt() {
       secret: process.env.TEST_JWT_SECRET ?? 'test-secret',
       algorithms: ['HS256'],
       issuer: issuers,
-      audience: [`api://${CLIENT_ID}`],
+      audience,
     })
   }
   return expressjwt({
@@ -29,7 +31,7 @@ function createValidateJwt() {
       jwksUri: `https://login.microsoftonline.com/${TENANT_ID}/discovery/v2.0/keys`,
     }) as jwksRsa.GetVerificationKey,
     issuer: issuers,
-    audience: [`api://${CLIENT_ID}`],
+    audience,
     algorithms: ['RS256'],
   })
 }
@@ -38,8 +40,14 @@ export const validateJwt = createValidateJwt()
 
 export async function resolveUser(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const auth = req.auth as { preferred_username?: string; upn?: string; email?: string; name?: string } | undefined
-    const email = auth?.preferred_username || auth?.upn || auth?.email
+    const auth = req.auth as {
+      preferred_username?: string
+      upn?: string
+      email?: string
+      unique_name?: string
+      name?: string
+    } | undefined
+    const email = auth?.preferred_username || auth?.upn || auth?.email || auth?.unique_name
 
     if (!email) {
       res.status(401).json({ error: 'No email claim in token' })

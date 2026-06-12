@@ -11,7 +11,7 @@ import { LoginPage } from '@/pages/LoginPage';
 import { HomePage } from '@/pages/HomePage';
 import { UnauthorizedPage } from '@/pages/UnauthorizedPage';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { apiGet } from '@/api/apiClient';
+import { apiGet, AuthRedirectInProgressError } from '@/api/apiClient';
 import { loginRequest } from '@/auth/msalConfig';
 
 export type UserInfo = {
@@ -32,8 +32,9 @@ function App() {
     apiGet<UserInfo>('/auth/me')
       .then(setUserInfo)
       .catch((err: unknown) => {
+        if (err instanceof AuthRedirectInProgressError) return;
         const status = (err as { status?: number }).status;
-        if (status === 401 || !status) {
+        if (status === 401) {
           setAuthError('session-expired');
         }
       });

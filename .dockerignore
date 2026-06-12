@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+.git
+.cursor
+.planning
+**/node_modules
+**/dist
+**/.env
+**/.env.local
