@@ -96,8 +96,10 @@ model Student {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
-  academicResults AcademicResult[]
-  activities      Activity[]
+  academicResults  AcademicResult[]
+  activities       Activity[]
+  awards           Award[]
+  workExperiences  WorkExperience[]
 
   @@index([fullName])
   @@index([formLevel, archivedAt])
@@ -135,6 +137,40 @@ model Activity {
   endYear      Int?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@index([studentId])
+}
+
+model Award {
+  id          String     @id @default(uuid())
+  studentId   String
+  student     Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title       String
+  issuer      String
+  awardMonth  Int
+  awardYear   Int
+  level       AwardLevel
+  description String?    @db.VarChar(500)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([studentId])
+  @@index([studentId, awardYear(sort: Desc), awardMonth(sort: Desc)])
+}
+
+model WorkExperience {
+  id          String   @id @default(uuid())
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  employer    String
+  role        String
+  description String?  @db.VarChar(500)
+  startMonth  Int
+  startYear   Int
+  endMonth    Int?
+  endYear     Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([studentId])
 }

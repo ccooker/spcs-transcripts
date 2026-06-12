@@ -154,8 +154,12 @@ router.post('/', async (req, res, next) => {
 
 import academicResultsRouter from './academicResults.js'
 import activitiesRouter from './activities.js'
+import awardsRouter from './awards.js'
+import workExperienceRouter from './workExperience.js'
 
 router.use('/:studentId/academics', academicResultsRouter)
 router.use('/:studentId/activities', activitiesRouter)
+router.use('/:studentId/awards', awardsRouter)
+router.use('/:studentId/work-experience', workExperienceRouter)
 
 export default router
