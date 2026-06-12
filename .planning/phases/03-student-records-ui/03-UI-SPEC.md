@@ -448,7 +448,7 @@ The Notes section uses an **append-only inline input** pattern (D-17 to D-20). N
 **Section header:** "Notes" title + `({count})` count. **No "Add" button in header** — entry is inline at top of card (D-19).
 
 **Textarea behaviour:**
-- Controlled; character count hint: `{count}/500` at bottom-right of textarea as `text-xs text-muted-foreground`
+- Controlled; character count hint: `{count}/500` at bottom-right of textarea as `text-sm text-muted-foreground`
 - "Clear" (`Button variant="ghost"`) clears textarea without submitting
 - "Add note" (`Button variant="default"`) submits; disabled when textarea empty or over 500 chars
 - On submit: POST API → sonner toast "Note added" → refetch notes list
