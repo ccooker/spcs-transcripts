@@ -630,17 +630,17 @@ it('stu-01-create: POST /api/students creates student and audit log', async () =
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should cohort summary counts reflect the full database or only the filtered/search results?**
+1. **Should cohort summary counts reflect the full database or only the filtered/search results?** — **RESOLVED**
    - What we know: D-10 requires grouped view on same table; filters and search are first-class
-   - What's unclear: Whether staff expect global counts vs filtered counts in group headers
-   - Recommendation: Start with filtered-set counts (A1); note in plan for UAT validation
+   - **Decision:** Cohort group header counts reflect the **current filtered/search result set** on screen (not whole-database totals). Matches staff mental model when narrowing the list ("of the students I'm looking at, how many per form are Finalised?"). See Pattern 5 and assumption A1.
+   - **Plan impact:** Plan 03 Task 3 computes Draft/Finalised/None counts from current page data only; UAT validates whether staff need global counts later.
 
-2. **PostgreSQL availability during development/CI**
-   - What we know: `docker-compose.yml` exists; tests require live DB per `vitest.config.ts`
-   - What's unclear: Whether CI runs PostgreSQL
-   - Recommendation: Document `docker compose up -d` prerequisite in plan Wave 0; tests fail without DB
+2. **PostgreSQL availability during development/CI** — **RESOLVED**
+   - What we know: `docker-compose.yml` exists; integration tests require live DB per `vitest.config.ts`
+   - **Decision:** Local dev and test runs require PostgreSQL via `docker compose up -d` before `npx prisma db push` or `npm test`. CI is not configured in this repo yet — Phase 2 plans document DB startup as a Wave 0 prerequisite; tests fail fast with connection errors if DB is down (no in-memory fallback).
+   - **Plan impact:** Plan 01 Task 2 includes blocking `[BLOCKING]` db push step; RESEARCH Environment Availability table remains authoritative.
 
 ---
 
