@@ -1,10 +1,73 @@
 import { Router } from 'express'
-import { Prisma } from '../generated/prisma/client.js'
+import { Prisma, Role } from '../generated/prisma/client.js'
 import { prisma } from '../lib/prisma.js'
-import { createStudentSchema } from '../schemas/student.js'
-import { createStudent } from '../services/student.js'
+import { requireRole } from '../middleware/requireRole.js'
+import { createStudentSchema, updateStudentSchema } from '../schemas/student.js'
+import {
+  archiveStudent,
+  createStudent,
+  getStudentById,
+  restoreStudent,
+  StudentArchivedError,
+  StudentNotFoundError,
+  updateStudent,
+} from '../services/student.js'
 
 const router = Router()
+
+function handleStudentError(err: unknown, res: import('express').Response, next: import('express').NextFunction) {
+  if (err instanceof StudentNotFoundError) {
+    res.status(404).json({ error: 'Student not found' })
+    return
+  }
+  if (err instanceof StudentArchivedError) {
+    res.status(409).json({ error: 'Student is archived' })
+    return
+  }
+  next(err)
+}
+
+router.get('/:id', async (req, res, next) => {
+  try {
+    const student = await getStudentById(prisma, req.params.id)
+    res.json(student)
+  } catch (err) {
+    handleStudentError(err, res, next)
+  }
+})
+
+router.patch('/:id', async (req, res, next) => {
+  try {
+    const parsed = updateStudentSchema.safeParse(req.body)
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Invalid request body' })
+      return
+    }
+
+    const student = await updateStudent(prisma, req.params.id, parsed.data, req.user!.id)
+    res.json(student)
+  } catch (err) {
+    handleStudentError(err, res, next)
+  }
+})
+
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const student = await archiveStudent(prisma, req.params.id, req.user!.id)
+    res.json(student)
+  } catch (err) {
+    handleStudentError(err, res, next)
+  }
+})
+
+router.post('/:id/restore', requireRole(Role.ADMIN), async (req, res, next) => {
+  try {
+    const student = await restoreStudent(prisma, req.params.id, req.user!.id)
+    res.json(student)
+  } catch (err) {
+    handleStudentError(err, res, next)
+  }
+})
 
 router.post('/', async (req, res, next) => {
   try {
