@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { AcademicResultsSection } from '@/components/records/AcademicResultsSection';
+import { ActivitiesSection } from '@/components/records/ActivitiesSection';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import type { UserInfo } from '@/App';
@@ -264,17 +266,12 @@ export function StudentDetailPage({ userInfo }: StudentDetailPageProps) {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold leading-tight">Student records</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Academic results, activities, awards, and other records will be available here in a
-                future update.
-              </p>
-            </CardContent>
-          </Card>
+          <div className="flex flex-col gap-8">
+            <AcademicResultsSection studentId={student.id} />
+            <ActivitiesSection studentId={student.id} />
+            {/* Awards and WorkExperience sections added in Plan 03-02 */}
+            {/* CareerGoals and Notes sections added in Plan 03-03 */}
+          </div>
 
           <ArchiveStudentDialog
             open={archiveOpen}
