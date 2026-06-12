@@ -1,10 +1,11 @@
 ---
 phase: 2
 slug: student-profiles-search
-status: draft
+status: approved
 shadcn_initialized: true
 preset: default (zinc base, blue-600 accent, Inter font)
 created: 2026-06-12
+reviewed_at: 2026-06-12
 ---
 
 # Phase 2 — UI Design Contract
