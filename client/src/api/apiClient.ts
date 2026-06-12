@@ -54,14 +54,45 @@ export async function apiFetch(
   return fetch(`/api${path}`, { ...options, headers });
 }
 
+function apiError(path: string, status: number): Error & { status: number } {
+  const err = new Error(`API ${status}: ${path}`) as Error & { status: number };
+  err.status = status;
+  return err;
+}
+
 export async function apiGet<T>(path: string): Promise<T> {
   const res = await apiFetch(path);
   if (!res.ok) {
-    const err = new Error(`API ${res.status}: ${path}`) as Error & {
-      status: number;
-    };
-    err.status = res.status;
-    throw err;
+    throw apiError(path, res.status);
   }
   return res.json() as Promise<T>;
+}
+
+export async function apiPost<T>(path: string, body: unknown): Promise<T> {
+  const res = await apiFetch(path, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    throw apiError(path, res.status);
+  }
+  return res.json() as Promise<T>;
+}
+
+export async function apiPatch<T>(path: string, body: unknown): Promise<T> {
+  const res = await apiFetch(path, {
+    method: 'PATCH',
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    throw apiError(path, res.status);
+  }
+  return res.json() as Promise<T>;
+}
+
+export async function apiDelete(path: string): Promise<void> {
+  const res = await apiFetch(path, { method: 'DELETE' });
+  if (!res.ok) {
+    throw apiError(path, res.status);
+  }
 }

@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { MsalProvider } from '@azure/msal-react';
 import { msalInstance } from './auth/msalConfig';
+import { Toaster } from 'sonner';
 import App from './App.tsx';
 import './index.css';
 
@@ -31,6 +32,7 @@ async function bootstrap() {
       <BrowserRouter>
         <MsalProvider instance={msalInstance}>
           <App />
+          <Toaster richColors closeButton position="top-right" />
         </MsalProvider>
       </BrowserRouter>
     </StrictMode>,

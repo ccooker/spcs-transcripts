@@ -9,6 +9,9 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LoginPage } from '@/pages/LoginPage';
 import { HomePage } from '@/pages/HomePage';
+import { StudentsPage } from '@/pages/StudentsPage';
+import { StudentNewPage } from '@/pages/StudentNewPage';
+import { StudentDetailPage } from '@/pages/StudentDetailPage';
 import { UnauthorizedPage } from '@/pages/UnauthorizedPage';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { apiGet, AuthRedirectInProgressError } from '@/api/apiClient';
@@ -80,6 +83,30 @@ function App() {
         element={
           <ProtectedRoute>
             <HomePage userInfo={userInfo} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/students"
+        element={
+          <ProtectedRoute>
+            <StudentsPage userInfo={userInfo} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/students/new"
+        element={
+          <ProtectedRoute>
+            <StudentNewPage userInfo={userInfo} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/students/:id"
+        element={
+          <ProtectedRoute>
+            <StudentDetailPage userInfo={userInfo} />
           </ProtectedRoute>
         }
       />
