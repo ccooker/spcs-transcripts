@@ -441,3 +441,201 @@ describe('stu-06: Work Experience', () => {
     expect(res.status).toBe(404)
   })
 })
+
+const validCareerGoalPayload = {
+  interests: ['ENGINEERING', 'IT_TECHNOLOGY'],
+  description: 'Targeting HKU Computer Science department',
+}
+
+describe('stu-07: Career Goals', () => {
+  it('stu-07-create: POST /career-goals with valid body returns 201 with expected fields', async () => {
+    const student = await createTestStudent({ schoolStudentId: 'S2024501' })
+    const token = staffToken()
+
+    const res = await request(app)
+      .post(`/api/students/${student.id}/career-goals`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validCareerGoalPayload)
+
+    expect(res.status).toBe(201)
+    expect(res.body).toMatchObject({
+      interests: validCareerGoalPayload.interests,
+      description: validCareerGoalPayload.description,
+    })
+    expect(res.body.id).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    )
+    expect(res.body.author).toMatchObject({ displayName: 'Test Staff' })
+  })
+
+  it('stu-07-list: GET /career-goals returns array sorted newest-first', async () => {
+    const student = await createTestStudent({ schoolStudentId: 'S2024502' })
+    const token = staffToken()
+
+    await request(app)
+      .post(`/api/students/${student.id}/career-goals`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validCareerGoalPayload)
+
+    const res = await request(app)
+      .get(`/api/students/${student.id}/career-goals`)
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    expect(Array.isArray(res.body)).toBe(true)
+    expect(res.body.length).toBe(1)
+  })
+
+  it('stu-07-versioning: POST twice creates two rows; GET returns newest first', async () => {
+    const student = await createTestStudent({ schoolStudentId: 'S2024503' })
+    const token = staffToken()
+
+    await request(app)
+      .post(`/api/students/${student.id}/career-goals`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ interests: ['MEDICINE_HEALTH'], description: 'First entry' })
+
+    const secondPayload = { interests: ['ENGINEERING', 'SCIENCE_RESEARCH'], description: 'Second entry' }
+    await request(app)
+      .post(`/api/students/${student.id}/career-goals`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(secondPayload)
+
+    const res = await request(app)
+      .get(`/api/students/${student.id}/career-goals`)
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.length).toBe(2)
+    expect(res.body[0].interests).toEqual(secondPayload.interests)
+  })
+
+  it('stu-07-no-patch: PATCH /career-goals/:goalId returns 404 (D-16 enforcement)', async () => {
+    const student = await createTestStudent({ schoolStudentId: 'S2024504' })
+    const token = staffToken()
+
+    const res = await request(app)
+      .patch(`/api/students/${student.id}/career-goals/fake-id`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ description: 'Attempt to update' })
+
+    expect(res.status).toBe(404)
+  })
+
+  it('stu-07-no-delete: DELETE /career-goals/:goalId returns 404 (D-16 enforcement)', async () => {
+    const student = await createTestStudent({ schoolStudentId: 'S2024505' })
+    const token = staffToken()
+
+    const res = await request(app)
+      .delete(`/api/students/${student.id}/career-goals/fake-id`)
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(404)
+  })
+
+  it('stu-07-empty-interests: POST with interests:[] returns 400', async () => {
+    const student = await createTestStudent({ schoolStudentId: 'S2024506' })
+    const token = staffToken()
+
+    const res = await request(app)
+      .post(`/api/students/${student.id}/career-goals`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ interests: [] })
+
+    expect(res.status).toBe(400)
+  })
+})
+
+const validStaffNotePayload = {
+  content: 'Student shows strong aptitude for STEM subjects',
+}
+
+describe('stu-08: Staff Notes', () => {
+  it('stu-08-create: POST /notes with valid body returns 201 with expected fields', async () => {
+    const student = await createTestStudent({ schoolStudentId: 'S2024601' })
+    const token = staffToken()
+
+    const res = await request(app)
+      .post(`/api/students/${student.id}/notes`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validStaffNotePayload)
+
+    expect(res.status).toBe(201)
+    expect(res.body).toMatchObject({ content: validStaffNotePayload.content })
+    expect(res.body.id).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    )
+    expect(res.body.author).toMatchObject({ displayName: 'Test Staff' })
+    expect(res.body.createdAt).toBeDefined()
+  })
+
+  it('stu-08-list: GET /notes returns notes newest-first', async () => {
+    const student = await createTestStudent({ schoolStudentId: 'S2024602' })
+    const token = staffToken()
+
+    await request(app)
+      .post(`/api/students/${student.id}/notes`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validStaffNotePayload)
+
+    const res = await request(app)
+      .get(`/api/students/${student.id}/notes`)
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    expect(Array.isArray(res.body)).toBe(true)
+    expect(res.body.length).toBe(1)
+  })
+
+  it('stu-08-append-only-no-patch: PATCH /notes/:noteId returns 404 (D-17 enforcement)', async () => {
+    const student = await createTestStudent({ schoolStudentId: 'S2024603' })
+    const token = staffToken()
+
+    const res = await request(app)
+      .patch(`/api/students/${student.id}/notes/fake-id`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ content: 'Attempt to update' })
+
+    expect(res.status).toBe(404)
+  })
+
+  it('stu-08-append-only-no-delete: DELETE /notes/:noteId returns 404 (D-17 enforcement)', async () => {
+    const student = await createTestStudent({ schoolStudentId: 'S2024604' })
+    const token = staffToken()
+
+    const res = await request(app)
+      .delete(`/api/students/${student.id}/notes/fake-id`)
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(404)
+  })
+
+  it('stu-08-max-length: POST with content of 501 characters returns 400', async () => {
+    const student = await createTestStudent({ schoolStudentId: 'S2024605' })
+    const token = staffToken()
+
+    const res = await request(app)
+      .post(`/api/students/${student.id}/notes`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ content: 'a'.repeat(501) })
+
+    expect(res.status).toBe(400)
+  })
+
+  it('stu-08-audit: POST /notes creates AuditLog row model:StaffNote action:CREATE', async () => {
+    const student = await createTestStudent({ schoolStudentId: 'S2024606' })
+    const token = staffToken()
+
+    const res = await request(app)
+      .post(`/api/students/${student.id}/notes`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validStaffNotePayload)
+
+    expect(res.status).toBe(201)
+
+    const logs = await prisma.auditLog.findMany({
+      where: { model: 'StaffNote', action: 'CREATE', recordId: res.body.id },
+    })
+    expect(logs).toHaveLength(1)
+  })
+})
