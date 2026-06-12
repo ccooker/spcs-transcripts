@@ -9,7 +9,7 @@
 ## Phases
 
 - [ ] **Phase 1: Infrastructure & Auth** — Microsoft Entra ID SSO, role-based access, audit logging, on-premise deployment
-- [ ] **Phase 2: Student Profiles & Search** — Student directory CRUD, name search, year/status filtering, cohort overview
+- [x] **Phase 2: Student Profiles & Search** — Student directory CRUD, name search, year/status filtering, cohort overview (completed 2026-06-12)
 - [ ] **Phase 3: Student Records UI** — All six record types: academics, activities, awards, work experience, career goals, notes
 - [ ] **Phase 4: Document Management** — PDF upload, secure storage, document listing/download/soft-delete, type tagging
 - [ ] **Phase 5: Transcript Assembly & Export** — Narrative template, draft/finalised status, school-branded PDF export
@@ -55,7 +55,7 @@ Plans:
 4. Staff can filter the student list by year level and by transcript status (Draft / Finalised / None).
 5. Staff can view a cohort overview table showing all students with per-student status indicators at a glance.
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 **Wave 1**
@@ -68,7 +68,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 02-03-PLAN.md — Student directory: list API, search/filter, cohort table, pagination
+- [x] 02-03-PLAN.md — Student directory: list API, search/filter, cohort table, pagination
 
 **UI hint**: yes
 
@@ -129,7 +129,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Infrastructure & Auth | 5/5 (checkpoint pending) | In Progress | — |
-| 2. Student Profiles & Search | 1/3 | In Progress|  |
+| 2. Student Profiles & Search | 3/3 | Complete   | 2026-06-12 |
 | 3. Student Records UI | 0/? | Not started | — |
 | 4. Document Management | 0/? | Not started | — |
 | 5. Transcript Assembly & Export | 0/? | Not started | — |

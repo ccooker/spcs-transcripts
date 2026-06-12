@@ -37,9 +37,9 @@
 
 ### Search & Navigation
 
-- [ ] **NAV-01**: Staff can search the student list by name
-- [ ] **NAV-02**: Staff can filter the student list by year level and transcript status (Draft / Finalised / None)
-- [ ] **NAV-03**: Staff can view a cohort overview table showing all students with status indicators per student
+- [x] **NAV-01**: Staff can search the student list by name
+- [x] **NAV-02**: Staff can filter the student list by year level and transcript status (Draft / Finalised / None)
+- [x] **NAV-03**: Staff can view a cohort overview table showing all students with status indicators per student
 
 ## v2 Requirements
 
@@ -108,9 +108,9 @@
 | TRN-01 | Phase 5: Transcript Assembly & Export | Pending |
 | TRN-02 | Phase 5: Transcript Assembly & Export | Pending |
 | TRN-03 | Phase 5: Transcript Assembly & Export | Pending |
-| NAV-01 | Phase 2: Student Profiles & Search | Pending |
-| NAV-02 | Phase 2: Student Profiles & Search | Pending |
-| NAV-03 | Phase 2: Student Profiles & Search | Pending |
+| NAV-01 | Phase 2: Student Profiles & Search | Complete |
+| NAV-02 | Phase 2: Student Profiles & Search | Complete |
+| NAV-03 | Phase 2: Student Profiles & Search | Complete |
 
 **Coverage:**
 

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 02
-status: Executing Phase 02
-last_updated: "2026-06-12T09:14:00.000Z"
+status: Phase 02 complete
+last_updated: "2026-06-12T09:02:00.000Z"
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 8
-  completed_plans: 7
-  percent: 22
+  completed_plans: 8
+  percent: 40
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 ## Current Status
 
 - Roadmap: created
-- Active phase: Phase 2 (context gathered 2026-06-12 — ready for `/gsd-plan-phase 2`)
-- Last action: Phase 2 discuss-phase completed — student profile, year level, list layout, and archive decisions captured in 02-CONTEXT.md
+- Active phase: Phase 2 complete — student directory with search, filter, cohort headers (2026-06-12)
+- Last action: Phase 2 Plan 03 — GET /api/students list API and StudentsListPage with TanStack table
 
 ## Phase History
 
@@ -40,6 +40,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | 01-infrastructure-auth | 05 (deploy) | PM2 ecosystem.config.js + IIS web.config (ARR proxy + SPA fallback) + 389-line DEPLOYMENT-RUNBOOK.md; Tasks 1+2 committed; Task 3 awaiting checkpoint:human-verify | 2026-06-11 |
 | 02-student-profiles-search | 01 (create) | Student Prisma model, POST /api/students, /students/new form, AppShell — stu-01 tests GREEN | 2026-06-12 |
 | 02-student-profiles-search | 02 (detail) | GET/PATCH/DELETE/restore API, StudentDetailPage, ArchiveStudentDialog — stu-02 tests GREEN | 2026-06-12 |
+| 02-student-profiles-search | 03 (list) | GET /api/students list API, StudentsListPage, cohort headers — nav-01/02/03 tests GREEN | 2026-06-12 |
 
 ---
 
@@ -78,7 +79,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 ---
 *State initialised: 2026-06-11*
-*Last updated: 2026-06-12 after Phase 2 Plan 02 — view/edit/archive/restore complete*
+*Last updated: 2026-06-12 after Phase 2 Plan 03 — student directory list complete*
 
 ## Performance Metrics
 
@@ -86,6 +87,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 |-------|------|----------|-------|
 | Phase 02-student-profiles-search P01 | 28min | 3 tasks | 31 files |
 | Phase 02-student-profiles-search P02 | 22min | 3 tasks | 7 files |
+| Phase 02-student-profiles-search P03 | 25min | 3 tasks | 9 files |
 
 ## Decisions
 
@@ -94,3 +96,6 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 - [Phase 02-02]: Manual alert-dialog when shadcn CLI blocked — @radix-ui/react-alert-dialog pre-installed; matches plan 01 pattern
 - [Phase 02-02]: PATCH returns 409 on archived students — GET :id still returns archived records for admin detail view
 - [Phase 02-02]: StudentForm edit mode keeps schoolStudentId read-only — updateStudentSchema omits ID from PATCH body
+- [Phase 02-03]: Badge variants on list table follow 02-UI-SPEC matching StudentDetailPage
+- [Phase 02-03]: Cohort header counts from current page data only per RESEARCH A1
+- [Phase 02-03]: Default list sort formLevel asc with secondary fullName asc for cohort grouping
