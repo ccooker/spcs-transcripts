@@ -98,7 +98,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion — runs in parallel: 03-02 server and 03-02b client)*
 
 - [x] 03-02-PLAN.md — Awards & Work Experience server slice: Award + WorkExperience schema models, Zod schemas, services (IDOR guard + audit), routes, RED tests (stu-05, stu-06)
-- [ ] 03-02b-PLAN.md — Awards & Work Experience client slice: AwardsSection (award level Badge) + WorkExperienceSection, StudentDetailPage updated *(parallel to 03-02, depends on 03-01b)*
+- [x] 03-02b-PLAN.md — Awards & Work Experience client slice: AwardsSection (award level Badge) + WorkExperienceSection, StudentDetailPage updated *(parallel to 03-02, depends on 03-01b)*
 
 **Wave 3** *(blocked on 03-02 completion)*
 

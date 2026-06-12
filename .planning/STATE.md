@@ -9,8 +9,8 @@ progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 14
-  completed_plans: 11
-  percent: 50
+  completed_plans: 12
+  percent: 57
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 ## Current Status
 
 - Roadmap: created
-- Active phase: Phase 3 — student records UI (Plan 02 complete 2026-06-13)
-- Last action: Phase 3 Plan 02 — Award + WorkExperience Prisma models, Zod schemas, IDOR-guarded services, nested routes mounted in students.ts, RED tests for STU-05+STU-06
+- Active phase: Phase 3 — student records UI (Plan 02b complete 2026-06-13)
+- Last action: Phase 3 Plan 02b — AwardsSection (AwardLevel Badge mapping) + WorkExperienceSection (period formatting + Ongoing checkbox), both added to StudentDetailPage in D-02 order
 
 ## Phase History
 
@@ -44,6 +44,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | 03-student-records-ui | 01 (server-academics-activities) | AcademicResult + Activity Prisma models, Zod schemas, IDOR-guarded services, nested routes mounted in students.ts, RED tests for STU-03+STU-04 | 2026-06-13 |
 | 03-student-records-ui | 01b (client-academics-activities) | TanStack Query + QueryClientProvider; RecordSectionCard/MonthYearPicker/RecordDeleteDialog/periodFormat; AcademicResultsSection + ActivitiesSection; StudentDetailPage placeholder replaced | 2026-06-13 |
 | 03-student-records-ui | 02 (server-awards-workexperience) | Award + WorkExperience Prisma models, Zod schemas, IDOR-guarded services, nested routes mounted in students.ts, RED tests for STU-05+STU-06 | 2026-06-13 |
+| 03-student-records-ui | 02b (client-awards-workexperience) | AwardsSection (AwardLevel Badge: SCHOOL=secondary/REGIONAL=outline/STATE,NATIONAL,INTERNATIONAL=default) + WorkExperienceSection (formatPeriod, Ongoing checkbox), both added to StudentDetailPage | 2026-06-13 |
 
 ---
 
@@ -82,7 +83,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 ---
 *State initialised: 2026-06-11*
-*Last updated: 2026-06-13 after Phase 3 Plan 02 — awards + work experience server slice complete*
+*Last updated: 2026-06-13 after Phase 3 Plan 02b — AwardsSection + WorkExperienceSection client slice complete*
 
 ## Performance Metrics
 
@@ -94,6 +95,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | Phase 03-student-records-ui P01 | 18min | 2 tasks | 10 files |
 | Phase 03-student-records-ui P01b | 18min | 2 tasks | 10 files |
 | Phase 03-student-records-ui P02 | 15min | 2 tasks | 10 files |
+| Phase 03-student-records-ui P02b | 8min | 1 task | 3 files |
 
 ## Decisions
 
