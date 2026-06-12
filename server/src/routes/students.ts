@@ -13,6 +13,7 @@ import {
   getStudentById,
   listStudents,
   restoreStudent,
+  StudentAlreadyActiveError,
   StudentArchivedError,
   StudentNotFoundError,
   updateStudent,
@@ -27,6 +28,10 @@ function handleStudentError(err: unknown, res: import('express').Response, next:
   }
   if (err instanceof StudentArchivedError) {
     res.status(409).json({ error: 'Student is archived' })
+    return
+  }
+  if (err instanceof StudentAlreadyActiveError) {
+    res.status(409).json({ error: 'Student is not archived' })
     return
   }
   next(err)

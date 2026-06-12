@@ -24,6 +24,13 @@ export class StudentArchivedError extends Error {
   }
 }
 
+export class StudentAlreadyActiveError extends Error {
+  constructor() {
+    super('Student is not archived')
+    this.name = 'StudentAlreadyActiveError'
+  }
+}
+
 export async function createStudent(
   prisma: InstanceType<typeof PrismaClient>,
   data: CreateStudentInput,
@@ -191,7 +198,7 @@ export async function restoreStudent(
     throw new StudentNotFoundError()
   }
   if (!existing.archivedAt) {
-    throw new StudentArchivedError()
+    throw new StudentAlreadyActiveError()
   }
 
   const student = await prisma.student.update({
