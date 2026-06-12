@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 ## Current Status
 
 - Roadmap: created
-- Active phase: Phase 3 — student records UI (Plan 02b complete 2026-06-13)
-- Last action: Phase 3 Plan 02b — AwardsSection (AwardLevel Badge mapping) + WorkExperienceSection (period formatting + Ongoing checkbox), both added to StudentDetailPage in D-02 order
+- Active phase: Phase 3 — student records UI (Plan 03a complete 2026-06-13)
+- Last action: Phase 3 Plan 03a — CareerGoal + StaffNote backend (versioned POST-only D-16, append-only D-17); RED tests for stu-07 and stu-08
 
 ## Phase History
 
@@ -46,9 +46,9 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | 03-student-records-ui | 02 (server-awards-workexperience) | Award + WorkExperience Prisma models, Zod schemas, IDOR-guarded services, nested routes mounted in students.ts, RED tests for STU-05+STU-06 | 2026-06-13 |
 | 03-student-records-ui | 02b (client-awards-workexperience) | AwardsSection (AwardLevel Badge: SCHOOL=secondary/REGIONAL=outline/STATE,NATIONAL,INTERNATIONAL=default) + WorkExperienceSection (formatPeriod, Ongoing checkbox), both added to StudentDetailPage | 2026-06-13 |
 
----
+|| 03-student-records-ui | 03a (server-careergoals-staffnotes) | CareerGoal + StaffNote Prisma models (no updatedAt, D-16/D-17), Zod schemas, list+create-only services, GET+POST-only routes mounted; RED tests stu-07+stu-08 | 2026-06-13 |
 
-## Accumulated Context
+---
 
 ### Key Decisions
 
@@ -114,3 +114,8 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 - [Phase 03-01b]: PRESET_SUBJECTS defined client-side as const array mirroring server Zod schema — not shared import
 - [Phase 03-02]: clearDb() uses (prisma as any)?.deleteMany() stubs in Task 1 RED phase so test setup doesn't throw before prisma generate; replaced with typed calls after Task 2
 - [Phase 03-02]: updateAwardSchema and updateWorkExperienceSchema are explicit partial .strict() objects (not .partial() on create schema) — consistent with updateActivitySchema pattern from 03-01
+| Phase 03-student-records-ui P03a | 15min | 2 tasks | 10 files |
+
+- [Phase 03-03a]: CareerGoal and StaffNote models have no updatedAt field -- immutability signal for maintainers (D-16/D-17)
+- [Phase 03-03a]: Route omission (no PATCH/DELETE on careerGoals/notes routers) is the enforcement mechanism for D-16 and D-17
+- [Phase 03-03a]: @ts-expect-error stubs used for staffNote/careerGoal in Task 1 testDb (models not yet in client); replaced with real calls after prisma generate

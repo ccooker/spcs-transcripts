@@ -102,7 +102,7 @@ Plans:
 
 **Wave 3** *(blocked on 03-02 completion)*
 
-- [ ] 03-03a-PLAN.md — Career Goals & Staff Notes server slice: CareerGoal + StaffNote schema models (POST-only / append-only per D-16/D-17), Zod schemas, services (list+create only), routes (GET+POST only), RED tests (stu-07, stu-08 including enforcement tests)
+- [x] 03-03a-PLAN.md — Career Goals & Staff Notes server slice: CareerGoal + StaffNote schema models (POST-only / append-only per D-16/D-17), Zod schemas, services (list+create only), routes (GET+POST only), RED tests (stu-07, stu-08 including enforcement tests)
 
 **Wave 4** *(blocked on 03-03a + 03-02b completion)*
 
