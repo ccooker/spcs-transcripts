@@ -86,7 +86,22 @@ Plans:
 4. Staff can add timestamped notes to a student record; each note is attributed to the entering staff member and the full history is visible.
 5. All six record types are accessible from a single student profile page without navigating away.
 
-**Plans:** TBD
+**Plans:** 3 plans
+
+Plans:
+
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Academics & Activities vertical slice: schema models + Prisma generate, Zod schemas, services (IDOR guard + audit), routes, RED tests (stu-03, stu-04), @tanstack/react-query + QueryClientProvider, RecordSectionCard + MonthYearPicker + RecordDeleteDialog + periodFormat, AcademicResultsSection + ActivitiesSection, StudentDetailPage placeholder replaced
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 03-02-PLAN.md — Awards & Work Experience vertical slice: Award + WorkExperience schema models, Zod schemas, services, routes, RED tests (stu-05, stu-06), AwardsSection (award level Badge) + WorkExperienceSection, StudentDetailPage updated
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 03-03-PLAN.md — Career Goals & Staff Notes + [BLOCKING] schema push: CareerGoal + StaffNote models, POST-only/append-only services + routes, RED tests (stu-07, stu-08), npx prisma db push (all 6 models deployed), shadcn checkbox/textarea/tooltip/scroll-area, CareerGoalsSection (versioned) + NotesSection (append-only) + CareerInterestsChecklist, all 6 sections on StudentDetailPage, all stu-03 through stu-08 GREEN
+
 **UI hint**: yes
 
 ### Phase 4: Document Management
