@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 02
 status: Executing Phase 02
-last_updated: "2026-06-12T08:51:35.183Z"
+last_updated: "2026-06-12T09:14:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 8
-  completed_plans: 6
-  percent: 20
+  completed_plans: 7
+  percent: 22
 ---
 
 # Project State
@@ -38,6 +38,8 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | 01-infrastructure-auth | 03 (auth) | Express JWT auth stack (HS256 test/RS256 JWKS), resolveUser upsert, requireRole, logAudit, GET /api/auth/me — all 8 tests GREEN | 2026-06-11 |
 | 01-infrastructure-auth | 04 (wire) | MSAL acquireTokenSilent apiFetch client, App.tsx /api/auth/me integration, role-gated HomePage with loading skeleton | 2026-06-11 |
 | 01-infrastructure-auth | 05 (deploy) | PM2 ecosystem.config.js + IIS web.config (ARR proxy + SPA fallback) + 389-line DEPLOYMENT-RUNBOOK.md; Tasks 1+2 committed; Task 3 awaiting checkpoint:human-verify | 2026-06-11 |
+| 02-student-profiles-search | 01 (create) | Student Prisma model, POST /api/students, /students/new form, AppShell — stu-01 tests GREEN | 2026-06-12 |
+| 02-student-profiles-search | 02 (detail) | GET/PATCH/DELETE/restore API, StudentDetailPage, ArchiveStudentDialog — stu-02 tests GREEN | 2026-06-12 |
 
 ---
 
@@ -76,15 +78,19 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 ---
 *State initialised: 2026-06-11*
-*Last updated: 2026-06-12 after Phase 2 discuss-phase — context captured in 02-CONTEXT.md*
+*Last updated: 2026-06-12 after Phase 2 Plan 02 — view/edit/archive/restore complete*
 
 ## Performance Metrics
 
 | Phase | Plan | Duration | Notes |
 |-------|------|----------|-------|
 | Phase 02-student-profiles-search P01 | 28min | 3 tasks | 31 files |
+| Phase 02-student-profiles-search P02 | 22min | 3 tasks | 7 files |
 
 ## Decisions
 
 - [Phase 02-01]: Student Prisma schema in RED test commit for testDb FK order — prisma.student.deleteMany requires generated client before route 404 RED
 - [Phase 02-01]: Manual shadcn UI primitives when CLI overwrite prompt blocked install — npx shadcn add hung on existing button.tsx
+- [Phase 02-02]: Manual alert-dialog when shadcn CLI blocked — @radix-ui/react-alert-dialog pre-installed; matches plan 01 pattern
+- [Phase 02-02]: PATCH returns 409 on archived students — GET :id still returns archived records for admin detail view
+- [Phase 02-02]: StudentForm edit mode keeps schoolStudentId read-only — updateStudentSchema omits ID from PATCH body

@@ -55,15 +55,16 @@ Plans:
 4. Staff can filter the student list by year level and by transcript status (Draft / Finalised / None).
 5. Staff can view a cohort overview table showing all students with per-student status indicators at a glance.
 
-**Plans:** 1/3 plans executed
-Plans:
+**Plans:** 2/3 plans executed
+
+Plans:
 **Wave 1**
 
 - [x] 02-01-PLAN.md — Create student vertical slice: schema, POST API, shadcn prep, /students/new UI
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 02-02-PLAN.md — View/edit/archive/restore: detail page, PATCH/DELETE/restore API, archive dialog
+- [x] 02-02-PLAN.md — View/edit/archive/restore: detail page, PATCH/DELETE/restore API, archive dialog
 
 **Wave 3** *(blocked on Wave 2 completion)*
 

@@ -14,7 +14,7 @@
 ### Student Records
 
 - [x] **STU-01**: Staff can create a student profile (name, year level, contact details)
-- [ ] **STU-02**: Staff can view, edit, and delete student profiles
+- [x] **STU-02**: Staff can view, edit, and delete student profiles
 - [ ] **STU-03**: Staff can add, edit, and delete academic results per student (subject, grade, year, optional notes)
 - [ ] **STU-04**: Staff can add, edit, and delete extracurricular activity entries per student (organisation, role, start and end dates, description)
 - [ ] **STU-05**: Staff can add, edit, and delete award and achievement entries per student (title, issuer, date, level — school/regional/state/national, description)
@@ -94,7 +94,7 @@
 | AUTH-02 | Phase 1: Infrastructure & Auth | Pending |
 | AUTH-03 | Phase 1: Infrastructure & Auth | Complete |
 | STU-01 | Phase 2: Student Profiles & Search | Complete |
-| STU-02 | Phase 2: Student Profiles & Search | Pending |
+| STU-02 | Phase 2: Student Profiles & Search | Complete |
 | STU-03 | Phase 3: Student Records UI | Pending |
 | STU-04 | Phase 3: Student Records UI | Pending |
 | STU-05 | Phase 3: Student Records UI | Pending |
