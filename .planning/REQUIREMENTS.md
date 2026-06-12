@@ -9,11 +9,11 @@
 
 - [ ] **AUTH-01**: Staff can log in using their Microsoft school account (Entra ID / Azure AD SSO)
 - [ ] **AUTH-02**: System enforces two roles — Admin (manage templates, delete records, manage users) and Staff (create and edit records, generate transcripts)
-- [ ] **AUTH-03**: All record create, update, and delete operations are logged with the acting user, the affected record, the action, and a timestamp
+- [x] **AUTH-03**: All record create, update, and delete operations are logged with the acting user, the affected record, the action, and a timestamp
 
 ### Student Records
 
-- [ ] **STU-01**: Staff can create a student profile (name, year level, contact details)
+- [x] **STU-01**: Staff can create a student profile (name, year level, contact details)
 - [ ] **STU-02**: Staff can view, edit, and delete student profiles
 - [ ] **STU-03**: Staff can add, edit, and delete academic results per student (subject, grade, year, optional notes)
 - [ ] **STU-04**: Staff can add, edit, and delete extracurricular activity entries per student (organisation, role, start and end dates, description)
@@ -92,8 +92,8 @@
 |-------------|-------|--------|
 | AUTH-01 | Phase 1: Infrastructure & Auth | Pending |
 | AUTH-02 | Phase 1: Infrastructure & Auth | Pending |
-| AUTH-03 | Phase 1: Infrastructure & Auth | Pending |
-| STU-01 | Phase 2: Student Profiles & Search | Pending |
+| AUTH-03 | Phase 1: Infrastructure & Auth | Complete |
+| STU-01 | Phase 2: Student Profiles & Search | Complete |
 | STU-02 | Phase 2: Student Profiles & Search | Pending |
 | STU-03 | Phase 3: Student Records UI | Pending |
 | STU-04 | Phase 3: Student Records UI | Pending |
@@ -113,6 +113,7 @@
 | NAV-03 | Phase 2: Student Profiles & Search | Pending |
 
 **Coverage:**
+
 - v1 requirements: 21 total
 - Mapped to phases: 21 ✓
 - Unmapped: 0 ✓

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 02
-status: Ready to execute
-last_updated: "2026-06-12T08:47:13.867Z"
+status: Executing Phase 02
+last_updated: "2026-06-12T08:51:35.183Z"
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 8
-  completed_plans: 5
+  completed_plans: 6
   percent: 20
 ---
 
@@ -77,3 +77,14 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 ---
 *State initialised: 2026-06-11*
 *Last updated: 2026-06-12 after Phase 2 discuss-phase — context captured in 02-CONTEXT.md*
+
+## Performance Metrics
+
+| Phase | Plan | Duration | Notes |
+|-------|------|----------|-------|
+| Phase 02-student-profiles-search P01 | 28min | 3 tasks | 31 files |
+
+## Decisions
+
+- [Phase 02-01]: Student Prisma schema in RED test commit for testDb FK order — prisma.student.deleteMany requires generated client before route 404 RED
+- [Phase 02-01]: Manual shadcn UI primitives when CLI overwrite prompt blocked install — npx shadcn add hung on existing button.tsx
