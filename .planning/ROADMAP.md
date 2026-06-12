@@ -10,7 +10,7 @@
 
 - [ ] **Phase 1: Infrastructure & Auth** — Microsoft Entra ID SSO, role-based access, audit logging, on-premise deployment
 - [x] **Phase 2: Student Profiles & Search** — Student directory CRUD, name search, year/status filtering, cohort overview (completed 2026-06-12)
-- [ ] **Phase 3: Student Records UI** — All six record types: academics, activities, awards, work experience, career goals, notes
+- [x] **Phase 3: Student Records UI** — All six record types: academics, activities, awards, work experience, career goals, notes (completed 2026-06-13)
 - [ ] **Phase 4: Document Management** — PDF upload, secure storage, document listing/download/soft-delete, type tagging
 - [ ] **Phase 5: Transcript Assembly & Export** — Narrative template, draft/finalised status, school-branded PDF export
 
@@ -106,7 +106,7 @@ Plans:
 
 **Wave 4** *(blocked on 03-03a + 03-02b completion)*
 
-- [ ] 03-03b-PLAN.md — DB push + client completion: [BLOCKING] npx prisma db push (all 6 models deployed), shadcn checkbox/textarea/tooltip/scroll-area, CareerGoalsSection (versioned) + NotesSection (append-only) + CareerInterestsChecklist, all 6 sections on StudentDetailPage in D-02 order, textarea upgrades in ActivitiesSection/AwardsSection/WorkExperienceSection, all stu-03 through stu-08 GREEN
+- [x] 03-03b-PLAN.md — DB push + client completion: [BLOCKING] npx prisma db push (all 6 models deployed), shadcn checkbox/textarea/tooltip/scroll-area, CareerGoalsSection (versioned) + NotesSection (append-only) + CareerInterestsChecklist, all 6 sections on StudentDetailPage in D-02 order, textarea upgrades in ActivitiesSection/AwardsSection/WorkExperienceSection, all stu-03 through stu-08 GREEN
 
 **UI hint**: yes
 

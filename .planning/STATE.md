@@ -9,8 +9,8 @@ progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 14
-  completed_plans: 12
-  percent: 57
+  completed_plans: 14
+  percent: 86
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 ## Current Status
 
 - Roadmap: created
-- Active phase: Phase 3 — student records UI (Plan 03a complete 2026-06-13)
-- Last action: Phase 3 Plan 03a — CareerGoal + StaffNote backend (versioned POST-only D-16, append-only D-17); RED tests for stu-07 and stu-08
+- Active phase: Phase 3 — student records UI (ALL plans complete 2026-06-13)
+- Last action: Phase 3 Plan 03b — DB push + CareerGoalsSection + NotesSection + CareerInterestsChecklist + StudentDetailPage complete; all 62 tests GREEN
 
 ## Phase History
 
@@ -47,6 +47,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | 03-student-records-ui | 02b (client-awards-workexperience) | AwardsSection (AwardLevel Badge: SCHOOL=secondary/REGIONAL=outline/STATE,NATIONAL,INTERNATIONAL=default) + WorkExperienceSection (formatPeriod, Ongoing checkbox), both added to StudentDetailPage | 2026-06-13 |
 
 || 03-student-records-ui | 03a (server-careergoals-staffnotes) | CareerGoal + StaffNote Prisma models (no updatedAt, D-16/D-17), Zod schemas, list+create-only services, GET+POST-only routes mounted; RED tests stu-07+stu-08 | 2026-06-13 |
+|| 03-student-records-ui | 03b (db-push+client-complete) | DB push (all 6 tables live in PostgreSQL); shadcn checkbox/textarea/tooltip/scroll-area installed; CareerGoalsSection (versioned POST-only, D-16) + NotesSection (append-only, D-17) + CareerInterestsChecklist (12-item grid, D-14); StudentDetailPage complete with all 6 sections in D-02 order; all 62 integration tests GREEN | 2026-06-13 |
 
 ---
 
@@ -115,7 +116,11 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 - [Phase 03-02]: clearDb() uses (prisma as any)?.deleteMany() stubs in Task 1 RED phase so test setup doesn't throw before prisma generate; replaced with typed calls after Task 2
 - [Phase 03-02]: updateAwardSchema and updateWorkExperienceSchema are explicit partial .strict() objects (not .partial() on create schema) — consistent with updateActivitySchema pattern from 03-01
 | Phase 03-student-records-ui P03a | 15min | 2 tasks | 10 files |
+| Phase 03-student-records-ui P03b | ~35min | 3 tasks | 18 files |
 
 - [Phase 03-03a]: CareerGoal and StaffNote models have no updatedAt field -- immutability signal for maintainers (D-16/D-17)
 - [Phase 03-03a]: Route omission (no PATCH/DELETE on careerGoals/notes routers) is the enforcement mechanism for D-16 and D-17
 - [Phase 03-03a]: @ts-expect-error stubs used for staffNote/careerGoal in Task 1 testDb (models not yet in client); replaced with real calls after prisma generate
+- [Phase 03-03b]: stu-04-ongoing-sort test had schoolStudentId in activity POST body (copy-paste typo); strict schema rejected it; fixed by removing the extra field
+- [Phase 03-03b]: PostgreSQL port not exposed to host by default; docker-compose.override.yml + server/.env password fix needed for local test run (user approved)
+- [Phase 03-03b]: CareerInterestsChecklist uses fieldset+legend for accessibility; 12 items, min-h-[44px] per row (D-14)
