@@ -95,7 +95,7 @@ Scroll-area optional — for long version history lists.
 
 **Version history entry:** timestamp + author at `text-sm text-muted-foreground`; description body at `text-sm font-normal`.
 
-**Note attribution line:** `text-xs text-muted-foreground` (12px acceptable here — ultra-compact metadata, not primary reading content).
+**Note attribution line:** `text-sm text-muted-foreground` (14px Label role — muted color provides sufficient visual de-emphasis without adding a 5th font size).
 
 ---
 
@@ -281,7 +281,7 @@ Title: "Add academic result" / "Edit academic result"
 | Form level | Yes | `Select` | Form 1–6 |
 | Notes | No | `Input` | Placeholder "Optional — short note"; `maxLength={200}` |
 
-Dialog footer: `Button variant="outline"` "Cancel" + `Button variant="default"` "Save result" / "Add result"
+Dialog footer: `Button variant="outline"` "Discard" + `Button variant="default"` "Save result" / "Add result"
 
 ---
 
@@ -310,7 +310,7 @@ Title: "Add activity" / "Edit activity"
 | Start month | Yes | `MonthYearPicker` | Month + Year side-by-side Selects |
 | End month | No | `MonthYearPicker` | Empty = "Present"; display "Leave blank if ongoing" as hint |
 
-Dialog footer: "Cancel" + "Save activity" / "Add activity"
+Dialog footer: "Discard" + "Save activity" / "Add activity"
 
 ---
 
@@ -340,7 +340,7 @@ Title: "Add award" / "Edit award"
 | Level | Yes | `Select` | Options: School, Regional, State, National, International |
 | Description | No | `Textarea` | Placeholder "Brief description"; `maxLength={500}`; `min-h-[80px]` |
 
-Dialog footer: "Cancel" + "Save award" / "Add award"
+Dialog footer: "Discard" + "Save award" / "Add award"
 
 ---
 
@@ -369,7 +369,7 @@ Title: "Add work experience" / "Edit work experience"
 | Start month | Yes | `MonthYearPicker` | |
 | End month | No | `MonthYearPicker` | Empty = "Present" |
 
-Dialog footer: "Cancel" + "Save work experience" / "Add work experience"
+Dialog footer: "Discard" + "Save work experience" / "Add work experience"
 
 ---
 
@@ -417,7 +417,7 @@ Title: "Update career goals" (always — creates a new version)
 
 Pre-populate from current version when editing — makes updating a version feel like "editing" while creating a new one underneath.
 
-Dialog footer: "Cancel" + "Save career goals"
+Dialog footer: "Discard" + "Save career goals"
 
 ---
 
@@ -432,7 +432,7 @@ The Notes section uses an **append-only inline input** pattern (D-17 to D-20). N
 │                                                                        │
 │  ┌─ Add a note ─────────────────────────────────────────────────────┐ │
 │  │  [Textarea placeholder "Add a note about this student…"]         │ │
-│  │                                    [Cancel]  [ Add note ]        │ │
+│  │                                    [Clear]   [ Add note ]        │ │
 │  └──────────────────────────────────────────────────────────────────┘ │
 │                                                                        │
 │  ── Ms Chan · 12 Jun 2026, 2:14 PM ──────────────────────────────── │
@@ -449,12 +449,12 @@ The Notes section uses an **append-only inline input** pattern (D-17 to D-20). N
 
 **Textarea behaviour:**
 - Controlled; character count hint: `{count}/500` at bottom-right of textarea as `text-xs text-muted-foreground`
-- "Cancel" (`Button variant="ghost"`) clears textarea without submitting
+- "Clear" (`Button variant="ghost"`) clears textarea without submitting
 - "Add note" (`Button variant="default"`) submits; disabled when textarea empty or over 500 chars
 - On submit: POST API → sonner toast "Note added" → refetch notes list
 
 **Note display (newest first — D-18):**
-- Attribution line: `{displayName} · {formatted datetime}` as `text-xs text-muted-foreground`
+- Attribution line: `{displayName} · {formatted datetime}` as `text-sm text-muted-foreground`
 - Content: `text-sm font-normal leading-relaxed`
 - Separator between notes (`<Separator />` or `border-b border-border`)
 - No edit or delete controls — append-only (D-17)
@@ -578,7 +578,7 @@ Each section card independently handles API errors:
 | Work experience | "Add work experience" | "Edit work experience" | "Add work experience" | "Save work experience" |
 | Career goals | "Update career goals" | — (always new version) | "Save career goals" | — |
 
-All dialog cancel buttons: `Button variant="outline"` label **"Cancel"**.
+All Add/Edit dialog dismiss buttons: `Button variant="outline"` label **"Discard"** (data would be lost on close). Notes inline dismiss: `Button variant="ghost"` label **"Clear"** (clears textarea content). The delete AlertDialog dismiss uses **"Keep entry"** (already set — do not change).
 
 ### Mutation Toasts (Sonner)
 
