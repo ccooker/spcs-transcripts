@@ -1,7 +1,11 @@
 import { PrismaClient } from '../generated/prisma/client.js'
 import { logAudit } from './audit.js'
 import type { z } from 'zod'
-import type { createStudentSchema, updateStudentSchema } from '../schemas/student.js'
+import type {
+  createStudentSchema,
+  ListStudentsQuery,
+  updateStudentSchema,
+} from '../schemas/student.js'
 
 type CreateStudentInput = z.infer<typeof createStudentSchema>
 type UpdateStudentInput = z.infer<typeof updateStudentSchema>
@@ -46,6 +50,49 @@ export async function createStudent(
   })
 
   return student
+}
+
+function buildListOrderBy(sort: ListStudentsQuery['sort'], order: ListStudentsQuery['order']) {
+  if (sort === 'formLevel') {
+    return [{ formLevel: order }, { fullName: 'asc' as const }]
+  }
+  return { [sort]: order }
+}
+
+export async function listStudents(
+  prisma: InstanceType<typeof PrismaClient>,
+  query: ListStudentsQuery,
+) {
+  const { q, formLevel, transcriptStatus, page, pageSize, sort, order, includeArchived } = query
+
+  const where = {
+    ...(includeArchived ? {} : { archivedAt: null }),
+    ...(q ? { fullName: { contains: q, mode: 'insensitive' as const } } : {}),
+    ...(formLevel ? { formLevel } : {}),
+    ...(transcriptStatus ? { transcriptStatus } : {}),
+  }
+
+  const skip = (page - 1) * pageSize
+
+  const [data, total] = await prisma.$transaction([
+    prisma.student.findMany({
+      where,
+      orderBy: buildListOrderBy(sort, order),
+      skip,
+      take: pageSize,
+    }),
+    prisma.student.count({ where }),
+  ])
+
+  return {
+    data,
+    meta: {
+      page,
+      pageSize,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / pageSize)),
+    },
+  }
 }
 
 export async function getStudentById(

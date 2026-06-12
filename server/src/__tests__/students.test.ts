@@ -449,7 +449,7 @@ describe('GET /api/students', () => {
 
     expect(res.status).toBe(200)
     const names = res.body.data.map((row: { fullName: string }) => row.fullName)
-    const sorted = [...names].sort((a, b) => a.localeCompare(b))
+    const sorted = [...names].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
     expect(names).toEqual(sorted)
   })
 })

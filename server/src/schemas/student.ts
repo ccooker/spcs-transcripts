@@ -23,3 +23,30 @@ export const createStudentSchema = z
   .strict()
 
 export const updateStudentSchema = createStudentSchema.partial().omit({ schoolStudentId: true })
+
+export const TRANSCRIPT_STATUSES = ['DRAFT', 'FINALISED', 'NONE'] as const
+
+export const LIST_SORT_COLUMNS = [
+  'fullName',
+  'formLevel',
+  'graduationYear',
+  'transcriptStatus',
+] as const
+
+export const listStudentsQuerySchema = z.object({
+  q: z.string().trim().min(1).optional(),
+  formLevel: z.enum(FORM_LEVELS).optional(),
+  transcriptStatus: z.enum(TRANSCRIPT_STATUSES).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(50),
+  sort: z.enum(LIST_SORT_COLUMNS).default('formLevel'),
+  order: z.enum(['asc', 'desc']).default('asc'),
+  includeArchived: z
+    .enum(['true', 'false'])
+    .optional()
+    .transform((v) => v === 'true')
+    .pipe(z.boolean())
+    .default(false),
+})
+
+export type ListStudentsQuery = z.infer<typeof listStudentsQuerySchema>

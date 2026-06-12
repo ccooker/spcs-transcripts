@@ -2,11 +2,16 @@ import { Router } from 'express'
 import { Prisma, Role } from '../generated/prisma/client.js'
 import { prisma } from '../lib/prisma.js'
 import { requireRole } from '../middleware/requireRole.js'
-import { createStudentSchema, updateStudentSchema } from '../schemas/student.js'
+import {
+  createStudentSchema,
+  listStudentsQuerySchema,
+  updateStudentSchema,
+} from '../schemas/student.js'
 import {
   archiveStudent,
   createStudent,
   getStudentById,
+  listStudents,
   restoreStudent,
   StudentArchivedError,
   StudentNotFoundError,
@@ -26,6 +31,26 @@ function handleStudentError(err: unknown, res: import('express').Response, next:
   }
   next(err)
 }
+
+router.get('/', async (req, res, next) => {
+  try {
+    const parsed = listStudentsQuerySchema.safeParse(req.query)
+    if (!parsed.success) {
+      res.status(400).json({ error: 'Invalid query parameters' })
+      return
+    }
+
+    if (parsed.data.includeArchived && req.user!.role !== Role.ADMIN) {
+      res.status(403).json({ error: 'Forbidden' })
+      return
+    }
+
+    const result = await listStudents(prisma, parsed.data)
+    res.json(result)
+  } catch (err) {
+    next(err)
+  }
+})
 
 router.get('/:id', async (req, res, next) => {
   try {
