@@ -63,7 +63,9 @@ model User {
   role        Role       @default(STAFF)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  auditLogs   AuditLog[] @relation("ActingUser")
+  auditLogs            AuditLog[]   @relation("ActingUser")
+  careerGoalsAuthored  CareerGoal[] @relation("CareerGoalAuthor")
+  staffNotesAuthored   StaffNote[]  @relation("StaffNoteAuthor")
 }
 
 model AuditLog {
@@ -100,6 +102,8 @@ model Student {
   activities       Activity[]
   awards           Award[]
   workExperiences  WorkExperience[]
+  careerGoals      CareerGoal[]
+  staffNotes       StaffNote[]
 
   @@index([fullName])
   @@index([formLevel, archivedAt])
@@ -173,4 +177,29 @@ model WorkExperience {
   updatedAt   DateTime @updatedAt
 
   @@index([studentId])
+}
+
+model CareerGoal {
+  id          String           @id @default(uuid())
+  studentId   String
+  student     Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  interests   CareerInterest[]
+  description String?          @db.VarChar(500)
+  authorId    String
+  author      User             @relation("CareerGoalAuthor", fields: [authorId], references: [id])
+  createdAt   DateTime         @default(now())
+
+  @@index([studentId, createdAt(sort: Desc)])
+}
+
+model StaffNote {
+  id        String   @id @default(uuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  content   String   @db.VarChar(500)
+  authorId  String
+  author    User     @relation("StaffNoteAuthor", fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([studentId, createdAt(sort: Desc)])
 }

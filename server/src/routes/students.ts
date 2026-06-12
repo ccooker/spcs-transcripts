@@ -156,10 +156,14 @@ import academicResultsRouter from './academicResults.js'
 import activitiesRouter from './activities.js'
 import awardsRouter from './awards.js'
 import workExperienceRouter from './workExperience.js'
+import careerGoalsRouter from './careerGoals.js'
+import notesRouter from './notes.js'
 
 router.use('/:studentId/academics', academicResultsRouter)
 router.use('/:studentId/activities', activitiesRouter)
 router.use('/:studentId/awards', awardsRouter)
 router.use('/:studentId/work-experience', workExperienceRouter)
+router.use('/:studentId/career-goals', careerGoalsRouter)
+router.use('/:studentId/notes', notesRouter)
 
 export default router
