@@ -1306,22 +1306,18 @@ const history = versions.slice(1)
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Prisma 7 enum array migration output**
+1. **Prisma 7 enum array migration output** — RESOLVED
    - What we know: Prisma supports `Type[]` for PostgreSQL arrays; `CareerInterest[]` is valid schema syntax
-   - What's unclear: Whether `prisma migrate diff` generates the correct `CREATE TYPE ... AS ENUM` + `"interests" "_CareerInterest" NOT NULL DEFAULT ARRAY[]::_CareerInterest[]` SQL in Prisma 7
-   - Recommendation: Planner should include a Wave 0 task to generate and inspect the migration SQL before writing service code; if array type is wrong, fall back to `String[] @db.Text[]` with app-level enum validation
+   - What was unclear: Whether `prisma migrate diff` generates the correct `CREATE TYPE ... AS ENUM` + `"interests" "_CareerInterest"[]` SQL in Prisma 7
+   - **Resolution:** If `prisma migrate diff` array output is incorrect for `CareerInterest[]` enum array, fall back to `String[] @db.Text[]` with app-level enum validation at the route layer. Plan 03-03 Task 2 (schema push) will inspect the generated migration SQL output before pushing and apply the `String[]` fallback if the array type column is malformed. The `db push` is the authoritative apply step regardless.
 
-2. **Subject "OTHER" sentinel — display in table**
-   - What we know: UI-SPEC column says `"Preset value or free-text 'Other: {value}'"` — implies the table cell shows "Other: Physics A-Level" format
-   - What's unclear: Whether to show `subjectOther` directly or prefix it with "Other: "
-   - Recommendation: In the AcademicResultsSection table column, render `subject === 'OTHER' ? subjectOther : subject` — no "Other: " prefix needed since the full subject name is in `subjectOther`
+2. **Subject "OTHER" sentinel — display in table** — RESOLVED
+   - **Resolution:** In the AcademicResultsSection table Subject column, render `result.subject === 'OTHER' ? result.subjectOther : result.subject` — no "Other: " prefix needed since the full subject name is stored in `subjectOther`. The conditional Input reveal (show when `watch('subject') === 'OTHER'`) is implemented per D-08 as a `show={subject === 'Other'}` conditional `FormField` below the subject Select in the dialog.
 
-3. **Career Goals version count in section header**
-   - What we know: D-05 says count appears in header; UI-SPEC shows "Career goals" without a count
-   - What's unclear: Should the count be the number of versions, or always show blank/no-count since there's no "number of entries" concept?
-   - Recommendation: Show count as total number of versions (including current). "Career goals (3)" means 3 versions exist. Staff can then tell at a glance that there's a history.
+3. **Career Goals version count in section header** — RESOLVED
+   - **Resolution:** Show count as total number of versions (including current), per D-05. "Career goals (3)" means 3 versions exist. Staff can tell at a glance that a history exists. The most recent version content is displayed in the card body; version count shown in parenthesis in the section header.
 
 ---
 
