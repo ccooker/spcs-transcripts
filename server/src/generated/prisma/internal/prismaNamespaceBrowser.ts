@@ -53,7 +53,9 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   AuditLog: 'AuditLog',
-  Student: 'Student'
+  Student: 'Student',
+  AcademicResult: 'AcademicResult',
+  Activity: 'Activity'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -114,6 +116,39 @@ export const StudentScalarFieldEnum = {
 } as const
 
 export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeof StudentScalarFieldEnum]
+
+
+export const AcademicResultScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  subject: 'subject',
+  subjectOther: 'subjectOther',
+  grade: 'grade',
+  calendarYear: 'calendarYear',
+  formLevel: 'formLevel',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AcademicResultScalarFieldEnum = (typeof AcademicResultScalarFieldEnum)[keyof typeof AcademicResultScalarFieldEnum]
+
+
+export const ActivityScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  organisation: 'organisation',
+  role: 'role',
+  description: 'description',
+  startMonth: 'startMonth',
+  startYear: 'startYear',
+  endMonth: 'endMonth',
+  endYear: 'endYear',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ActivityScalarFieldEnum = (typeof ActivityScalarFieldEnum)[keyof typeof ActivityScalarFieldEnum]
 
 
 export const SortOrder = {

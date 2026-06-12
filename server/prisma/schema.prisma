@@ -33,6 +33,29 @@ enum TranscriptStatus {
   NONE
 }
 
+enum AwardLevel {
+  SCHOOL
+  REGIONAL
+  STATE
+  NATIONAL
+  INTERNATIONAL
+}
+
+enum CareerInterest {
+  MEDICINE_HEALTH
+  LAW
+  ENGINEERING
+  BUSINESS_FINANCE
+  EDUCATION
+  ARTS_DESIGN
+  SCIENCE_RESEARCH
+  IT_TECHNOLOGY
+  HOSPITALITY
+  SOCIAL_SERVICES
+  SPORTS
+  UNDECIDED
+}
+
 model User {
   id          String     @id @default(uuid())
   email       String     @unique
@@ -73,8 +96,45 @@ model Student {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
+  academicResults AcademicResult[]
+  activities      Activity[]
+
   @@index([fullName])
   @@index([formLevel, archivedAt])
   @@index([transcriptStatus])
   @@index([archivedAt])
+}
+
+model AcademicResult {
+  id           String    @id @default(uuid())
+  studentId    String
+  student      Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subject      String
+  subjectOther String?
+  grade        String    @db.VarChar(20)
+  calendarYear Int
+  formLevel    FormLevel
+  notes        String?   @db.VarChar(200)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([studentId])
+  @@index([studentId, calendarYear(sort: Desc)])
+}
+
+model Activity {
+  id           String   @id @default(uuid())
+  studentId    String
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  organisation String
+  role         String
+  description  String?  @db.VarChar(500)
+  startMonth   Int
+  startYear    Int
+  endMonth     Int?
+  endYear      Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([studentId])
 }

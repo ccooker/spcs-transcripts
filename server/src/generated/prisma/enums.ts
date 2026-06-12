@@ -45,3 +45,32 @@ export const TranscriptStatus = {
 } as const
 
 export type TranscriptStatus = (typeof TranscriptStatus)[keyof typeof TranscriptStatus]
+
+
+export const AwardLevel = {
+  SCHOOL: 'SCHOOL',
+  REGIONAL: 'REGIONAL',
+  STATE: 'STATE',
+  NATIONAL: 'NATIONAL',
+  INTERNATIONAL: 'INTERNATIONAL'
+} as const
+
+export type AwardLevel = (typeof AwardLevel)[keyof typeof AwardLevel]
+
+
+export const CareerInterest = {
+  MEDICINE_HEALTH: 'MEDICINE_HEALTH',
+  LAW: 'LAW',
+  ENGINEERING: 'ENGINEERING',
+  BUSINESS_FINANCE: 'BUSINESS_FINANCE',
+  EDUCATION: 'EDUCATION',
+  ARTS_DESIGN: 'ARTS_DESIGN',
+  SCIENCE_RESEARCH: 'SCIENCE_RESEARCH',
+  IT_TECHNOLOGY: 'IT_TECHNOLOGY',
+  HOSPITALITY: 'HOSPITALITY',
+  SOCIAL_SERVICES: 'SOCIAL_SERVICES',
+  SPORTS: 'SPORTS',
+  UNDECIDED: 'UNDECIDED'
+} as const
+
+export type CareerInterest = (typeof CareerInterest)[keyof typeof CareerInterest]

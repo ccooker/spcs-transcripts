@@ -23,10 +23,15 @@ import {
 const router = Router()
 
 function parseStudentId(
-  id: string,
+  id: string | string[] | undefined,
   res: import('express').Response,
 ): string | null {
-  const parsed = studentIdParamSchema.safeParse(id)
+  const raw = Array.isArray(id) ? id[0] : id
+  if (!raw) {
+    res.status(404).json({ error: 'Student not found' })
+    return null
+  }
+  const parsed = studentIdParamSchema.safeParse(raw)
   if (!parsed.success) {
     res.status(404).json({ error: 'Student not found' })
     return null
@@ -146,5 +151,11 @@ router.post('/', async (req, res, next) => {
     next(err)
   }
 })
+
+import academicResultsRouter from './academicResults.js'
+import activitiesRouter from './activities.js'
+
+router.use('/:studentId/academics', academicResultsRouter)
+router.use('/:studentId/activities', activitiesRouter)
 
 export default router

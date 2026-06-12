@@ -56,3 +56,13 @@ export type AuditLog = Prisma.AuditLogModel
  * 
  */
 export type Student = Prisma.StudentModel
+/**
+ * Model AcademicResult
+ * 
+ */
+export type AcademicResult = Prisma.AcademicResultModel
+/**
+ * Model Activity
+ * 
+ */
+export type Activity = Prisma.ActivityModel
