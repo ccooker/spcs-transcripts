@@ -92,6 +92,10 @@ router.patch('/:id', async (req, res, next) => {
       res.status(400).json({ error: 'Invalid request body' })
       return
     }
+    if (Object.keys(parsed.data).length === 0) {
+      res.status(400).json({ error: 'No fields to update' })
+      return
+    }
 
     const student = await updateStudent(prisma, id, parsed.data, req.user!.id)
     res.json(student)
