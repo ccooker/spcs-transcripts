@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
@@ -16,6 +17,8 @@ import { UnauthorizedPage } from '@/pages/UnauthorizedPage';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { apiGet, AuthRedirectInProgressError } from '@/api/apiClient';
 import { loginRequest } from '@/auth/msalConfig';
+
+const queryClient = new QueryClient();
 
 export type UserInfo = {
   id: string;
@@ -64,6 +67,7 @@ function App() {
   }
 
   return (
+    <QueryClientProvider client={queryClient}>
     <Routes>
       <Route
         path="/"
@@ -112,6 +116,7 @@ function App() {
       />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
     </Routes>
+    </QueryClientProvider>
   );
 }
 
