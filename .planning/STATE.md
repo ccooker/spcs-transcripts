@@ -9,8 +9,8 @@ progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 14
-  completed_plans: 10
-  percent: 46
+  completed_plans: 11
+  percent: 50
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 ## Current Status
 
 - Roadmap: created
-- Active phase: Phase 3 — student records UI (Plan 01b complete 2026-06-13)
-- Last action: Phase 3 Plan 01b — TanStack Query client, shared RecordSectionCard/MonthYearPicker/RecordDeleteDialog/periodFormat, AcademicResultsSection + ActivitiesSection CRUD UI
+- Active phase: Phase 3 — student records UI (Plan 02 complete 2026-06-13)
+- Last action: Phase 3 Plan 02 — Award + WorkExperience Prisma models, Zod schemas, IDOR-guarded services, nested routes mounted in students.ts, RED tests for STU-05+STU-06
 
 ## Phase History
 
@@ -43,6 +43,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | 02-student-profiles-search | 03 (list) | GET /api/students list API, StudentsListPage, cohort headers — nav-01/02/03 tests GREEN | 2026-06-12 |
 | 03-student-records-ui | 01 (server-academics-activities) | AcademicResult + Activity Prisma models, Zod schemas, IDOR-guarded services, nested routes mounted in students.ts, RED tests for STU-03+STU-04 | 2026-06-13 |
 | 03-student-records-ui | 01b (client-academics-activities) | TanStack Query + QueryClientProvider; RecordSectionCard/MonthYearPicker/RecordDeleteDialog/periodFormat; AcademicResultsSection + ActivitiesSection; StudentDetailPage placeholder replaced | 2026-06-13 |
+| 03-student-records-ui | 02 (server-awards-workexperience) | Award + WorkExperience Prisma models, Zod schemas, IDOR-guarded services, nested routes mounted in students.ts, RED tests for STU-05+STU-06 | 2026-06-13 |
 
 ---
 
@@ -81,7 +82,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 ---
 *State initialised: 2026-06-11*
-*Last updated: 2026-06-13 after Phase 3 Plan 01b — academics + activities client slice complete*
+*Last updated: 2026-06-13 after Phase 3 Plan 02 — awards + work experience server slice complete*
 
 ## Performance Metrics
 
@@ -92,6 +93,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | Phase 02-student-profiles-search P03 | 25min | 3 tasks | 9 files |
 | Phase 03-student-records-ui P01 | 18min | 2 tasks | 10 files |
 | Phase 03-student-records-ui P01b | 18min | 2 tasks | 10 files |
+| Phase 03-student-records-ui P02 | 15min | 2 tasks | 10 files |
 
 ## Decisions
 
@@ -108,3 +110,5 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 - [Phase 03-01b]: shadcn Dialog was absent from Phase 2 install — installed in 03-01b as Rule 3 blocking fix
 - [Phase 03-01b]: Native HTML checkbox used for ActivitiesSection Ongoing flag — shadcn Checkbox deferred to 03-03b
 - [Phase 03-01b]: PRESET_SUBJECTS defined client-side as const array mirroring server Zod schema — not shared import
+- [Phase 03-02]: clearDb() uses (prisma as any)?.deleteMany() stubs in Task 1 RED phase so test setup doesn't throw before prisma generate; replaced with typed calls after Task 2
+- [Phase 03-02]: updateAwardSchema and updateWorkExperienceSchema are explicit partial .strict() objects (not .partial() on create schema) — consistent with updateActivitySchema pattern from 03-01
