@@ -9,7 +9,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LoginPage } from '@/pages/LoginPage';
 import { HomePage } from '@/pages/HomePage';
-import { StudentsPage } from '@/pages/StudentsPage';
+import { StudentsListPage } from '@/pages/StudentsListPage';
 import { StudentNewPage } from '@/pages/StudentNewPage';
 import { StudentDetailPage } from '@/pages/StudentDetailPage';
 import { UnauthorizedPage } from '@/pages/UnauthorizedPage';
@@ -90,7 +90,7 @@ function App() {
         path="/students"
         element={
           <ProtectedRoute>
-            <StudentsPage userInfo={userInfo} />
+            <StudentsListPage userInfo={userInfo} />
           </ProtectedRoute>
         }
       />
