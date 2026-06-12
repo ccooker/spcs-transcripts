@@ -5,6 +5,7 @@ import { validateJwt, resolveUser } from './middleware/auth.js'
 import { requireRole } from './middleware/requireRole.js'
 import { Role } from './generated/prisma/client.js'
 import authRouter from './routes/auth.js'
+import studentsRouter from './routes/students.js'
 
 export const app = express()
 
@@ -19,6 +20,7 @@ app.use('/api', validateJwt)
 app.use('/api', resolveUser)
 
 app.use('/api/auth', authRouter)
+app.use('/api/students', studentsRouter)
 
 // Admin-only test route used by auth-02-admin-route integration test
 app.get('/api/admin/test', requireRole(Role.ADMIN), (_req, res) => res.json({ ok: true }))
