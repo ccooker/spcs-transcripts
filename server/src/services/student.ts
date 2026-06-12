@@ -59,6 +59,10 @@ export async function createStudent(
   return student
 }
 
+function escapeLikePattern(value: string): string {
+  return value.replace(/[%_\\]/g, '\\$&')
+}
+
 function buildListOrderBy(sort: ListStudentsQuery['sort'], order: ListStudentsQuery['order']) {
   if (sort === 'formLevel') {
     return [{ formLevel: order }, { fullName: 'asc' as const }]
@@ -74,7 +78,9 @@ export async function listStudents(
 
   const where = {
     ...(includeArchived ? {} : { archivedAt: null }),
-    ...(q ? { fullName: { contains: q, mode: 'insensitive' as const } } : {}),
+    ...(q
+      ? { fullName: { contains: escapeLikePattern(q), mode: 'insensitive' as const } }
+      : {}),
     ...(formLevel ? { formLevel } : {}),
     ...(transcriptStatus ? { transcriptStatus } : {}),
   }
