@@ -296,3 +296,160 @@ describe('POST /api/students/:id/restore', () => {
     expect(res.status).toBe(403)
   })
 })
+
+async function seedListStudents() {
+  const token = staffToken()
+  await request(app)
+    .get('/api/auth/me')
+    .set('Authorization', `Bearer ${token}`)
+
+  const chan = await createTestStudent({
+    fullName: 'Chan Tai Man',
+    formLevel: 'FORM_4',
+    schoolStudentId: 'S2024101',
+  })
+  const wong = await createTestStudent({
+    fullName: 'Wong Mei Ling',
+    formLevel: 'FORM_1',
+    graduationYear: 2029,
+    schoolStudentId: 'S2024102',
+  })
+  const chanLower = await createTestStudent({
+    fullName: 'chan siu wai',
+    formLevel: 'FORM_4',
+    schoolStudentId: 'S2024103',
+  })
+  const lee = await createTestStudent({
+    fullName: 'Lee Siu Ming',
+    formLevel: 'FORM_1',
+    graduationYear: 2029,
+    schoolStudentId: 'S2024104',
+  })
+
+  await request(app)
+    .delete(`/api/students/${wong.id}`)
+    .set('Authorization', `Bearer ${token}`)
+
+  await prisma.student.update({
+    where: { id: lee.id },
+    data: { transcriptStatus: 'DRAFT' },
+  })
+
+  return { chan, wong, chanLower, lee }
+}
+
+describe('GET /api/students', () => {
+  it('nav-01: q=Chan returns only students whose fullName contains Chan case-insensitive', async () => {
+    await seedListStudents()
+    const token = staffToken()
+
+    const res = await request(app)
+      .get('/api/students?q=Chan')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.data).toHaveLength(2)
+    for (const row of res.body.data) {
+      expect(row.fullName.toLowerCase()).toContain('chan')
+    }
+  })
+
+  it('nav-02-form: formLevel=FORM_4 returns only FORM_4 students', async () => {
+    await seedListStudents()
+    const token = staffToken()
+
+    const res = await request(app)
+      .get('/api/students?formLevel=FORM_4')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.data.length).toBeGreaterThan(0)
+    for (const row of res.body.data) {
+      expect(row.formLevel).toBe('FORM_4')
+    }
+  })
+
+  it('nav-02-status: transcriptStatus=NONE returns only NONE status students', async () => {
+    await seedListStudents()
+    const token = staffToken()
+
+    const res = await request(app)
+      .get('/api/students?transcriptStatus=NONE')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.data.length).toBeGreaterThan(0)
+    for (const row of res.body.data) {
+      expect(row.transcriptStatus).toBe('NONE')
+    }
+  })
+
+  it('list-default: excludes archived students by default', async () => {
+    const { wong } = await seedListStudents()
+    const token = staffToken()
+
+    const res = await request(app)
+      .get('/api/students')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    const ids = res.body.data.map((row: { id: string }) => row.id)
+    expect(ids).not.toContain(wong.id)
+  })
+
+  it('list-admin-archived: includeArchived=true includes archived for admin; staff gets 403', async () => {
+    const { wong } = await seedListStudents()
+    const admin = adminToken()
+    const staff = staffToken()
+
+    await request(app)
+      .get('/api/auth/me')
+      .set('Authorization', `Bearer ${admin}`)
+
+    const adminRes = await request(app)
+      .get('/api/students?includeArchived=true')
+      .set('Authorization', `Bearer ${admin}`)
+
+    expect(adminRes.status).toBe(200)
+    const adminIds = adminRes.body.data.map((row: { id: string }) => row.id)
+    expect(adminIds).toContain(wong.id)
+
+    const staffRes = await request(app)
+      .get('/api/students?includeArchived=true')
+      .set('Authorization', `Bearer ${staff}`)
+
+    expect(staffRes.status).toBe(403)
+  })
+
+  it('list-pagination: page=1&pageSize=2 returns meta and at most 2 data rows', async () => {
+    await seedListStudents()
+    const token = staffToken()
+
+    const res = await request(app)
+      .get('/api/students?page=1&pageSize=2')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.data.length).toBeLessThanOrEqual(2)
+    expect(res.body.meta).toMatchObject({
+      page: 1,
+      pageSize: 2,
+    })
+    expect(res.body.meta.total).toBeGreaterThan(2)
+    expect(res.body.meta.totalPages).toBeGreaterThan(1)
+  })
+
+  it('list-sort: sort=fullName&order=asc returns ascending fullName order', async () => {
+    await seedListStudents()
+    const token = staffToken()
+
+    const res = await request(app)
+      .get('/api/students?sort=fullName&order=asc')
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    const names = res.body.data.map((row: { fullName: string }) => row.fullName)
+    const sorted = [...names].sort((a, b) => a.localeCompare(b))
+    expect(names).toEqual(sorted)
+  })
+})
