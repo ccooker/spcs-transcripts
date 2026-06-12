@@ -90,9 +90,9 @@ Extract `AppShell` from `HomePage.tsx` header/nav pattern. All Phase 2 routes re
 | Display | 28px | Semibold (600) | 1.2 | `text-2xl font-semibold leading-tight` | Page titles: "Students", student full name on detail |
 | Heading | 20px | Semibold (600) | 1.2 | `text-xl font-semibold leading-tight` | Section headings: "Profile", "Student records" placeholder |
 | Body | 16px | Regular (400) | 1.5 | `text-base font-normal leading-relaxed` | Table cell text, form descriptions |
-| Label | 14px | Regular (400) | 1.4 | `text-sm font-normal leading-snug` | Column headers, form labels, filter labels, cohort summary counts |
+| Label | 14px | Regular (400) | 1.4 | `text-sm font-normal leading-snug` | Form labels, filter labels, cohort summary counts |
 
-**Table column headers:** `text-sm font-medium` (semibold not required — medium weight acceptable within shadcn Table default; do not introduce weight 500 elsewhere).
+**Table column headers:** `text-sm font-semibold` (600 — same weight scale as Phase 1; no font-medium/500).
 
 **Cohort group header row:** Form label at `text-sm font-semibold`; summary counts at `text-sm text-muted-foreground`.
 
@@ -171,12 +171,25 @@ All from **shadcn official registry**. No third-party blocks.
 
 ---
 
+## Visual Focal Points
+
+Each primary screen has one dominant element that draws the eye first. Secondary chrome (nav, toolbars, pagination) supports but does not compete.
+
+| Screen | Focal point | Implementation |
+|--------|-------------|----------------|
+| Student list (`/students`) | **Data table** | Full-width table occupies ~60% of viewport below toolbar; page title and "Add student" are secondary; cohort group headers guide scan within the table |
+| Create student (`/students/new`) | **Profile form card** | Single Card with form fields centered in content area; page title "Add student" above; action row below card |
+| Student detail (`/students/:id`) | **Student name header** | `text-2xl font-semibold` full name + subtitle line is the hero block; profile card and records placeholder are supporting content below |
+
+---
+
 ## Screen Inventory
 
 ### Screen 1 — Student List
 
 **Route:** `/students`  
-**Requirements:** STU-02 (list), NAV-01, NAV-02, NAV-03, D-09, D-10, D-11
+**Requirements:** STU-02 (list), NAV-01, NAV-02, NAV-03, D-09, D-10, D-11  
+**Focal point:** Data table (see Visual Focal Points)
 
 **Layout:**
 
@@ -187,7 +200,7 @@ All from **shadcn official registry**. No third-party blocks.
 │  Students                                           [ Add student ]      │
 │                                                                          │
 │  ┌─────────────────────────────────────────────────────────────────────┐ │
-│  │ [Search by name___________] [Search]  Form [All ▾]  Status [All ▾] │ │
+│  │ [Search by name___________] [Search students]  Form [All ▾]  Status [All ▾] │ │
 │  │ [Admin only: ☐ Show archived]                                        │ │
 │  └─────────────────────────────────────────────────────────────────────┘ │
 │                                                                          │
@@ -213,8 +226,8 @@ All from **shadcn official registry**. No third-party blocks.
 | Control | Component | Behaviour |
 |---------|-----------|-----------|
 | Name search input | `Input` | Placeholder: "Search by name"; controlled local state; **does not** trigger API on change |
-| Search button | `Button variant="default"` | Label: "Search"; applies `q` param and refetches (D-11) |
-| Enter key in search input | — | Same as Search button click |
+| Search button | `Button variant="default"` | Label: "Search students"; applies `q` param and refetches (D-11) |
+| Enter key in search input | — | Same as Search students button click |
 | Form level filter | `Select` | Options: "All forms", "Form 1" … "Form 6" (D-05, D-06); changing value immediately refetches |
 | Transcript status filter | `Select` | Options: "All statuses", "Draft", "Finalised", "None" (D-08); immediate refetch |
 | Show archived toggle | `Checkbox` or switch-style toggle | **Admin only** (D-14); sets `includeArchived=true`; hidden for Staff |
@@ -260,7 +273,7 @@ All from **shadcn official registry**. No third-party blocks.
 | Loading (initial / refetch) | 5 skeleton rows matching table column layout; toolbar controls remain visible but disabled |
 | Empty — no students yet | See Copywriting: empty list |
 | Empty — no search results | See Copywriting: no results |
-| Error — API failure | `Alert variant="destructive"` above table + retry button |
+| Error — API failure | `Alert variant="destructive"` above table + "Try again" button |
 | Loaded | Full table |
 
 ---
@@ -268,7 +281,8 @@ All from **shadcn official registry**. No third-party blocks.
 ### Screen 2 — Create Student
 
 **Route:** `/students/new`  
-**Requirements:** STU-01, D-01, D-03, D-05, D-07, D-12
+**Requirements:** STU-01, D-01, D-03, D-05, D-07, D-12  
+**Focal point:** Profile form card (see Visual Focal Points)
 
 **Layout:** Full page inside AppShell — **not a modal** (D-12).
 
@@ -293,7 +307,7 @@ All from **shadcn official registry**. No third-party blocks.
 │  │ Parent/guardian phone[________________________________]            │  │
 │  └──────────────────────────────────────────────────────────────────────┘  │
 │                                                                          │
-│                              [ Cancel ]  [ Create student ]              │
+│                    [ Back without saving ]  [ Create student ]           │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -316,7 +330,7 @@ All from **shadcn official registry**. No third-party blocks.
 
 **Actions:**
 
-- "Cancel" → `Button variant="outline"` → navigate to `/students` without save
+- "Back without saving" → `Button variant="outline"` → navigate to `/students` without save
 - "Create student" → `Button variant="default"` → POST; on success toast + redirect to `/students/:id`
 
 **Back link:** `text-sm` link with Lucide `ArrowLeft` icon, "Back to students" → `/students`
@@ -335,7 +349,8 @@ All from **shadcn official registry**. No third-party blocks.
 ### Screen 3 — Student Detail / Edit
 
 **Route:** `/students/:id`  
-**Requirements:** STU-02, D-04, D-13, D-14, D-15
+**Requirements:** STU-02, D-04, D-13, D-14, D-15  
+**Focal point:** Student name header (see Visual Focal Points)
 
 **Layout:**
 
@@ -348,7 +363,7 @@ All from **shadcn official registry**. No third-party blocks.
 │  Chan Tai Man                                    [None]  [ Archive ]     │
 │  Form 4 · Class of 2027 · S2024001                                       │
 │                                                                          │
-│  ┌─ Profile ──────────────────────────────────────── [ Edit ] [ Save ] ─┐│
+│  ┌─ Profile ─────────────── [ Edit ] [ Discard changes ] [ Save changes ]─┐│
 │  │  (read-only view OR inline edit fields — same as create form)        ││
 │  └──────────────────────────────────────────────────────────────────────┘│
 │                                                                          │
@@ -371,8 +386,8 @@ All from **shadcn official registry**. No third-party blocks.
 **Profile section:**
 
 - Default: read-only field display (label + value pairs, `gap-4` grid, 2 columns on `md+`)
-- **Edit** toggles to same fields as create form; **Save** submits PATCH
-- **Cancel edit** reverts to read-only without navigation
+- **Edit** toggles to same fields as create form; **Save changes** submits PATCH
+- **Discard changes** (`Button variant="outline"`) reverts to read-only without navigation — visible only in edit mode
 
 **Phase 3 placeholder (D-04):**
 
@@ -393,8 +408,8 @@ All from **shadcn official registry**. No third-party blocks.
   - Description: explains student hidden from list, data retained
   - Label: "Type **{fullName}** to confirm"
   - Text input (controlled)
-  - Cancel: `AlertDialogCancel`
-  - Confirm: `AlertDialogAction variant="destructive"` — **disabled** until input matches `fullName` after trim, case-insensitive (RESEARCH A3)
+  - Dismiss: `AlertDialogCancel` — label **"Keep student"**
+  - Confirm: `AlertDialogAction variant="destructive"` — label **"Archive student"**; **disabled** until input matches `fullName` after trim, case-insensitive (RESEARCH A3)
 - On confirm: DELETE (soft-archive) API call → toast "Student archived" → redirect to `/students`
 
 **States:**
@@ -403,7 +418,7 @@ All from **shadcn official registry**. No third-party blocks.
 |-------|--------|
 | Loading | Skeleton for name, subtitle, profile fields |
 | Not found (404) | Alert + "Back to students" link |
-| Edit mode | Form fields editable, Save/Cancel visible |
+| Edit mode | Form fields editable; "Save changes" and "Discard changes" visible |
 | Read mode | Field values static, Edit button visible |
 | Archived (admin view) | "(Archived)" in subtitle; Archive hidden; Restore visible |
 
@@ -423,7 +438,7 @@ All from **shadcn official registry**. No third-party blocks.
 | D-08 | transcriptStatus enum | Badge + filter; all show None in Phase 2 |
 | D-09 | Sortable data table | Column header click toggles asc/desc; server-side sort |
 | D-10 | Cohort on same table | `CohortGroupHeader` rows injected — no separate page/tab |
-| D-11 | Search box + button | No debounced/instant search; Enter = Search click |
+| D-11 | Search box + button | No debounced/instant search; Enter = "Search students" click |
 | D-12 | `/students/new` full page | Not Dialog/Drawer/Modal |
 | D-13 | Soft delete | Archive terminology in UI — never "Delete permanently" |
 | D-14 | Staff archive; Admin restore | Role-gated toggle and restore button |
@@ -439,7 +454,7 @@ All from **shadcn official registry**. No third-party blocks.
 | List page title | "Students" | |
 | Primary CTA (list) | "Add student" | Navigates to `/students/new` |
 | Search input placeholder | "Search by name" | |
-| Search button | "Search" | Not "Go" or icon-only |
+| Search button | "Search students" | Not "Go" or icon-only |
 | Form filter — all | "All forms" | Default selected |
 | Form filter options | "Form 1" … "Form 6" | |
 | Status filter — all | "All statuses" | Default selected |
@@ -453,7 +468,7 @@ All from **shadcn official registry**. No third-party blocks.
 | No results body | "Try a different name or adjust your filters." | |
 | List error heading | "Couldn't load students" | |
 | List error body | "Something went wrong. Please try again." | |
-| List error retry | "Retry" | `Button variant="outline"` |
+| List error retry | "Try again" | `Button variant="outline"` |
 | Create page title | "Add student" | |
 | Create submit CTA | "Create student" | |
 | Create submitting | "Creating…" | |
@@ -461,7 +476,8 @@ All from **shadcn official registry**. No third-party blocks.
 | Edit save CTA | "Save changes" | |
 | Edit saving | "Saving…" | |
 | Edit success toast | "Changes saved" | |
-| Cancel (form) | "Cancel" | |
+| Create form dismiss | "Back without saving" | Create page action row; navigates to `/students` |
+| Edit form dismiss | "Discard changes" | Detail page edit mode only; reverts to read-only |
 | Back link | "Back to students" | All student sub-pages |
 | Detail section — profile | "Profile" | Card title |
 | Detail section — records | "Student records" | Placeholder card title (D-04) |
@@ -471,7 +487,7 @@ All from **shadcn official registry**. No third-party blocks.
 | Archive dialog description | "This student will be hidden from the student list. Their data is retained and can be restored by an administrator." | |
 | Archive dialog label | "Type the student's full name to confirm" | Show `fullName` in bold within description |
 | Archive dialog confirm | "Archive student" | Destructive action |
-| Archive dialog cancel | "Cancel" | |
+| Archive dialog dismiss | "Keep student" | AlertDialogCancel — closes dialog without archiving |
 | Archive success toast | "Student archived" | |
 | Restore button | "Restore student" | Admin only |
 | Restore success toast | "Student restored" | |
