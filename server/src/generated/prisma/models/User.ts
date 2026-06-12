@@ -191,6 +191,8 @@ export type UserWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   auditLogs?: Prisma.AuditLogListRelationFilter
+  careerGoalsAuthored?: Prisma.CareerGoalListRelationFilter
+  staffNotesAuthored?: Prisma.StaffNoteListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -201,6 +203,8 @@ export type UserOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
+  careerGoalsAuthored?: Prisma.CareerGoalOrderByRelationAggregateInput
+  staffNotesAuthored?: Prisma.StaffNoteOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -214,6 +218,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   auditLogs?: Prisma.AuditLogListRelationFilter
+  careerGoalsAuthored?: Prisma.CareerGoalListRelationFilter
+  staffNotesAuthored?: Prisma.StaffNoteListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -248,6 +254,8 @@ export type UserCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActingUserInput
+  careerGoalsAuthored?: Prisma.CareerGoalCreateNestedManyWithoutAuthorInput
+  staffNotesAuthored?: Prisma.StaffNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -258,6 +266,8 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActingUserInput
+  careerGoalsAuthored?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutAuthorInput
+  staffNotesAuthored?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserUpdateInput = {
@@ -268,6 +278,8 @@ export type UserUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActingUserNestedInput
+  careerGoalsAuthored?: Prisma.CareerGoalUpdateManyWithoutAuthorNestedInput
+  staffNotesAuthored?: Prisma.StaffNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -278,6 +290,8 @@ export type UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActingUserNestedInput
+  careerGoalsAuthored?: Prisma.CareerGoalUncheckedUpdateManyWithoutAuthorNestedInput
+  staffNotesAuthored?: Prisma.StaffNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -365,6 +379,34 @@ export type UserUpdateOneRequiredWithoutAuditLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuditLogsInput, Prisma.UserUpdateWithoutAuditLogsInput>, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
 }
 
+export type UserCreateNestedOneWithoutCareerGoalsAuthoredInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCareerGoalsAuthoredInput, Prisma.UserUncheckedCreateWithoutCareerGoalsAuthoredInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCareerGoalsAuthoredInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutCareerGoalsAuthoredNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCareerGoalsAuthoredInput, Prisma.UserUncheckedCreateWithoutCareerGoalsAuthoredInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCareerGoalsAuthoredInput
+  upsert?: Prisma.UserUpsertWithoutCareerGoalsAuthoredInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCareerGoalsAuthoredInput, Prisma.UserUpdateWithoutCareerGoalsAuthoredInput>, Prisma.UserUncheckedUpdateWithoutCareerGoalsAuthoredInput>
+}
+
+export type UserCreateNestedOneWithoutStaffNotesAuthoredInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStaffNotesAuthoredInput, Prisma.UserUncheckedCreateWithoutStaffNotesAuthoredInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStaffNotesAuthoredInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutStaffNotesAuthoredNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStaffNotesAuthoredInput, Prisma.UserUncheckedCreateWithoutStaffNotesAuthoredInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStaffNotesAuthoredInput
+  upsert?: Prisma.UserUpsertWithoutStaffNotesAuthoredInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStaffNotesAuthoredInput, Prisma.UserUpdateWithoutStaffNotesAuthoredInput>, Prisma.UserUncheckedUpdateWithoutStaffNotesAuthoredInput>
+}
+
 export type UserCreateWithoutAuditLogsInput = {
   id?: string
   email: string
@@ -372,6 +414,8 @@ export type UserCreateWithoutAuditLogsInput = {
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
+  careerGoalsAuthored?: Prisma.CareerGoalCreateNestedManyWithoutAuthorInput
+  staffNotesAuthored?: Prisma.StaffNoteCreateNestedManyWithoutAuthorInput
 }
 
 export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -381,6 +425,8 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
+  careerGoalsAuthored?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutAuthorInput
+  staffNotesAuthored?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -406,6 +452,8 @@ export type UserUpdateWithoutAuditLogsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  careerGoalsAuthored?: Prisma.CareerGoalUpdateManyWithoutAuthorNestedInput
+  staffNotesAuthored?: Prisma.StaffNoteUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -415,6 +463,128 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  careerGoalsAuthored?: Prisma.CareerGoalUncheckedUpdateManyWithoutAuthorNestedInput
+  staffNotesAuthored?: Prisma.StaffNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserCreateWithoutCareerGoalsAuthoredInput = {
+  id?: string
+  email: string
+  displayName: string
+  role?: $Enums.Role
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActingUserInput
+  staffNotesAuthored?: Prisma.StaffNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserUncheckedCreateWithoutCareerGoalsAuthoredInput = {
+  id?: string
+  email: string
+  displayName: string
+  role?: $Enums.Role
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActingUserInput
+  staffNotesAuthored?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserCreateOrConnectWithoutCareerGoalsAuthoredInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCareerGoalsAuthoredInput, Prisma.UserUncheckedCreateWithoutCareerGoalsAuthoredInput>
+}
+
+export type UserUpsertWithoutCareerGoalsAuthoredInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCareerGoalsAuthoredInput, Prisma.UserUncheckedUpdateWithoutCareerGoalsAuthoredInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCareerGoalsAuthoredInput, Prisma.UserUncheckedCreateWithoutCareerGoalsAuthoredInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCareerGoalsAuthoredInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCareerGoalsAuthoredInput, Prisma.UserUncheckedUpdateWithoutCareerGoalsAuthoredInput>
+}
+
+export type UserUpdateWithoutCareerGoalsAuthoredInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActingUserNestedInput
+  staffNotesAuthored?: Prisma.StaffNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCareerGoalsAuthoredInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActingUserNestedInput
+  staffNotesAuthored?: Prisma.StaffNoteUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserCreateWithoutStaffNotesAuthoredInput = {
+  id?: string
+  email: string
+  displayName: string
+  role?: $Enums.Role
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActingUserInput
+  careerGoalsAuthored?: Prisma.CareerGoalCreateNestedManyWithoutAuthorInput
+}
+
+export type UserUncheckedCreateWithoutStaffNotesAuthoredInput = {
+  id?: string
+  email: string
+  displayName: string
+  role?: $Enums.Role
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActingUserInput
+  careerGoalsAuthored?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserCreateOrConnectWithoutStaffNotesAuthoredInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutStaffNotesAuthoredInput, Prisma.UserUncheckedCreateWithoutStaffNotesAuthoredInput>
+}
+
+export type UserUpsertWithoutStaffNotesAuthoredInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutStaffNotesAuthoredInput, Prisma.UserUncheckedUpdateWithoutStaffNotesAuthoredInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutStaffNotesAuthoredInput, Prisma.UserUncheckedCreateWithoutStaffNotesAuthoredInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutStaffNotesAuthoredInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutStaffNotesAuthoredInput, Prisma.UserUncheckedUpdateWithoutStaffNotesAuthoredInput>
+}
+
+export type UserUpdateWithoutStaffNotesAuthoredInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActingUserNestedInput
+  careerGoalsAuthored?: Prisma.CareerGoalUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutStaffNotesAuthoredInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActingUserNestedInput
+  careerGoalsAuthored?: Prisma.CareerGoalUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 
@@ -424,10 +594,14 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
 
 export type UserCountOutputType = {
   auditLogs: number
+  careerGoalsAuthored: number
+  staffNotesAuthored: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
+  careerGoalsAuthored?: boolean | UserCountOutputTypeCountCareerGoalsAuthoredArgs
+  staffNotesAuthored?: boolean | UserCountOutputTypeCountStaffNotesAuthoredArgs
 }
 
 /**
@@ -447,6 +621,20 @@ export type UserCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types.
   where?: Prisma.AuditLogWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCareerGoalsAuthoredArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CareerGoalWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountStaffNotesAuthoredArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StaffNoteWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -456,6 +644,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
+  careerGoalsAuthored?: boolean | Prisma.User$careerGoalsAuthoredArgs<ExtArgs>
+  staffNotesAuthored?: boolean | Prisma.User$staffNotesAuthoredArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -489,6 +679,8 @@ export type UserSelectScalar = {
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "displayName" | "role" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
+  careerGoalsAuthored?: boolean | Prisma.User$careerGoalsAuthoredArgs<ExtArgs>
+  staffNotesAuthored?: boolean | Prisma.User$staffNotesAuthoredArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -498,6 +690,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
+    careerGoalsAuthored: Prisma.$CareerGoalPayload<ExtArgs>[]
+    staffNotesAuthored: Prisma.$StaffNotePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -901,6 +1095,8 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  careerGoalsAuthored<T extends Prisma.User$careerGoalsAuthoredArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$careerGoalsAuthoredArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CareerGoalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  staffNotesAuthored<T extends Prisma.User$staffNotesAuthoredArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$staffNotesAuthoredArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StaffNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1350,6 +1546,54 @@ export type User$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
+}
+
+/**
+ * User.careerGoalsAuthored
+ */
+export type User$careerGoalsAuthoredArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CareerGoal
+   */
+  select?: Prisma.CareerGoalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CareerGoal
+   */
+  omit?: Prisma.CareerGoalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CareerGoalInclude<ExtArgs> | null
+  where?: Prisma.CareerGoalWhereInput
+  orderBy?: Prisma.CareerGoalOrderByWithRelationInput | Prisma.CareerGoalOrderByWithRelationInput[]
+  cursor?: Prisma.CareerGoalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CareerGoalScalarFieldEnum | Prisma.CareerGoalScalarFieldEnum[]
+}
+
+/**
+ * User.staffNotesAuthored
+ */
+export type User$staffNotesAuthoredArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StaffNote
+   */
+  select?: Prisma.StaffNoteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StaffNote
+   */
+  omit?: Prisma.StaffNoteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StaffNoteInclude<ExtArgs> | null
+  where?: Prisma.StaffNoteWhereInput
+  orderBy?: Prisma.StaffNoteOrderByWithRelationInput | Prisma.StaffNoteOrderByWithRelationInput[]
+  cursor?: Prisma.StaffNoteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StaffNoteScalarFieldEnum | Prisma.StaffNoteScalarFieldEnum[]
 }
 
 /**

@@ -42,3 +42,23 @@ export type AcademicResult = Prisma.AcademicResultModel
  * 
  */
 export type Activity = Prisma.ActivityModel
+/**
+ * Model Award
+ * 
+ */
+export type Award = Prisma.AwardModel
+/**
+ * Model WorkExperience
+ * 
+ */
+export type WorkExperience = Prisma.WorkExperienceModel
+/**
+ * Model CareerGoal
+ * 
+ */
+export type CareerGoal = Prisma.CareerGoalModel
+/**
+ * Model StaffNote
+ * 
+ */
+export type StaffNote = Prisma.StaffNoteModel

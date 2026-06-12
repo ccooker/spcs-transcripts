@@ -55,7 +55,11 @@ export const ModelName = {
   AuditLog: 'AuditLog',
   Student: 'Student',
   AcademicResult: 'AcademicResult',
-  Activity: 'Activity'
+  Activity: 'Activity',
+  Award: 'Award',
+  WorkExperience: 'WorkExperience',
+  CareerGoal: 'CareerGoal',
+  StaffNote: 'StaffNote'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -149,6 +153,62 @@ export const ActivityScalarFieldEnum = {
 } as const
 
 export type ActivityScalarFieldEnum = (typeof ActivityScalarFieldEnum)[keyof typeof ActivityScalarFieldEnum]
+
+
+export const AwardScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  title: 'title',
+  issuer: 'issuer',
+  awardMonth: 'awardMonth',
+  awardYear: 'awardYear',
+  level: 'level',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AwardScalarFieldEnum = (typeof AwardScalarFieldEnum)[keyof typeof AwardScalarFieldEnum]
+
+
+export const WorkExperienceScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  employer: 'employer',
+  role: 'role',
+  description: 'description',
+  startMonth: 'startMonth',
+  startYear: 'startYear',
+  endMonth: 'endMonth',
+  endYear: 'endYear',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkExperienceScalarFieldEnum = (typeof WorkExperienceScalarFieldEnum)[keyof typeof WorkExperienceScalarFieldEnum]
+
+
+export const CareerGoalScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  interests: 'interests',
+  description: 'description',
+  authorId: 'authorId',
+  createdAt: 'createdAt'
+} as const
+
+export type CareerGoalScalarFieldEnum = (typeof CareerGoalScalarFieldEnum)[keyof typeof CareerGoalScalarFieldEnum]
+
+
+export const StaffNoteScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  content: 'content',
+  authorId: 'authorId',
+  createdAt: 'createdAt'
+} as const
+
+export type StaffNoteScalarFieldEnum = (typeof StaffNoteScalarFieldEnum)[keyof typeof StaffNoteScalarFieldEnum]
 
 
 export const SortOrder = {

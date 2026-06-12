@@ -257,6 +257,23 @@ export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedIntNullableFilter<$PrismaModel>
 }
 
+export type EnumAwardLevelFilter<$PrismaModel = never> = {
+  equals?: $Enums.AwardLevel | Prisma.EnumAwardLevelFieldRefInput<$PrismaModel>
+  in?: $Enums.AwardLevel[] | Prisma.ListEnumAwardLevelFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AwardLevel[] | Prisma.ListEnumAwardLevelFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAwardLevelFilter<$PrismaModel> | $Enums.AwardLevel
+}
+
+export type EnumAwardLevelWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AwardLevel | Prisma.EnumAwardLevelFieldRefInput<$PrismaModel>
+  in?: $Enums.AwardLevel[] | Prisma.ListEnumAwardLevelFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AwardLevel[] | Prisma.ListEnumAwardLevelFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAwardLevelWithAggregatesFilter<$PrismaModel> | $Enums.AwardLevel
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAwardLevelFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAwardLevelFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -511,6 +528,23 @@ export type NestedFloatNullableFilter<$PrismaModel = never> = {
   gt?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   gte?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   not?: Prisma.NestedFloatNullableFilter<$PrismaModel> | number | null
+}
+
+export type NestedEnumAwardLevelFilter<$PrismaModel = never> = {
+  equals?: $Enums.AwardLevel | Prisma.EnumAwardLevelFieldRefInput<$PrismaModel>
+  in?: $Enums.AwardLevel[] | Prisma.ListEnumAwardLevelFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AwardLevel[] | Prisma.ListEnumAwardLevelFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAwardLevelFilter<$PrismaModel> | $Enums.AwardLevel
+}
+
+export type NestedEnumAwardLevelWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AwardLevel | Prisma.EnumAwardLevelFieldRefInput<$PrismaModel>
+  in?: $Enums.AwardLevel[] | Prisma.ListEnumAwardLevelFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AwardLevel[] | Prisma.ListEnumAwardLevelFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAwardLevelWithAggregatesFilter<$PrismaModel> | $Enums.AwardLevel
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAwardLevelFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAwardLevelFilter<$PrismaModel>
 }
 
 
