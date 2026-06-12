@@ -206,7 +206,7 @@ describe('stu-04: Activities', () => {
     await request(app)
       .post(`/api/students/${student.id}/activities`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ ...validActivityPayload, organisation: 'Ongoing Club', schoolStudentId: 'S2024103' })
+      .send({ ...validActivityPayload, organisation: 'Ongoing Club' })
 
     const res = await request(app)
       .get(`/api/students/${student.id}/activities`)

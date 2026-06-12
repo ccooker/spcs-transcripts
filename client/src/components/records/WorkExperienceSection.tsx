@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Table,
   TableBody,
@@ -298,7 +299,6 @@ export function WorkExperienceSection({ studentId }: WorkExperienceSectionProps)
                 )}
               />
 
-              {/* Description — plain HTML textarea (shadcn Textarea installed in Plan 03-03b) */}
               <FormField
                 control={form.control}
                 name="description"
@@ -306,10 +306,10 @@ export function WorkExperienceSection({ studentId }: WorkExperienceSectionProps)
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <textarea
-                        className="min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        placeholder="Brief description of responsibilities"
+                      <Textarea
+                        placeholder="Brief description of role and responsibilities"
                         maxLength={500}
+                        className="min-h-[80px]"
                         {...field}
                         value={field.value ?? ''}
                       />
