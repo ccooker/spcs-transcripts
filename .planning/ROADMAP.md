@@ -86,21 +86,27 @@ Plans:
 4. Staff can add timestamped notes to a student record; each note is attributed to the entering staff member and the full history is visible.
 5. All six record types are accessible from a single student profile page without navigating away.
 
-**Plans:** 3 plans
+**Plans:** 6 plans
 
 Plans:
 
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Academics & Activities vertical slice: schema models + Prisma generate, Zod schemas, services (IDOR guard + audit), routes, RED tests (stu-03, stu-04), @tanstack/react-query + QueryClientProvider, RecordSectionCard + MonthYearPicker + RecordDeleteDialog + periodFormat, AcademicResultsSection + ActivitiesSection, StudentDetailPage placeholder replaced
+- [ ] 03-01-PLAN.md — Academics & Activities server slice: AcademicResult + Activity schema models, Zod schemas, services (IDOR guard + audit), routes, RED tests (stu-03, stu-04)
+- [ ] 03-01b-PLAN.md — Client infrastructure: @tanstack/react-query + QueryClientProvider, RecordSectionCard + MonthYearPicker + RecordDeleteDialog + periodFormat, AcademicResultsSection + ActivitiesSection, StudentDetailPage placeholder replaced
 
-**Wave 2** *(blocked on Wave 1 completion)*
+**Wave 2** *(blocked on Wave 1 completion — runs in parallel: 03-02 server and 03-02b client)*
 
-- [ ] 03-02-PLAN.md — Awards & Work Experience vertical slice: Award + WorkExperience schema models, Zod schemas, services, routes, RED tests (stu-05, stu-06), AwardsSection (award level Badge) + WorkExperienceSection, StudentDetailPage updated
+- [ ] 03-02-PLAN.md — Awards & Work Experience server slice: Award + WorkExperience schema models, Zod schemas, services (IDOR guard + audit), routes, RED tests (stu-05, stu-06)
+- [ ] 03-02b-PLAN.md — Awards & Work Experience client slice: AwardsSection (award level Badge) + WorkExperienceSection, StudentDetailPage updated *(parallel to 03-02, depends on 03-01b)*
 
-**Wave 3** *(blocked on Wave 2 completion)*
+**Wave 3** *(blocked on 03-02 completion)*
 
-- [ ] 03-03-PLAN.md — Career Goals & Staff Notes + [BLOCKING] schema push: CareerGoal + StaffNote models, POST-only/append-only services + routes, RED tests (stu-07, stu-08), npx prisma db push (all 6 models deployed), shadcn checkbox/textarea/tooltip/scroll-area, CareerGoalsSection (versioned) + NotesSection (append-only) + CareerInterestsChecklist, all 6 sections on StudentDetailPage, all stu-03 through stu-08 GREEN
+- [ ] 03-03a-PLAN.md — Career Goals & Staff Notes server slice: CareerGoal + StaffNote schema models (POST-only / append-only per D-16/D-17), Zod schemas, services (list+create only), routes (GET+POST only), RED tests (stu-07, stu-08 including enforcement tests)
+
+**Wave 4** *(blocked on 03-03a + 03-02b completion)*
+
+- [ ] 03-03b-PLAN.md — DB push + client completion: [BLOCKING] npx prisma db push (all 6 models deployed), shadcn checkbox/textarea/tooltip/scroll-area, CareerGoalsSection (versioned) + NotesSection (append-only) + CareerInterestsChecklist, all 6 sections on StudentDetailPage in D-02 order, textarea upgrades in ActivitiesSection/AwardsSection/WorkExperienceSection, all stu-03 through stu-08 GREEN
 
 **UI hint**: yes
 
