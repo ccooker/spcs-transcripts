@@ -22,7 +22,12 @@ import {
 import { FORM_LEVELS, formLevelLabel } from '@/lib/formLevels';
 
 const currentYear = new Date().getFullYear();
-const graduationYearOptions = Array.from({ length: 7 }, (_, i) => currentYear + i);
+const GRADUATION_YEAR_MIN = 2020;
+const GRADUATION_YEAR_MAX = 2040;
+const graduationYearOptions = Array.from(
+  { length: GRADUATION_YEAR_MAX - GRADUATION_YEAR_MIN + 1 },
+  (_, i) => GRADUATION_YEAR_MIN + i,
+);
 
 export const createStudentFormSchema = z.object({
   fullName: z.string().trim().min(1, 'Full name is required').max(200),
