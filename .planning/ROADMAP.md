@@ -92,7 +92,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Academics & Activities server slice: AcademicResult + Activity schema models, Zod schemas, services (IDOR guard + audit), routes, RED tests (stu-03, stu-04)
+- [x] 03-01-PLAN.md — Academics & Activities server slice: AcademicResult + Activity schema models, Zod schemas, services (IDOR guard + audit), routes, RED tests (stu-03, stu-04)
 - [ ] 03-01b-PLAN.md — Client infrastructure: @tanstack/react-query + QueryClientProvider, RecordSectionCard + MonthYearPicker + RecordDeleteDialog + periodFormat, AcademicResultsSection + ActivitiesSection, StudentDetailPage placeholder replaced
 
 **Wave 2** *(blocked on Wave 1 completion — runs in parallel: 03-02 server and 03-02b client)*

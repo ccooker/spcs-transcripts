@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 02
-status: Ready to execute
-last_updated: "2026-06-12T15:58:19.665Z"
+current_phase: 03
+status: Executing Phase 03
+last_updated: "2026-06-13T00:00:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 8
-  completed_plans: 8
-  percent: 40
+  total_plans: 14
+  completed_plans: 9
+  percent: 43
 ---
 
 # Project State
@@ -21,13 +21,13 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 **Core value:** A careers staff member can open any student's record and produce a completed, professional transcript PDF in a single session — no hunting through spreadsheets, emails, or paper.
 **Current milestone:** v1.0
-**Current phase:** 02
+**Current phase:** 03
 
 ## Current Status
 
 - Roadmap: created
-- Active phase: Phase 2 complete — student directory with search, filter, cohort headers (2026-06-12)
-- Last action: Phase 2 Plan 03 — GET /api/students list API and StudentsListPage with TanStack table
+- Active phase: Phase 3 — student records UI (Plan 01 complete 2026-06-13)
+- Last action: Phase 3 Plan 01 — AcademicResult + Activity backend (schema, Zod, services, routes) + RED tests for STU-03/STU-04
 
 ## Phase History
 
@@ -41,6 +41,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | 02-student-profiles-search | 01 (create) | Student Prisma model, POST /api/students, /students/new form, AppShell — stu-01 tests GREEN | 2026-06-12 |
 | 02-student-profiles-search | 02 (detail) | GET/PATCH/DELETE/restore API, StudentDetailPage, ArchiveStudentDialog — stu-02 tests GREEN | 2026-06-12 |
 | 02-student-profiles-search | 03 (list) | GET /api/students list API, StudentsListPage, cohort headers — nav-01/02/03 tests GREEN | 2026-06-12 |
+| 03-student-records-ui | 01 (server-academics-activities) | AcademicResult + Activity Prisma models, Zod schemas, IDOR-guarded services, nested routes mounted in students.ts, RED tests for STU-03+STU-04 | 2026-06-13 |
 
 ---
 
@@ -79,7 +80,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 ---
 *State initialised: 2026-06-11*
-*Last updated: 2026-06-12 after Phase 2 Plan 03 — student directory list complete*
+*Last updated: 2026-06-13 after Phase 3 Plan 01 — academics + activities server slice complete*
 
 ## Performance Metrics
 
@@ -88,6 +89,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | Phase 02-student-profiles-search P01 | 28min | 3 tasks | 31 files |
 | Phase 02-student-profiles-search P02 | 22min | 3 tasks | 7 files |
 | Phase 02-student-profiles-search P03 | 25min | 3 tasks | 9 files |
+| Phase 03-student-records-ui P01 | 18min | 2 tasks | 10 files |
 
 ## Decisions
 
@@ -99,3 +101,5 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 - [Phase 02-03]: Badge variants on list table follow 02-UI-SPEC matching StudentDetailPage
 - [Phase 02-03]: Cohort header counts from current page data only per RESEARCH A1
 - [Phase 02-03]: Default list sort formLevel asc with secondary fullName asc for cohort grouping
+- [Phase 03-01]: mergeParams params typed as Record<string,string> — Express 5 strict param inference doesn't propagate parent :studentId into child router; bracket access with cast resolves TS7053
+- [Phase 03-01]: updateAcademicResultSchema built manually (not .partial()) — partial update with undefined subject must not require subjectOther; conditional refine guards on subject !== undefined
