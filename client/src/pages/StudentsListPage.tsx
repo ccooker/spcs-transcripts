@@ -86,6 +86,10 @@ export function StudentsListPage({ userInfo }: StudentsListPageProps) {
     setError(false);
     try {
       const res = await apiGet<ListResponse>(`/students?${buildQueryString()}`);
+      if (res.data.length === 0 && res.meta.total > 0 && pageIndex > 0) {
+        setPageIndex(0);
+        return;
+      }
       setStudents(res.data);
       setTotal(res.meta.total);
       setTotalPages(res.meta.totalPages);
@@ -95,7 +99,7 @@ export function StudentsListPage({ userInfo }: StudentsListPageProps) {
       setLoading(false);
       setInitialLoad(false);
     }
-  }, [buildQueryString]);
+  }, [buildQueryString, pageIndex]);
 
   useEffect(() => {
     if (!userInfo) return;
