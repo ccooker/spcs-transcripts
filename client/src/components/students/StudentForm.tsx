@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -36,30 +37,42 @@ export const createStudentFormSchema = z.object({
 
 export type CreateStudentFormValues = z.infer<typeof createStudentFormSchema>;
 
+const emptyDefaults: CreateStudentFormValues = {
+  fullName: '',
+  formLevel: 'FORM_4',
+  graduationYear: currentYear + 1,
+  schoolStudentId: '',
+  studentEmail: '',
+  studentPhone: '',
+  parentEmail: '',
+  parentPhone: '',
+};
+
 interface StudentFormProps {
   onSubmit: (values: CreateStudentFormValues) => Promise<void>;
   isSubmitting?: boolean;
   schoolStudentIdError?: string | null;
+  defaultValues?: CreateStudentFormValues;
+  mode?: 'create' | 'edit';
 }
 
 export function StudentForm({
   onSubmit,
   isSubmitting = false,
   schoolStudentIdError,
+  defaultValues,
+  mode = 'create',
 }: StudentFormProps) {
   const form = useForm<CreateStudentFormValues>({
     resolver: zodResolver(createStudentFormSchema),
-    defaultValues: {
-      fullName: '',
-      formLevel: 'FORM_4',
-      graduationYear: currentYear + 1,
-      schoolStudentId: '',
-      studentEmail: '',
-      studentPhone: '',
-      parentEmail: '',
-      parentPhone: '',
-    },
+    defaultValues: defaultValues ?? emptyDefaults,
   });
+
+  useEffect(() => {
+    if (defaultValues) {
+      form.reset(defaultValues);
+    }
+  }, [defaultValues, form]);
 
   return (
     <Form {...form}>
@@ -140,24 +153,39 @@ export function StudentForm({
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="schoolStudentId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  School student ID <span className="text-destructive">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g. S2024001" {...field} />
-                </FormControl>
-                <FormMessage />
-                {schoolStudentIdError && (
-                  <p className="text-sm font-medium text-destructive">{schoolStudentIdError}</p>
-                )}
-              </FormItem>
-            )}
-          />
+          {mode === 'create' ? (
+            <FormField
+              control={form.control}
+              name="schoolStudentId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    School student ID <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. S2024001" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                  {schoolStudentIdError && (
+                    <p className="text-sm font-medium text-destructive">{schoolStudentIdError}</p>
+                  )}
+                </FormItem>
+              )}
+            />
+          ) : (
+            <FormField
+              control={form.control}
+              name="schoolStudentId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>School student ID</FormLabel>
+                  <FormControl>
+                    <Input {...field} readOnly className="bg-muted" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          )}
 
           <Separator className="my-4" />
           <p className="text-sm text-muted-foreground">Contact details (optional)</p>
