@@ -237,3 +237,207 @@ describe('stu-04: Activities', () => {
     expect(res.status).toBe(404)
   })
 })
+
+const validAwardPayload = {
+  title: 'Best Science Project',
+  issuer: 'HKSAR Education Bureau',
+  awardMonth: 3,
+  awardYear: 2024,
+  level: 'NATIONAL',
+  description: 'Regional winner',
+}
+
+const validWorkExperiencePayload = {
+  employer: 'HSBC Hong Kong',
+  role: 'Summer Intern',
+  startMonth: 6,
+  startYear: 2023,
+}
+
+describe('stu-05: Awards', () => {
+  it('stu-05-list: GET /api/students/:id/awards returns 200 with array', async () => {
+    const student = await createTestStudent()
+    const token = staffToken()
+
+    const res = await request(app)
+      .get(`/api/students/${student.id}/awards`)
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    expect(Array.isArray(res.body)).toBe(true)
+  })
+
+  it('stu-05-create: POST /awards with valid body returns 201 with all fields', async () => {
+    const student = await createTestStudent()
+    const token = staffToken()
+
+    const res = await request(app)
+      .post(`/api/students/${student.id}/awards`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validAwardPayload)
+
+    expect(res.status).toBe(201)
+    expect(res.body).toMatchObject({
+      title: validAwardPayload.title,
+      issuer: validAwardPayload.issuer,
+      awardMonth: validAwardPayload.awardMonth,
+      awardYear: validAwardPayload.awardYear,
+      level: validAwardPayload.level,
+      description: validAwardPayload.description,
+    })
+    expect(res.body.id).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    )
+  })
+
+  it('stu-05-update: PATCH /awards/:awardId with level change returns 200', async () => {
+    const student = await createTestStudent()
+    const token = staffToken()
+
+    const createRes = await request(app)
+      .post(`/api/students/${student.id}/awards`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validAwardPayload)
+    expect(createRes.status).toBe(201)
+
+    const res = await request(app)
+      .patch(`/api/students/${student.id}/awards/${createRes.body.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ level: 'INTERNATIONAL' })
+
+    expect(res.status).toBe(200)
+    expect(res.body.level).toBe('INTERNATIONAL')
+  })
+
+  it('stu-05-delete: DELETE /awards/:awardId returns 204', async () => {
+    const student = await createTestStudent()
+    const token = staffToken()
+
+    const createRes = await request(app)
+      .post(`/api/students/${student.id}/awards`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validAwardPayload)
+    expect(createRes.status).toBe(201)
+
+    const res = await request(app)
+      .delete(`/api/students/${student.id}/awards/${createRes.body.id}`)
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(204)
+  })
+
+  it('stu-05-invalid-level: POST with level OLYMPIC returns 400', async () => {
+    const student = await createTestStudent()
+    const token = staffToken()
+
+    const res = await request(app)
+      .post(`/api/students/${student.id}/awards`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...validAwardPayload, level: 'OLYMPIC' })
+
+    expect(res.status).toBe(400)
+  })
+
+  it('stu-05-idor: PATCH award belonging to different student returns 404', async () => {
+    const studentA = await createTestStudent({ schoolStudentId: 'S2024301' })
+    const studentB = await createTestStudent({ schoolStudentId: 'S2024302', fullName: 'Li Xiao Hong' })
+    const token = staffToken()
+
+    const createRes = await request(app)
+      .post(`/api/students/${studentA.id}/awards`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validAwardPayload)
+    expect(createRes.status).toBe(201)
+
+    const res = await request(app)
+      .patch(`/api/students/${studentB.id}/awards/${createRes.body.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ level: 'REGIONAL' })
+
+    expect(res.status).toBe(404)
+  })
+
+  it('stu-05-audit: POST /awards creates AuditLog row model:Award action:CREATE', async () => {
+    const student = await createTestStudent()
+    const token = staffToken()
+
+    const res = await request(app)
+      .post(`/api/students/${student.id}/awards`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validAwardPayload)
+
+    expect(res.status).toBe(201)
+
+    const logs = await prisma.auditLog.findMany({
+      where: { model: 'Award', action: 'CREATE', recordId: res.body.id },
+    })
+    expect(logs).toHaveLength(1)
+  })
+})
+
+describe('stu-06: Work Experience', () => {
+  it('stu-06-create: POST /work-experience with valid body (no end date) returns 201', async () => {
+    const student = await createTestStudent()
+    const token = staffToken()
+
+    const res = await request(app)
+      .post(`/api/students/${student.id}/work-experience`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validWorkExperiencePayload)
+
+    expect(res.status).toBe(201)
+    expect(res.body).toMatchObject({
+      employer: validWorkExperiencePayload.employer,
+      role: validWorkExperiencePayload.role,
+      startMonth: validWorkExperiencePayload.startMonth,
+      startYear: validWorkExperiencePayload.startYear,
+    })
+    expect(res.body.endYear).toBeNull()
+    expect(res.body.id).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    )
+  })
+
+  it('stu-06-ongoing-sort: work experience with null endYear sorts before dated entry', async () => {
+    const student = await createTestStudent()
+    const token = staffToken()
+
+    await request(app)
+      .post(`/api/students/${student.id}/work-experience`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...validWorkExperiencePayload, employer: 'Past Company', endMonth: 12, endYear: 2022 })
+
+    await request(app)
+      .post(`/api/students/${student.id}/work-experience`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...validWorkExperiencePayload, employer: 'Ongoing Company' })
+
+    const res = await request(app)
+      .get(`/api/students/${student.id}/work-experience`)
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body.length).toBe(2)
+    expect(res.body[0].endYear).toBeNull()
+    expect(res.body[1].endYear).not.toBeNull()
+  })
+
+  it('stu-06-idor: PATCH work experience belonging to different student returns 404', async () => {
+    const studentA = await createTestStudent({ schoolStudentId: 'S2024401' })
+    const studentB = await createTestStudent({ schoolStudentId: 'S2024402', fullName: 'Zhang Wei' })
+    const token = staffToken()
+
+    const createRes = await request(app)
+      .post(`/api/students/${studentA.id}/work-experience`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(validWorkExperiencePayload)
+    expect(createRes.status).toBe(201)
+
+    const res = await request(app)
+      .patch(`/api/students/${studentB.id}/work-experience/${createRes.body.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ role: 'Senior Intern' })
+
+    expect(res.status).toBe(404)
+  })
+})
