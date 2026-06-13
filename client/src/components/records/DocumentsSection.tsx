@@ -35,6 +35,7 @@ import { Progress } from '@/components/ui/progress';
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import {
@@ -275,14 +276,16 @@ export function DocumentsSection({ studentId }: DocumentsSectionProps) {
             {data.map((doc) => (
               <TableRow key={doc.id}>
                 <TableCell className="max-w-[240px]">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="text-sm font-semibold truncate block max-w-[240px]">
-                        {doc.originalFilename}
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>{doc.originalFilename}</TooltipContent>
-                  </Tooltip>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="text-sm font-semibold truncate block max-w-[240px]">
+                          {doc.originalFilename}
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>{doc.originalFilename}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </TableCell>
                 <TableCell>
                   <Badge variant="secondary">
