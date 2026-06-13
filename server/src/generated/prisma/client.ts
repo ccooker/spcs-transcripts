@@ -91,3 +91,13 @@ export type StaffNote = Prisma.StaffNoteModel
  * 
  */
 export type Document = Prisma.DocumentModel
+/**
+ * Model Transcript
+ * 
+ */
+export type Transcript = Prisma.TranscriptModel
+/**
+ * Model SchoolSettings
+ * 
+ */
+export type SchoolSettings = Prisma.SchoolSettingsModel

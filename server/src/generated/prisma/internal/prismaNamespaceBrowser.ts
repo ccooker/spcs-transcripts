@@ -60,7 +60,9 @@ export const ModelName = {
   WorkExperience: 'WorkExperience',
   CareerGoal: 'CareerGoal',
   StaffNote: 'StaffNote',
-  Document: 'Document'
+  Document: 'Document',
+  Transcript: 'Transcript',
+  SchoolSettings: 'SchoolSettings'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -114,7 +116,6 @@ export const StudentScalarFieldEnum = {
   studentPhone: 'studentPhone',
   parentEmail: 'parentEmail',
   parentPhone: 'parentPhone',
-  transcriptStatus: 'transcriptStatus',
   archivedAt: 'archivedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -224,6 +225,41 @@ export const DocumentScalarFieldEnum = {
 } as const
 
 export type DocumentScalarFieldEnum = (typeof DocumentScalarFieldEnum)[keyof typeof DocumentScalarFieldEnum]
+
+
+export const TranscriptScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  status: 'status',
+  academicsContent: 'academicsContent',
+  activitiesContent: 'activitiesContent',
+  awardsContent: 'awardsContent',
+  workExperienceContent: 'workExperienceContent',
+  careerGoalsContent: 'careerGoalsContent',
+  staffEndorsementContent: 'staffEndorsementContent',
+  academicsVisible: 'academicsVisible',
+  activitiesVisible: 'activitiesVisible',
+  awardsVisible: 'awardsVisible',
+  workExperienceVisible: 'workExperienceVisible',
+  careerGoalsVisible: 'careerGoalsVisible',
+  staffEndorsementVisible: 'staffEndorsementVisible',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TranscriptScalarFieldEnum = (typeof TranscriptScalarFieldEnum)[keyof typeof TranscriptScalarFieldEnum]
+
+
+export const SchoolSettingsScalarFieldEnum = {
+  id: 'id',
+  schoolName: 'schoolName',
+  schoolAddress: 'schoolAddress',
+  letterheadHtml: 'letterheadHtml',
+  logoPath: 'logoPath',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SchoolSettingsScalarFieldEnum = (typeof SchoolSettingsScalarFieldEnum)[keyof typeof SchoolSettingsScalarFieldEnum]
 
 
 export const SortOrder = {

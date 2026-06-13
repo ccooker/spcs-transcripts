@@ -393,7 +393,9 @@ export const ModelName = {
   WorkExperience: 'WorkExperience',
   CareerGoal: 'CareerGoal',
   StaffNote: 'StaffNote',
-  Document: 'Document'
+  Document: 'Document',
+  Transcript: 'Transcript',
+  SchoolSettings: 'SchoolSettings'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -409,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "auditLog" | "student" | "academicResult" | "activity" | "award" | "workExperience" | "careerGoal" | "staffNote" | "document"
+    modelProps: "user" | "auditLog" | "student" | "academicResult" | "activity" | "award" | "workExperience" | "careerGoal" | "staffNote" | "document" | "transcript" | "schoolSettings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1153,6 +1155,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Transcript: {
+      payload: Prisma.$TranscriptPayload<ExtArgs>
+      fields: Prisma.TranscriptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TranscriptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TranscriptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>
+        }
+        findFirst: {
+          args: Prisma.TranscriptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TranscriptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>
+        }
+        findMany: {
+          args: Prisma.TranscriptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>[]
+        }
+        create: {
+          args: Prisma.TranscriptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>
+        }
+        createMany: {
+          args: Prisma.TranscriptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TranscriptCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>[]
+        }
+        delete: {
+          args: Prisma.TranscriptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>
+        }
+        update: {
+          args: Prisma.TranscriptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>
+        }
+        deleteMany: {
+          args: Prisma.TranscriptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TranscriptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TranscriptUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>[]
+        }
+        upsert: {
+          args: Prisma.TranscriptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TranscriptPayload>
+        }
+        aggregate: {
+          args: Prisma.TranscriptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTranscript>
+        }
+        groupBy: {
+          args: Prisma.TranscriptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TranscriptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TranscriptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TranscriptCountAggregateOutputType> | number
+        }
+      }
+    }
+    SchoolSettings: {
+      payload: Prisma.$SchoolSettingsPayload<ExtArgs>
+      fields: Prisma.SchoolSettingsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SchoolSettingsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolSettingsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SchoolSettingsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolSettingsPayload>
+        }
+        findFirst: {
+          args: Prisma.SchoolSettingsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolSettingsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SchoolSettingsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolSettingsPayload>
+        }
+        findMany: {
+          args: Prisma.SchoolSettingsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolSettingsPayload>[]
+        }
+        create: {
+          args: Prisma.SchoolSettingsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolSettingsPayload>
+        }
+        createMany: {
+          args: Prisma.SchoolSettingsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SchoolSettingsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolSettingsPayload>[]
+        }
+        delete: {
+          args: Prisma.SchoolSettingsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolSettingsPayload>
+        }
+        update: {
+          args: Prisma.SchoolSettingsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolSettingsPayload>
+        }
+        deleteMany: {
+          args: Prisma.SchoolSettingsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SchoolSettingsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SchoolSettingsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolSettingsPayload>[]
+        }
+        upsert: {
+          args: Prisma.SchoolSettingsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SchoolSettingsPayload>
+        }
+        aggregate: {
+          args: Prisma.SchoolSettingsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSchoolSettings>
+        }
+        groupBy: {
+          args: Prisma.SchoolSettingsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SchoolSettingsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SchoolSettingsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SchoolSettingsCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1227,7 +1377,6 @@ export const StudentScalarFieldEnum = {
   studentPhone: 'studentPhone',
   parentEmail: 'parentEmail',
   parentPhone: 'parentPhone',
-  transcriptStatus: 'transcriptStatus',
   archivedAt: 'archivedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1337,6 +1486,41 @@ export const DocumentScalarFieldEnum = {
 } as const
 
 export type DocumentScalarFieldEnum = (typeof DocumentScalarFieldEnum)[keyof typeof DocumentScalarFieldEnum]
+
+
+export const TranscriptScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  status: 'status',
+  academicsContent: 'academicsContent',
+  activitiesContent: 'activitiesContent',
+  awardsContent: 'awardsContent',
+  workExperienceContent: 'workExperienceContent',
+  careerGoalsContent: 'careerGoalsContent',
+  staffEndorsementContent: 'staffEndorsementContent',
+  academicsVisible: 'academicsVisible',
+  activitiesVisible: 'activitiesVisible',
+  awardsVisible: 'awardsVisible',
+  workExperienceVisible: 'workExperienceVisible',
+  careerGoalsVisible: 'careerGoalsVisible',
+  staffEndorsementVisible: 'staffEndorsementVisible',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TranscriptScalarFieldEnum = (typeof TranscriptScalarFieldEnum)[keyof typeof TranscriptScalarFieldEnum]
+
+
+export const SchoolSettingsScalarFieldEnum = {
+  id: 'id',
+  schoolName: 'schoolName',
+  schoolAddress: 'schoolAddress',
+  letterheadHtml: 'letterheadHtml',
+  logoPath: 'logoPath',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SchoolSettingsScalarFieldEnum = (typeof SchoolSettingsScalarFieldEnum)[keyof typeof SchoolSettingsScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1454,20 +1638,6 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
- * Reference to a field of type 'TranscriptStatus'
- */
-export type EnumTranscriptStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TranscriptStatus'>
-    
-
-
-/**
- * Reference to a field of type 'TranscriptStatus[]'
- */
-export type ListEnumTranscriptStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TranscriptStatus[]'>
-    
-
-
-/**
  * Reference to a field of type 'AwardLevel'
  */
 export type EnumAwardLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AwardLevel'>
@@ -1506,6 +1676,27 @@ export type EnumDocumentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
  * Reference to a field of type 'DocumentType[]'
  */
 export type ListEnumDocumentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DocumentType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'TranscriptStatus'
+ */
+export type EnumTranscriptStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TranscriptStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'TranscriptStatus[]'
+ */
+export type ListEnumTranscriptStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TranscriptStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -1642,6 +1833,8 @@ export type GlobalOmitConfig = {
   careerGoal?: Prisma.CareerGoalOmit
   staffNote?: Prisma.StaffNoteOmit
   document?: Prisma.DocumentOmit
+  transcript?: Prisma.TranscriptOmit
+  schoolSettings?: Prisma.SchoolSettingsOmit
 }
 
 /* Types for Logging */

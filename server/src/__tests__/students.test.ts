@@ -330,8 +330,7 @@ async function seedListStudents() {
     .delete(`/api/students/${wong.id}`)
     .set('Authorization', `Bearer ${token}`)
 
-  // @ts-expect-error — transcript model not in generated client until Plan 02
-  await (prisma as any).transcript.create({ data: { studentId: lee.id, status: 'DRAFT' } })
+  await prisma.transcript.create({ data: { studentId: lee.id, status: 'DRAFT' } })
 
   return { chan, wong, chanLower, lee }
 }

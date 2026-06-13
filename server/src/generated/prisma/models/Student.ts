@@ -44,7 +44,6 @@ export type StudentMinAggregateOutputType = {
   studentPhone: string | null
   parentEmail: string | null
   parentPhone: string | null
-  transcriptStatus: $Enums.TranscriptStatus | null
   archivedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -60,7 +59,6 @@ export type StudentMaxAggregateOutputType = {
   studentPhone: string | null
   parentEmail: string | null
   parentPhone: string | null
-  transcriptStatus: $Enums.TranscriptStatus | null
   archivedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -76,7 +74,6 @@ export type StudentCountAggregateOutputType = {
   studentPhone: number
   parentEmail: number
   parentPhone: number
-  transcriptStatus: number
   archivedAt: number
   createdAt: number
   updatedAt: number
@@ -102,7 +99,6 @@ export type StudentMinAggregateInputType = {
   studentPhone?: true
   parentEmail?: true
   parentPhone?: true
-  transcriptStatus?: true
   archivedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -118,7 +114,6 @@ export type StudentMaxAggregateInputType = {
   studentPhone?: true
   parentEmail?: true
   parentPhone?: true
-  transcriptStatus?: true
   archivedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -134,7 +129,6 @@ export type StudentCountAggregateInputType = {
   studentPhone?: true
   parentEmail?: true
   parentPhone?: true
-  transcriptStatus?: true
   archivedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -237,7 +231,6 @@ export type StudentGroupByOutputType = {
   studentPhone: string | null
   parentEmail: string | null
   parentPhone: string | null
-  transcriptStatus: $Enums.TranscriptStatus
   archivedAt: Date | null
   createdAt: Date
   updatedAt: Date
@@ -276,7 +269,6 @@ export type StudentWhereInput = {
   studentPhone?: Prisma.StringNullableFilter<"Student"> | string | null
   parentEmail?: Prisma.StringNullableFilter<"Student"> | string | null
   parentPhone?: Prisma.StringNullableFilter<"Student"> | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFilter<"Student"> | $Enums.TranscriptStatus
   archivedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Student"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Student"> | Date | string
@@ -287,6 +279,7 @@ export type StudentWhereInput = {
   careerGoals?: Prisma.CareerGoalListRelationFilter
   staffNotes?: Prisma.StaffNoteListRelationFilter
   documents?: Prisma.DocumentListRelationFilter
+  transcript?: Prisma.XOR<Prisma.TranscriptNullableScalarRelationFilter, Prisma.TranscriptWhereInput> | null
 }
 
 export type StudentOrderByWithRelationInput = {
@@ -299,7 +292,6 @@ export type StudentOrderByWithRelationInput = {
   studentPhone?: Prisma.SortOrderInput | Prisma.SortOrder
   parentEmail?: Prisma.SortOrderInput | Prisma.SortOrder
   parentPhone?: Prisma.SortOrderInput | Prisma.SortOrder
-  transcriptStatus?: Prisma.SortOrder
   archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -310,6 +302,7 @@ export type StudentOrderByWithRelationInput = {
   careerGoals?: Prisma.CareerGoalOrderByRelationAggregateInput
   staffNotes?: Prisma.StaffNoteOrderByRelationAggregateInput
   documents?: Prisma.DocumentOrderByRelationAggregateInput
+  transcript?: Prisma.TranscriptOrderByWithRelationInput
 }
 
 export type StudentWhereUniqueInput = Prisma.AtLeast<{
@@ -325,7 +318,6 @@ export type StudentWhereUniqueInput = Prisma.AtLeast<{
   studentPhone?: Prisma.StringNullableFilter<"Student"> | string | null
   parentEmail?: Prisma.StringNullableFilter<"Student"> | string | null
   parentPhone?: Prisma.StringNullableFilter<"Student"> | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFilter<"Student"> | $Enums.TranscriptStatus
   archivedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Student"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Student"> | Date | string
@@ -336,6 +328,7 @@ export type StudentWhereUniqueInput = Prisma.AtLeast<{
   careerGoals?: Prisma.CareerGoalListRelationFilter
   staffNotes?: Prisma.StaffNoteListRelationFilter
   documents?: Prisma.DocumentListRelationFilter
+  transcript?: Prisma.XOR<Prisma.TranscriptNullableScalarRelationFilter, Prisma.TranscriptWhereInput> | null
 }, "id" | "schoolStudentId">
 
 export type StudentOrderByWithAggregationInput = {
@@ -348,7 +341,6 @@ export type StudentOrderByWithAggregationInput = {
   studentPhone?: Prisma.SortOrderInput | Prisma.SortOrder
   parentEmail?: Prisma.SortOrderInput | Prisma.SortOrder
   parentPhone?: Prisma.SortOrderInput | Prisma.SortOrder
-  transcriptStatus?: Prisma.SortOrder
   archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -372,7 +364,6 @@ export type StudentScalarWhereWithAggregatesInput = {
   studentPhone?: Prisma.StringNullableWithAggregatesFilter<"Student"> | string | null
   parentEmail?: Prisma.StringNullableWithAggregatesFilter<"Student"> | string | null
   parentPhone?: Prisma.StringNullableWithAggregatesFilter<"Student"> | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusWithAggregatesFilter<"Student"> | $Enums.TranscriptStatus
   archivedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Student"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Student"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Student"> | Date | string
@@ -388,7 +379,6 @@ export type StudentCreateInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -399,6 +389,7 @@ export type StudentCreateInput = {
   careerGoals?: Prisma.CareerGoalCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteCreateNestedManyWithoutStudentInput
   documents?: Prisma.DocumentCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUncheckedCreateInput = {
@@ -411,7 +402,6 @@ export type StudentUncheckedCreateInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -422,6 +412,7 @@ export type StudentUncheckedCreateInput = {
   careerGoals?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutStudentInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptUncheckedCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUpdateInput = {
@@ -434,7 +425,6 @@ export type StudentUpdateInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -445,6 +435,7 @@ export type StudentUpdateInput = {
   careerGoals?: Prisma.CareerGoalUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUpdateManyWithoutStudentNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateInput = {
@@ -457,7 +448,6 @@ export type StudentUncheckedUpdateInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -468,6 +458,7 @@ export type StudentUncheckedUpdateInput = {
   careerGoals?: Prisma.CareerGoalUncheckedUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUncheckedUpdateManyWithoutStudentNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUncheckedUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentCreateManyInput = {
@@ -480,7 +471,6 @@ export type StudentCreateManyInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -496,7 +486,6 @@ export type StudentUpdateManyMutationInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -512,7 +501,6 @@ export type StudentUncheckedUpdateManyInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -528,7 +516,6 @@ export type StudentCountOrderByAggregateInput = {
   studentPhone?: Prisma.SortOrder
   parentEmail?: Prisma.SortOrder
   parentPhone?: Prisma.SortOrder
-  transcriptStatus?: Prisma.SortOrder
   archivedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -548,7 +535,6 @@ export type StudentMaxOrderByAggregateInput = {
   studentPhone?: Prisma.SortOrder
   parentEmail?: Prisma.SortOrder
   parentPhone?: Prisma.SortOrder
-  transcriptStatus?: Prisma.SortOrder
   archivedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -564,7 +550,6 @@ export type StudentMinOrderByAggregateInput = {
   studentPhone?: Prisma.SortOrder
   parentEmail?: Prisma.SortOrder
   parentPhone?: Prisma.SortOrder
-  transcriptStatus?: Prisma.SortOrder
   archivedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -589,10 +574,6 @@ export type IntFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
-}
-
-export type EnumTranscriptStatusFieldUpdateOperationsInput = {
-  set?: $Enums.TranscriptStatus
 }
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -697,6 +678,20 @@ export type StudentUpdateOneRequiredWithoutDocumentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.StudentUpdateToOneWithWhereWithoutDocumentsInput, Prisma.StudentUpdateWithoutDocumentsInput>, Prisma.StudentUncheckedUpdateWithoutDocumentsInput>
 }
 
+export type StudentCreateNestedOneWithoutTranscriptInput = {
+  create?: Prisma.XOR<Prisma.StudentCreateWithoutTranscriptInput, Prisma.StudentUncheckedCreateWithoutTranscriptInput>
+  connectOrCreate?: Prisma.StudentCreateOrConnectWithoutTranscriptInput
+  connect?: Prisma.StudentWhereUniqueInput
+}
+
+export type StudentUpdateOneRequiredWithoutTranscriptNestedInput = {
+  create?: Prisma.XOR<Prisma.StudentCreateWithoutTranscriptInput, Prisma.StudentUncheckedCreateWithoutTranscriptInput>
+  connectOrCreate?: Prisma.StudentCreateOrConnectWithoutTranscriptInput
+  upsert?: Prisma.StudentUpsertWithoutTranscriptInput
+  connect?: Prisma.StudentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StudentUpdateToOneWithWhereWithoutTranscriptInput, Prisma.StudentUpdateWithoutTranscriptInput>, Prisma.StudentUncheckedUpdateWithoutTranscriptInput>
+}
+
 export type StudentCreateWithoutAcademicResultsInput = {
   id?: string
   fullName: string
@@ -707,7 +702,6 @@ export type StudentCreateWithoutAcademicResultsInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -717,6 +711,7 @@ export type StudentCreateWithoutAcademicResultsInput = {
   careerGoals?: Prisma.CareerGoalCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteCreateNestedManyWithoutStudentInput
   documents?: Prisma.DocumentCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutAcademicResultsInput = {
@@ -729,7 +724,6 @@ export type StudentUncheckedCreateWithoutAcademicResultsInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -739,6 +733,7 @@ export type StudentUncheckedCreateWithoutAcademicResultsInput = {
   careerGoals?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutStudentInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptUncheckedCreateNestedOneWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutAcademicResultsInput = {
@@ -767,7 +762,6 @@ export type StudentUpdateWithoutAcademicResultsInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -777,6 +771,7 @@ export type StudentUpdateWithoutAcademicResultsInput = {
   careerGoals?: Prisma.CareerGoalUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUpdateManyWithoutStudentNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutAcademicResultsInput = {
@@ -789,7 +784,6 @@ export type StudentUncheckedUpdateWithoutAcademicResultsInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -799,6 +793,7 @@ export type StudentUncheckedUpdateWithoutAcademicResultsInput = {
   careerGoals?: Prisma.CareerGoalUncheckedUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUncheckedUpdateManyWithoutStudentNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUncheckedUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutActivitiesInput = {
@@ -811,7 +806,6 @@ export type StudentCreateWithoutActivitiesInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -821,6 +815,7 @@ export type StudentCreateWithoutActivitiesInput = {
   careerGoals?: Prisma.CareerGoalCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteCreateNestedManyWithoutStudentInput
   documents?: Prisma.DocumentCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutActivitiesInput = {
@@ -833,7 +828,6 @@ export type StudentUncheckedCreateWithoutActivitiesInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -843,6 +837,7 @@ export type StudentUncheckedCreateWithoutActivitiesInput = {
   careerGoals?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutStudentInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptUncheckedCreateNestedOneWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutActivitiesInput = {
@@ -871,7 +866,6 @@ export type StudentUpdateWithoutActivitiesInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -881,6 +875,7 @@ export type StudentUpdateWithoutActivitiesInput = {
   careerGoals?: Prisma.CareerGoalUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUpdateManyWithoutStudentNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutActivitiesInput = {
@@ -893,7 +888,6 @@ export type StudentUncheckedUpdateWithoutActivitiesInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -903,6 +897,7 @@ export type StudentUncheckedUpdateWithoutActivitiesInput = {
   careerGoals?: Prisma.CareerGoalUncheckedUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUncheckedUpdateManyWithoutStudentNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUncheckedUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutAwardsInput = {
@@ -915,7 +910,6 @@ export type StudentCreateWithoutAwardsInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -925,6 +919,7 @@ export type StudentCreateWithoutAwardsInput = {
   careerGoals?: Prisma.CareerGoalCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteCreateNestedManyWithoutStudentInput
   documents?: Prisma.DocumentCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutAwardsInput = {
@@ -937,7 +932,6 @@ export type StudentUncheckedCreateWithoutAwardsInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -947,6 +941,7 @@ export type StudentUncheckedCreateWithoutAwardsInput = {
   careerGoals?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutStudentInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptUncheckedCreateNestedOneWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutAwardsInput = {
@@ -975,7 +970,6 @@ export type StudentUpdateWithoutAwardsInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -985,6 +979,7 @@ export type StudentUpdateWithoutAwardsInput = {
   careerGoals?: Prisma.CareerGoalUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUpdateManyWithoutStudentNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutAwardsInput = {
@@ -997,7 +992,6 @@ export type StudentUncheckedUpdateWithoutAwardsInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1007,6 +1001,7 @@ export type StudentUncheckedUpdateWithoutAwardsInput = {
   careerGoals?: Prisma.CareerGoalUncheckedUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUncheckedUpdateManyWithoutStudentNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUncheckedUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutWorkExperiencesInput = {
@@ -1019,7 +1014,6 @@ export type StudentCreateWithoutWorkExperiencesInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1029,6 +1023,7 @@ export type StudentCreateWithoutWorkExperiencesInput = {
   careerGoals?: Prisma.CareerGoalCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteCreateNestedManyWithoutStudentInput
   documents?: Prisma.DocumentCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutWorkExperiencesInput = {
@@ -1041,7 +1036,6 @@ export type StudentUncheckedCreateWithoutWorkExperiencesInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1051,6 +1045,7 @@ export type StudentUncheckedCreateWithoutWorkExperiencesInput = {
   careerGoals?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutStudentInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptUncheckedCreateNestedOneWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutWorkExperiencesInput = {
@@ -1079,7 +1074,6 @@ export type StudentUpdateWithoutWorkExperiencesInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1089,6 +1083,7 @@ export type StudentUpdateWithoutWorkExperiencesInput = {
   careerGoals?: Prisma.CareerGoalUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUpdateManyWithoutStudentNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutWorkExperiencesInput = {
@@ -1101,7 +1096,6 @@ export type StudentUncheckedUpdateWithoutWorkExperiencesInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1111,6 +1105,7 @@ export type StudentUncheckedUpdateWithoutWorkExperiencesInput = {
   careerGoals?: Prisma.CareerGoalUncheckedUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUncheckedUpdateManyWithoutStudentNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUncheckedUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutCareerGoalsInput = {
@@ -1123,7 +1118,6 @@ export type StudentCreateWithoutCareerGoalsInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1133,6 +1127,7 @@ export type StudentCreateWithoutCareerGoalsInput = {
   workExperiences?: Prisma.WorkExperienceCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteCreateNestedManyWithoutStudentInput
   documents?: Prisma.DocumentCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutCareerGoalsInput = {
@@ -1145,7 +1140,6 @@ export type StudentUncheckedCreateWithoutCareerGoalsInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1155,6 +1149,7 @@ export type StudentUncheckedCreateWithoutCareerGoalsInput = {
   workExperiences?: Prisma.WorkExperienceUncheckedCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutStudentInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptUncheckedCreateNestedOneWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutCareerGoalsInput = {
@@ -1183,7 +1178,6 @@ export type StudentUpdateWithoutCareerGoalsInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1193,6 +1187,7 @@ export type StudentUpdateWithoutCareerGoalsInput = {
   workExperiences?: Prisma.WorkExperienceUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUpdateManyWithoutStudentNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutCareerGoalsInput = {
@@ -1205,7 +1200,6 @@ export type StudentUncheckedUpdateWithoutCareerGoalsInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1215,6 +1209,7 @@ export type StudentUncheckedUpdateWithoutCareerGoalsInput = {
   workExperiences?: Prisma.WorkExperienceUncheckedUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUncheckedUpdateManyWithoutStudentNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUncheckedUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutStaffNotesInput = {
@@ -1227,7 +1222,6 @@ export type StudentCreateWithoutStaffNotesInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1237,6 +1231,7 @@ export type StudentCreateWithoutStaffNotesInput = {
   workExperiences?: Prisma.WorkExperienceCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalCreateNestedManyWithoutStudentInput
   documents?: Prisma.DocumentCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutStaffNotesInput = {
@@ -1249,7 +1244,6 @@ export type StudentUncheckedCreateWithoutStaffNotesInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1259,6 +1253,7 @@ export type StudentUncheckedCreateWithoutStaffNotesInput = {
   workExperiences?: Prisma.WorkExperienceUncheckedCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutStudentInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptUncheckedCreateNestedOneWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutStaffNotesInput = {
@@ -1287,7 +1282,6 @@ export type StudentUpdateWithoutStaffNotesInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1297,6 +1291,7 @@ export type StudentUpdateWithoutStaffNotesInput = {
   workExperiences?: Prisma.WorkExperienceUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUpdateManyWithoutStudentNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutStaffNotesInput = {
@@ -1309,7 +1304,6 @@ export type StudentUncheckedUpdateWithoutStaffNotesInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1319,6 +1313,7 @@ export type StudentUncheckedUpdateWithoutStaffNotesInput = {
   workExperiences?: Prisma.WorkExperienceUncheckedUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUncheckedUpdateManyWithoutStudentNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUncheckedUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutDocumentsInput = {
@@ -1331,7 +1326,6 @@ export type StudentCreateWithoutDocumentsInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1341,6 +1335,7 @@ export type StudentCreateWithoutDocumentsInput = {
   workExperiences?: Prisma.WorkExperienceCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptCreateNestedOneWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutDocumentsInput = {
@@ -1353,7 +1348,6 @@ export type StudentUncheckedCreateWithoutDocumentsInput = {
   studentPhone?: string | null
   parentEmail?: string | null
   parentPhone?: string | null
-  transcriptStatus?: $Enums.TranscriptStatus
   archivedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1363,6 +1357,7 @@ export type StudentUncheckedCreateWithoutDocumentsInput = {
   workExperiences?: Prisma.WorkExperienceUncheckedCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutStudentInput
+  transcript?: Prisma.TranscriptUncheckedCreateNestedOneWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutDocumentsInput = {
@@ -1391,7 +1386,6 @@ export type StudentUpdateWithoutDocumentsInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1401,6 +1395,7 @@ export type StudentUpdateWithoutDocumentsInput = {
   workExperiences?: Prisma.WorkExperienceUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUpdateOneWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutDocumentsInput = {
@@ -1413,7 +1408,6 @@ export type StudentUncheckedUpdateWithoutDocumentsInput = {
   studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
   archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1423,6 +1417,111 @@ export type StudentUncheckedUpdateWithoutDocumentsInput = {
   workExperiences?: Prisma.WorkExperienceUncheckedUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUncheckedUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUncheckedUpdateManyWithoutStudentNestedInput
+  transcript?: Prisma.TranscriptUncheckedUpdateOneWithoutStudentNestedInput
+}
+
+export type StudentCreateWithoutTranscriptInput = {
+  id?: string
+  fullName: string
+  formLevel: $Enums.FormLevel
+  graduationYear: number
+  schoolStudentId: string
+  studentEmail?: string | null
+  studentPhone?: string | null
+  parentEmail?: string | null
+  parentPhone?: string | null
+  archivedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  academicResults?: Prisma.AcademicResultCreateNestedManyWithoutStudentInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutStudentInput
+  awards?: Prisma.AwardCreateNestedManyWithoutStudentInput
+  workExperiences?: Prisma.WorkExperienceCreateNestedManyWithoutStudentInput
+  careerGoals?: Prisma.CareerGoalCreateNestedManyWithoutStudentInput
+  staffNotes?: Prisma.StaffNoteCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutStudentInput
+}
+
+export type StudentUncheckedCreateWithoutTranscriptInput = {
+  id?: string
+  fullName: string
+  formLevel: $Enums.FormLevel
+  graduationYear: number
+  schoolStudentId: string
+  studentEmail?: string | null
+  studentPhone?: string | null
+  parentEmail?: string | null
+  parentPhone?: string | null
+  archivedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  academicResults?: Prisma.AcademicResultUncheckedCreateNestedManyWithoutStudentInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutStudentInput
+  awards?: Prisma.AwardUncheckedCreateNestedManyWithoutStudentInput
+  workExperiences?: Prisma.WorkExperienceUncheckedCreateNestedManyWithoutStudentInput
+  careerGoals?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutStudentInput
+  staffNotes?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutStudentInput
+}
+
+export type StudentCreateOrConnectWithoutTranscriptInput = {
+  where: Prisma.StudentWhereUniqueInput
+  create: Prisma.XOR<Prisma.StudentCreateWithoutTranscriptInput, Prisma.StudentUncheckedCreateWithoutTranscriptInput>
+}
+
+export type StudentUpsertWithoutTranscriptInput = {
+  update: Prisma.XOR<Prisma.StudentUpdateWithoutTranscriptInput, Prisma.StudentUncheckedUpdateWithoutTranscriptInput>
+  create: Prisma.XOR<Prisma.StudentCreateWithoutTranscriptInput, Prisma.StudentUncheckedCreateWithoutTranscriptInput>
+  where?: Prisma.StudentWhereInput
+}
+
+export type StudentUpdateToOneWithWhereWithoutTranscriptInput = {
+  where?: Prisma.StudentWhereInput
+  data: Prisma.XOR<Prisma.StudentUpdateWithoutTranscriptInput, Prisma.StudentUncheckedUpdateWithoutTranscriptInput>
+}
+
+export type StudentUpdateWithoutTranscriptInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  formLevel?: Prisma.EnumFormLevelFieldUpdateOperationsInput | $Enums.FormLevel
+  graduationYear?: Prisma.IntFieldUpdateOperationsInput | number
+  schoolStudentId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  academicResults?: Prisma.AcademicResultUpdateManyWithoutStudentNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutStudentNestedInput
+  awards?: Prisma.AwardUpdateManyWithoutStudentNestedInput
+  workExperiences?: Prisma.WorkExperienceUpdateManyWithoutStudentNestedInput
+  careerGoals?: Prisma.CareerGoalUpdateManyWithoutStudentNestedInput
+  staffNotes?: Prisma.StaffNoteUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutStudentNestedInput
+}
+
+export type StudentUncheckedUpdateWithoutTranscriptInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  formLevel?: Prisma.EnumFormLevelFieldUpdateOperationsInput | $Enums.FormLevel
+  graduationYear?: Prisma.IntFieldUpdateOperationsInput | number
+  schoolStudentId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  academicResults?: Prisma.AcademicResultUncheckedUpdateManyWithoutStudentNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutStudentNestedInput
+  awards?: Prisma.AwardUncheckedUpdateManyWithoutStudentNestedInput
+  workExperiences?: Prisma.WorkExperienceUncheckedUpdateManyWithoutStudentNestedInput
+  careerGoals?: Prisma.CareerGoalUncheckedUpdateManyWithoutStudentNestedInput
+  staffNotes?: Prisma.StaffNoteUncheckedUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 
@@ -1520,7 +1619,6 @@ export type StudentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   studentPhone?: boolean
   parentEmail?: boolean
   parentPhone?: boolean
-  transcriptStatus?: boolean
   archivedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1531,6 +1629,7 @@ export type StudentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   careerGoals?: boolean | Prisma.Student$careerGoalsArgs<ExtArgs>
   staffNotes?: boolean | Prisma.Student$staffNotesArgs<ExtArgs>
   documents?: boolean | Prisma.Student$documentsArgs<ExtArgs>
+  transcript?: boolean | Prisma.Student$transcriptArgs<ExtArgs>
   _count?: boolean | Prisma.StudentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["student"]>
 
@@ -1544,7 +1643,6 @@ export type StudentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   studentPhone?: boolean
   parentEmail?: boolean
   parentPhone?: boolean
-  transcriptStatus?: boolean
   archivedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1560,7 +1658,6 @@ export type StudentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   studentPhone?: boolean
   parentEmail?: boolean
   parentPhone?: boolean
-  transcriptStatus?: boolean
   archivedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1576,13 +1673,12 @@ export type StudentSelectScalar = {
   studentPhone?: boolean
   parentEmail?: boolean
   parentPhone?: boolean
-  transcriptStatus?: boolean
   archivedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type StudentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "formLevel" | "graduationYear" | "schoolStudentId" | "studentEmail" | "studentPhone" | "parentEmail" | "parentPhone" | "transcriptStatus" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["student"]>
+export type StudentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "formLevel" | "graduationYear" | "schoolStudentId" | "studentEmail" | "studentPhone" | "parentEmail" | "parentPhone" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["student"]>
 export type StudentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   academicResults?: boolean | Prisma.Student$academicResultsArgs<ExtArgs>
   activities?: boolean | Prisma.Student$activitiesArgs<ExtArgs>
@@ -1591,6 +1687,7 @@ export type StudentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   careerGoals?: boolean | Prisma.Student$careerGoalsArgs<ExtArgs>
   staffNotes?: boolean | Prisma.Student$staffNotesArgs<ExtArgs>
   documents?: boolean | Prisma.Student$documentsArgs<ExtArgs>
+  transcript?: boolean | Prisma.Student$transcriptArgs<ExtArgs>
   _count?: boolean | Prisma.StudentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type StudentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1606,6 +1703,7 @@ export type $StudentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     careerGoals: Prisma.$CareerGoalPayload<ExtArgs>[]
     staffNotes: Prisma.$StaffNotePayload<ExtArgs>[]
     documents: Prisma.$DocumentPayload<ExtArgs>[]
+    transcript: Prisma.$TranscriptPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1617,7 +1715,6 @@ export type $StudentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     studentPhone: string | null
     parentEmail: string | null
     parentPhone: string | null
-    transcriptStatus: $Enums.TranscriptStatus
     archivedAt: Date | null
     createdAt: Date
     updatedAt: Date
@@ -2022,6 +2119,7 @@ export interface Prisma__StudentClient<T, Null = never, ExtArgs extends runtime.
   careerGoals<T extends Prisma.Student$careerGoalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$careerGoalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CareerGoalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   staffNotes<T extends Prisma.Student$staffNotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$staffNotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StaffNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   documents<T extends Prisma.Student$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  transcript<T extends Prisma.Student$transcriptArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$transcriptArgs<ExtArgs>>): Prisma.Prisma__TranscriptClient<runtime.Types.Result.GetResult<Prisma.$TranscriptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2060,7 +2158,6 @@ export interface StudentFieldRefs {
   readonly studentPhone: Prisma.FieldRef<"Student", 'String'>
   readonly parentEmail: Prisma.FieldRef<"Student", 'String'>
   readonly parentPhone: Prisma.FieldRef<"Student", 'String'>
-  readonly transcriptStatus: Prisma.FieldRef<"Student", 'TranscriptStatus'>
   readonly archivedAt: Prisma.FieldRef<"Student", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Student", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Student", 'DateTime'>
@@ -2622,6 +2719,25 @@ export type Student$documentsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.DocumentScalarFieldEnum | Prisma.DocumentScalarFieldEnum[]
+}
+
+/**
+ * Student.transcript
+ */
+export type Student$transcriptArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Transcript
+   */
+  select?: Prisma.TranscriptSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Transcript
+   */
+  omit?: Prisma.TranscriptOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TranscriptInclude<ExtArgs> | null
+  where?: Prisma.TranscriptWhereInput
 }
 
 /**
