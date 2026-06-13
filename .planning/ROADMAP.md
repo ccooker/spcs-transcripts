@@ -11,7 +11,7 @@
 - [ ] **Phase 1: Infrastructure & Auth** — Microsoft Entra ID SSO, role-based access, audit logging, on-premise deployment
 - [x] **Phase 2: Student Profiles & Search** — Student directory CRUD, name search, year/status filtering, cohort overview (completed 2026-06-12)
 - [x] **Phase 3: Student Records UI** — All six record types: academics, activities, awards, work experience, career goals, notes (completed 2026-06-13)
-- [ ] **Phase 4: Document Management** — PDF upload, secure storage, document listing/download/soft-delete, type tagging
+- [x] **Phase 4: Document Management** — PDF upload, secure storage, document listing/download/soft-delete, type tagging (completed 2026-06-13)
 - [ ] **Phase 5: Transcript Assembly & Export** — Narrative template, draft/finalised status, school-branded PDF export
 
 ---
@@ -123,7 +123,7 @@ Plans:
 3. Staff can soft-delete a document; the file disappears from the active list but is retained on disk with an audit trail entry.
 4. Staff can assign a document type tag (Report Card, Certificate, Award Letter, Work Experience Letter, Reference Letter, Other) to each uploaded file.
 
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 
 Plans:
 
@@ -167,7 +167,7 @@ Plans:
 | 1. Infrastructure & Auth | 5/5 (checkpoint pending) | In Progress | — |
 | 2. Student Profiles & Search | 3/3 | Complete   | 2026-06-12 |
 | 3. Student Records UI | 0/? | Not started | — |
-| 4. Document Management | 3/3 | Complete | 2026-06-13 |
+| 4. Document Management | 3/3 | Complete    | 2026-06-13 |
 | 5. Transcript Assembly & Export | 0/? | Not started | — |
 
 ---

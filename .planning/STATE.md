@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 04
-status: Executing Phase 04
-last_updated: "2026-06-13T03:20:00.000Z"
+current_phase: 5
+status: Ready to plan
+last_updated: "2026-06-13T12:06:43.909Z"
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 17
-  completed_plans: 16
-  percent: 65
+  completed_plans: 17
+  percent: 80
 ---
 
 # Project State
@@ -21,13 +21,13 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 **Core value:** A careers staff member can open any student's record and produce a completed, professional transcript PDF in a single session — no hunting through spreadsheets, emails, or paper.
 **Current milestone:** v1.0
-**Current phase:** 04
+**Current phase:** 5
 
 ## Current Status
 
 - Roadmap: created
-- Active phase: Phase 4 — document management
-- Last action: Phase 4 Plan 04-03 — shadcn progress installed; DocumentsSection.tsx created (XHR upload+progress, fetch+blob download, delete AlertDialog, DOCUMENT_TYPE_LABELS, 5-column table); DocumentsSection wired as 7th section in StudentDetailPage; tsc clean
+- Active phase: Phase 5 — transcript assembly & export (not started)
+- Last action: Phase 4 complete 2026-06-13 — UAT passed; DocumentsSection (upload/list/download/soft-delete), 73 tests GREEN
 
 ## Phase History
 
@@ -134,11 +134,13 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 - [Phase 04-01]: storedPath stored relative to UPLOAD_ROOT (not absolute) to survive container remounts
 
 | Phase 04-document-management P01 | ~15min | 3 tasks | 10 files |
+
 - [Phase 04-02]: docker-compose.override.yml created to expose postgres:5432 to host for prisma db push
 - [Phase 04-02]: doc-01-idor uses fake UUID non-existent student ID to trigger 404 IDOR guard
 - [Phase 04-02]: doc-04-all-types creates unique student per type tag to avoid schoolStudentId uniqueness conflicts
 
 | Phase 04-document-management P02 | ~10min | 2 tasks | 8 files |
+
 - [Phase 04-03]: Download uses fetch+blob+anchor (not window.open) — all /api/students routes require JWT Bearer token
 - [Phase 04-03]: AlertDialog inlined in DocumentsSection per UI-SPEC — delete copy differs from Phase 3 RecordDeleteDialog
 - [Phase 04-03]: Date formatted via toLocaleDateString (en-GB) — date-fns not in project dependencies
