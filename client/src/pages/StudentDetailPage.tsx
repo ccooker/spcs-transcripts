@@ -272,13 +272,13 @@ export function StudentDetailPage({ userInfo }: StudentDetailPageProps) {
           </Card>
 
           <div className="flex flex-col gap-8">
+            <DocumentsSection studentId={student.id} />
             <AcademicResultsSection studentId={student.id} />
             <ActivitiesSection studentId={student.id} />
             <AwardsSection studentId={student.id} />
             <WorkExperienceSection studentId={student.id} />
             <CareerGoalsSection studentId={student.id} />
             <NotesSection studentId={student.id} />
-            <DocumentsSection studentId={student.id} />
           </div>
 
           <ArchiveStudentDialog
