@@ -8,7 +8,6 @@ export async function clearDb(): Promise<void> {
   await prisma.award.deleteMany()
   await prisma.activity.deleteMany()
   await prisma.academicResult.deleteMany()
-  // @ts-expect-error — Document model not yet in client; remove after prisma generate in 04-02
   await prisma.document.deleteMany()
   await prisma.auditLog.deleteMany()
   await prisma.student.deleteMany()

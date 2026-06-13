@@ -193,6 +193,7 @@ export type UserWhereInput = {
   auditLogs?: Prisma.AuditLogListRelationFilter
   careerGoalsAuthored?: Prisma.CareerGoalListRelationFilter
   staffNotesAuthored?: Prisma.StaffNoteListRelationFilter
+  documentsUploaded?: Prisma.DocumentListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -205,6 +206,7 @@ export type UserOrderByWithRelationInput = {
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
   careerGoalsAuthored?: Prisma.CareerGoalOrderByRelationAggregateInput
   staffNotesAuthored?: Prisma.StaffNoteOrderByRelationAggregateInput
+  documentsUploaded?: Prisma.DocumentOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -220,6 +222,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   auditLogs?: Prisma.AuditLogListRelationFilter
   careerGoalsAuthored?: Prisma.CareerGoalListRelationFilter
   staffNotesAuthored?: Prisma.StaffNoteListRelationFilter
+  documentsUploaded?: Prisma.DocumentListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -256,6 +259,7 @@ export type UserCreateInput = {
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActingUserInput
   careerGoalsAuthored?: Prisma.CareerGoalCreateNestedManyWithoutAuthorInput
   staffNotesAuthored?: Prisma.StaffNoteCreateNestedManyWithoutAuthorInput
+  documentsUploaded?: Prisma.DocumentCreateNestedManyWithoutUploaderInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -268,6 +272,7 @@ export type UserUncheckedCreateInput = {
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActingUserInput
   careerGoalsAuthored?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutAuthorInput
   staffNotesAuthored?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutAuthorInput
+  documentsUploaded?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploaderInput
 }
 
 export type UserUpdateInput = {
@@ -280,6 +285,7 @@ export type UserUpdateInput = {
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActingUserNestedInput
   careerGoalsAuthored?: Prisma.CareerGoalUpdateManyWithoutAuthorNestedInput
   staffNotesAuthored?: Prisma.StaffNoteUpdateManyWithoutAuthorNestedInput
+  documentsUploaded?: Prisma.DocumentUpdateManyWithoutUploaderNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -292,6 +298,7 @@ export type UserUncheckedUpdateInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActingUserNestedInput
   careerGoalsAuthored?: Prisma.CareerGoalUncheckedUpdateManyWithoutAuthorNestedInput
   staffNotesAuthored?: Prisma.StaffNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  documentsUploaded?: Prisma.DocumentUncheckedUpdateManyWithoutUploaderNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -407,6 +414,20 @@ export type UserUpdateOneRequiredWithoutStaffNotesAuthoredNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStaffNotesAuthoredInput, Prisma.UserUpdateWithoutStaffNotesAuthoredInput>, Prisma.UserUncheckedUpdateWithoutStaffNotesAuthoredInput>
 }
 
+export type UserCreateNestedOneWithoutDocumentsUploadedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDocumentsUploadedInput, Prisma.UserUncheckedCreateWithoutDocumentsUploadedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDocumentsUploadedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutDocumentsUploadedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDocumentsUploadedInput, Prisma.UserUncheckedCreateWithoutDocumentsUploadedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDocumentsUploadedInput
+  upsert?: Prisma.UserUpsertWithoutDocumentsUploadedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDocumentsUploadedInput, Prisma.UserUpdateWithoutDocumentsUploadedInput>, Prisma.UserUncheckedUpdateWithoutDocumentsUploadedInput>
+}
+
 export type UserCreateWithoutAuditLogsInput = {
   id?: string
   email: string
@@ -416,6 +437,7 @@ export type UserCreateWithoutAuditLogsInput = {
   updatedAt?: Date | string
   careerGoalsAuthored?: Prisma.CareerGoalCreateNestedManyWithoutAuthorInput
   staffNotesAuthored?: Prisma.StaffNoteCreateNestedManyWithoutAuthorInput
+  documentsUploaded?: Prisma.DocumentCreateNestedManyWithoutUploaderInput
 }
 
 export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -427,6 +449,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   updatedAt?: Date | string
   careerGoalsAuthored?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutAuthorInput
   staffNotesAuthored?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutAuthorInput
+  documentsUploaded?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploaderInput
 }
 
 export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -454,6 +477,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   careerGoalsAuthored?: Prisma.CareerGoalUpdateManyWithoutAuthorNestedInput
   staffNotesAuthored?: Prisma.StaffNoteUpdateManyWithoutAuthorNestedInput
+  documentsUploaded?: Prisma.DocumentUpdateManyWithoutUploaderNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -465,6 +489,7 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   careerGoalsAuthored?: Prisma.CareerGoalUncheckedUpdateManyWithoutAuthorNestedInput
   staffNotesAuthored?: Prisma.StaffNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  documentsUploaded?: Prisma.DocumentUncheckedUpdateManyWithoutUploaderNestedInput
 }
 
 export type UserCreateWithoutCareerGoalsAuthoredInput = {
@@ -476,6 +501,7 @@ export type UserCreateWithoutCareerGoalsAuthoredInput = {
   updatedAt?: Date | string
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActingUserInput
   staffNotesAuthored?: Prisma.StaffNoteCreateNestedManyWithoutAuthorInput
+  documentsUploaded?: Prisma.DocumentCreateNestedManyWithoutUploaderInput
 }
 
 export type UserUncheckedCreateWithoutCareerGoalsAuthoredInput = {
@@ -487,6 +513,7 @@ export type UserUncheckedCreateWithoutCareerGoalsAuthoredInput = {
   updatedAt?: Date | string
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActingUserInput
   staffNotesAuthored?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutAuthorInput
+  documentsUploaded?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploaderInput
 }
 
 export type UserCreateOrConnectWithoutCareerGoalsAuthoredInput = {
@@ -514,6 +541,7 @@ export type UserUpdateWithoutCareerGoalsAuthoredInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActingUserNestedInput
   staffNotesAuthored?: Prisma.StaffNoteUpdateManyWithoutAuthorNestedInput
+  documentsUploaded?: Prisma.DocumentUpdateManyWithoutUploaderNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCareerGoalsAuthoredInput = {
@@ -525,6 +553,7 @@ export type UserUncheckedUpdateWithoutCareerGoalsAuthoredInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActingUserNestedInput
   staffNotesAuthored?: Prisma.StaffNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  documentsUploaded?: Prisma.DocumentUncheckedUpdateManyWithoutUploaderNestedInput
 }
 
 export type UserCreateWithoutStaffNotesAuthoredInput = {
@@ -536,6 +565,7 @@ export type UserCreateWithoutStaffNotesAuthoredInput = {
   updatedAt?: Date | string
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActingUserInput
   careerGoalsAuthored?: Prisma.CareerGoalCreateNestedManyWithoutAuthorInput
+  documentsUploaded?: Prisma.DocumentCreateNestedManyWithoutUploaderInput
 }
 
 export type UserUncheckedCreateWithoutStaffNotesAuthoredInput = {
@@ -547,6 +577,7 @@ export type UserUncheckedCreateWithoutStaffNotesAuthoredInput = {
   updatedAt?: Date | string
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActingUserInput
   careerGoalsAuthored?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutAuthorInput
+  documentsUploaded?: Prisma.DocumentUncheckedCreateNestedManyWithoutUploaderInput
 }
 
 export type UserCreateOrConnectWithoutStaffNotesAuthoredInput = {
@@ -574,6 +605,7 @@ export type UserUpdateWithoutStaffNotesAuthoredInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActingUserNestedInput
   careerGoalsAuthored?: Prisma.CareerGoalUpdateManyWithoutAuthorNestedInput
+  documentsUploaded?: Prisma.DocumentUpdateManyWithoutUploaderNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStaffNotesAuthoredInput = {
@@ -585,6 +617,71 @@ export type UserUncheckedUpdateWithoutStaffNotesAuthoredInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActingUserNestedInput
   careerGoalsAuthored?: Prisma.CareerGoalUncheckedUpdateManyWithoutAuthorNestedInput
+  documentsUploaded?: Prisma.DocumentUncheckedUpdateManyWithoutUploaderNestedInput
+}
+
+export type UserCreateWithoutDocumentsUploadedInput = {
+  id?: string
+  email: string
+  displayName: string
+  role?: $Enums.Role
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActingUserInput
+  careerGoalsAuthored?: Prisma.CareerGoalCreateNestedManyWithoutAuthorInput
+  staffNotesAuthored?: Prisma.StaffNoteCreateNestedManyWithoutAuthorInput
+}
+
+export type UserUncheckedCreateWithoutDocumentsUploadedInput = {
+  id?: string
+  email: string
+  displayName: string
+  role?: $Enums.Role
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActingUserInput
+  careerGoalsAuthored?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutAuthorInput
+  staffNotesAuthored?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserCreateOrConnectWithoutDocumentsUploadedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDocumentsUploadedInput, Prisma.UserUncheckedCreateWithoutDocumentsUploadedInput>
+}
+
+export type UserUpsertWithoutDocumentsUploadedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDocumentsUploadedInput, Prisma.UserUncheckedUpdateWithoutDocumentsUploadedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDocumentsUploadedInput, Prisma.UserUncheckedCreateWithoutDocumentsUploadedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDocumentsUploadedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDocumentsUploadedInput, Prisma.UserUncheckedUpdateWithoutDocumentsUploadedInput>
+}
+
+export type UserUpdateWithoutDocumentsUploadedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActingUserNestedInput
+  careerGoalsAuthored?: Prisma.CareerGoalUpdateManyWithoutAuthorNestedInput
+  staffNotesAuthored?: Prisma.StaffNoteUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDocumentsUploadedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActingUserNestedInput
+  careerGoalsAuthored?: Prisma.CareerGoalUncheckedUpdateManyWithoutAuthorNestedInput
+  staffNotesAuthored?: Prisma.StaffNoteUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 
@@ -596,12 +693,14 @@ export type UserCountOutputType = {
   auditLogs: number
   careerGoalsAuthored: number
   staffNotesAuthored: number
+  documentsUploaded: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
   careerGoalsAuthored?: boolean | UserCountOutputTypeCountCareerGoalsAuthoredArgs
   staffNotesAuthored?: boolean | UserCountOutputTypeCountStaffNotesAuthoredArgs
+  documentsUploaded?: boolean | UserCountOutputTypeCountDocumentsUploadedArgs
 }
 
 /**
@@ -635,6 +734,13 @@ export type UserCountOutputTypeCountStaffNotesAuthoredArgs<ExtArgs extends runti
   where?: Prisma.StaffNoteWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDocumentsUploadedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DocumentWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -646,6 +752,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   careerGoalsAuthored?: boolean | Prisma.User$careerGoalsAuthoredArgs<ExtArgs>
   staffNotesAuthored?: boolean | Prisma.User$staffNotesAuthoredArgs<ExtArgs>
+  documentsUploaded?: boolean | Prisma.User$documentsUploadedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -681,6 +788,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   careerGoalsAuthored?: boolean | Prisma.User$careerGoalsAuthoredArgs<ExtArgs>
   staffNotesAuthored?: boolean | Prisma.User$staffNotesAuthoredArgs<ExtArgs>
+  documentsUploaded?: boolean | Prisma.User$documentsUploadedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -692,6 +800,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
     careerGoalsAuthored: Prisma.$CareerGoalPayload<ExtArgs>[]
     staffNotesAuthored: Prisma.$StaffNotePayload<ExtArgs>[]
+    documentsUploaded: Prisma.$DocumentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1097,6 +1206,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   careerGoalsAuthored<T extends Prisma.User$careerGoalsAuthoredArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$careerGoalsAuthoredArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CareerGoalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   staffNotesAuthored<T extends Prisma.User$staffNotesAuthoredArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$staffNotesAuthoredArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StaffNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  documentsUploaded<T extends Prisma.User$documentsUploadedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$documentsUploadedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1594,6 +1704,30 @@ export type User$staffNotesAuthoredArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.StaffNoteScalarFieldEnum | Prisma.StaffNoteScalarFieldEnum[]
+}
+
+/**
+ * User.documentsUploaded
+ */
+export type User$documentsUploadedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Document
+   */
+  select?: Prisma.DocumentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Document
+   */
+  omit?: Prisma.DocumentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DocumentInclude<ExtArgs> | null
+  where?: Prisma.DocumentWhereInput
+  orderBy?: Prisma.DocumentOrderByWithRelationInput | Prisma.DocumentOrderByWithRelationInput[]
+  cursor?: Prisma.DocumentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DocumentScalarFieldEnum | Prisma.DocumentScalarFieldEnum[]
 }
 
 /**

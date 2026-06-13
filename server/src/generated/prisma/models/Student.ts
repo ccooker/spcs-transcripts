@@ -286,6 +286,7 @@ export type StudentWhereInput = {
   workExperiences?: Prisma.WorkExperienceListRelationFilter
   careerGoals?: Prisma.CareerGoalListRelationFilter
   staffNotes?: Prisma.StaffNoteListRelationFilter
+  documents?: Prisma.DocumentListRelationFilter
 }
 
 export type StudentOrderByWithRelationInput = {
@@ -308,6 +309,7 @@ export type StudentOrderByWithRelationInput = {
   workExperiences?: Prisma.WorkExperienceOrderByRelationAggregateInput
   careerGoals?: Prisma.CareerGoalOrderByRelationAggregateInput
   staffNotes?: Prisma.StaffNoteOrderByRelationAggregateInput
+  documents?: Prisma.DocumentOrderByRelationAggregateInput
 }
 
 export type StudentWhereUniqueInput = Prisma.AtLeast<{
@@ -333,6 +335,7 @@ export type StudentWhereUniqueInput = Prisma.AtLeast<{
   workExperiences?: Prisma.WorkExperienceListRelationFilter
   careerGoals?: Prisma.CareerGoalListRelationFilter
   staffNotes?: Prisma.StaffNoteListRelationFilter
+  documents?: Prisma.DocumentListRelationFilter
 }, "id" | "schoolStudentId">
 
 export type StudentOrderByWithAggregationInput = {
@@ -395,6 +398,7 @@ export type StudentCreateInput = {
   workExperiences?: Prisma.WorkExperienceCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateInput = {
@@ -417,6 +421,7 @@ export type StudentUncheckedCreateInput = {
   workExperiences?: Prisma.WorkExperienceUncheckedCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUpdateInput = {
@@ -439,6 +444,7 @@ export type StudentUpdateInput = {
   workExperiences?: Prisma.WorkExperienceUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateInput = {
@@ -461,6 +467,7 @@ export type StudentUncheckedUpdateInput = {
   workExperiences?: Prisma.WorkExperienceUncheckedUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUncheckedUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUncheckedUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentCreateManyInput = {
@@ -676,6 +683,20 @@ export type StudentUpdateOneRequiredWithoutStaffNotesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.StudentUpdateToOneWithWhereWithoutStaffNotesInput, Prisma.StudentUpdateWithoutStaffNotesInput>, Prisma.StudentUncheckedUpdateWithoutStaffNotesInput>
 }
 
+export type StudentCreateNestedOneWithoutDocumentsInput = {
+  create?: Prisma.XOR<Prisma.StudentCreateWithoutDocumentsInput, Prisma.StudentUncheckedCreateWithoutDocumentsInput>
+  connectOrCreate?: Prisma.StudentCreateOrConnectWithoutDocumentsInput
+  connect?: Prisma.StudentWhereUniqueInput
+}
+
+export type StudentUpdateOneRequiredWithoutDocumentsNestedInput = {
+  create?: Prisma.XOR<Prisma.StudentCreateWithoutDocumentsInput, Prisma.StudentUncheckedCreateWithoutDocumentsInput>
+  connectOrCreate?: Prisma.StudentCreateOrConnectWithoutDocumentsInput
+  upsert?: Prisma.StudentUpsertWithoutDocumentsInput
+  connect?: Prisma.StudentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StudentUpdateToOneWithWhereWithoutDocumentsInput, Prisma.StudentUpdateWithoutDocumentsInput>, Prisma.StudentUncheckedUpdateWithoutDocumentsInput>
+}
+
 export type StudentCreateWithoutAcademicResultsInput = {
   id?: string
   fullName: string
@@ -695,6 +716,7 @@ export type StudentCreateWithoutAcademicResultsInput = {
   workExperiences?: Prisma.WorkExperienceCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutAcademicResultsInput = {
@@ -716,6 +738,7 @@ export type StudentUncheckedCreateWithoutAcademicResultsInput = {
   workExperiences?: Prisma.WorkExperienceUncheckedCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutAcademicResultsInput = {
@@ -753,6 +776,7 @@ export type StudentUpdateWithoutAcademicResultsInput = {
   workExperiences?: Prisma.WorkExperienceUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutAcademicResultsInput = {
@@ -774,6 +798,7 @@ export type StudentUncheckedUpdateWithoutAcademicResultsInput = {
   workExperiences?: Prisma.WorkExperienceUncheckedUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUncheckedUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUncheckedUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutActivitiesInput = {
@@ -795,6 +820,7 @@ export type StudentCreateWithoutActivitiesInput = {
   workExperiences?: Prisma.WorkExperienceCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutActivitiesInput = {
@@ -816,6 +842,7 @@ export type StudentUncheckedCreateWithoutActivitiesInput = {
   workExperiences?: Prisma.WorkExperienceUncheckedCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutActivitiesInput = {
@@ -853,6 +880,7 @@ export type StudentUpdateWithoutActivitiesInput = {
   workExperiences?: Prisma.WorkExperienceUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutActivitiesInput = {
@@ -874,6 +902,7 @@ export type StudentUncheckedUpdateWithoutActivitiesInput = {
   workExperiences?: Prisma.WorkExperienceUncheckedUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUncheckedUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUncheckedUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutAwardsInput = {
@@ -895,6 +924,7 @@ export type StudentCreateWithoutAwardsInput = {
   workExperiences?: Prisma.WorkExperienceCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutAwardsInput = {
@@ -916,6 +946,7 @@ export type StudentUncheckedCreateWithoutAwardsInput = {
   workExperiences?: Prisma.WorkExperienceUncheckedCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutAwardsInput = {
@@ -953,6 +984,7 @@ export type StudentUpdateWithoutAwardsInput = {
   workExperiences?: Prisma.WorkExperienceUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutAwardsInput = {
@@ -974,6 +1006,7 @@ export type StudentUncheckedUpdateWithoutAwardsInput = {
   workExperiences?: Prisma.WorkExperienceUncheckedUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUncheckedUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUncheckedUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutWorkExperiencesInput = {
@@ -995,6 +1028,7 @@ export type StudentCreateWithoutWorkExperiencesInput = {
   awards?: Prisma.AwardCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutWorkExperiencesInput = {
@@ -1016,6 +1050,7 @@ export type StudentUncheckedCreateWithoutWorkExperiencesInput = {
   awards?: Prisma.AwardUncheckedCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutWorkExperiencesInput = {
@@ -1053,6 +1088,7 @@ export type StudentUpdateWithoutWorkExperiencesInput = {
   awards?: Prisma.AwardUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutWorkExperiencesInput = {
@@ -1074,6 +1110,7 @@ export type StudentUncheckedUpdateWithoutWorkExperiencesInput = {
   awards?: Prisma.AwardUncheckedUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUncheckedUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUncheckedUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutCareerGoalsInput = {
@@ -1095,6 +1132,7 @@ export type StudentCreateWithoutCareerGoalsInput = {
   awards?: Prisma.AwardCreateNestedManyWithoutStudentInput
   workExperiences?: Prisma.WorkExperienceCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutCareerGoalsInput = {
@@ -1116,6 +1154,7 @@ export type StudentUncheckedCreateWithoutCareerGoalsInput = {
   awards?: Prisma.AwardUncheckedCreateNestedManyWithoutStudentInput
   workExperiences?: Prisma.WorkExperienceUncheckedCreateNestedManyWithoutStudentInput
   staffNotes?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutCareerGoalsInput = {
@@ -1153,6 +1192,7 @@ export type StudentUpdateWithoutCareerGoalsInput = {
   awards?: Prisma.AwardUpdateManyWithoutStudentNestedInput
   workExperiences?: Prisma.WorkExperienceUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutCareerGoalsInput = {
@@ -1174,6 +1214,7 @@ export type StudentUncheckedUpdateWithoutCareerGoalsInput = {
   awards?: Prisma.AwardUncheckedUpdateManyWithoutStudentNestedInput
   workExperiences?: Prisma.WorkExperienceUncheckedUpdateManyWithoutStudentNestedInput
   staffNotes?: Prisma.StaffNoteUncheckedUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentCreateWithoutStaffNotesInput = {
@@ -1195,6 +1236,7 @@ export type StudentCreateWithoutStaffNotesInput = {
   awards?: Prisma.AwardCreateNestedManyWithoutStudentInput
   workExperiences?: Prisma.WorkExperienceCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutStudentInput
 }
 
 export type StudentUncheckedCreateWithoutStaffNotesInput = {
@@ -1216,6 +1258,7 @@ export type StudentUncheckedCreateWithoutStaffNotesInput = {
   awards?: Prisma.AwardUncheckedCreateNestedManyWithoutStudentInput
   workExperiences?: Prisma.WorkExperienceUncheckedCreateNestedManyWithoutStudentInput
   careerGoals?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutStudentInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutStudentInput
 }
 
 export type StudentCreateOrConnectWithoutStaffNotesInput = {
@@ -1253,6 +1296,7 @@ export type StudentUpdateWithoutStaffNotesInput = {
   awards?: Prisma.AwardUpdateManyWithoutStudentNestedInput
   workExperiences?: Prisma.WorkExperienceUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutStudentNestedInput
 }
 
 export type StudentUncheckedUpdateWithoutStaffNotesInput = {
@@ -1274,6 +1318,111 @@ export type StudentUncheckedUpdateWithoutStaffNotesInput = {
   awards?: Prisma.AwardUncheckedUpdateManyWithoutStudentNestedInput
   workExperiences?: Prisma.WorkExperienceUncheckedUpdateManyWithoutStudentNestedInput
   careerGoals?: Prisma.CareerGoalUncheckedUpdateManyWithoutStudentNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutStudentNestedInput
+}
+
+export type StudentCreateWithoutDocumentsInput = {
+  id?: string
+  fullName: string
+  formLevel: $Enums.FormLevel
+  graduationYear: number
+  schoolStudentId: string
+  studentEmail?: string | null
+  studentPhone?: string | null
+  parentEmail?: string | null
+  parentPhone?: string | null
+  transcriptStatus?: $Enums.TranscriptStatus
+  archivedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  academicResults?: Prisma.AcademicResultCreateNestedManyWithoutStudentInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutStudentInput
+  awards?: Prisma.AwardCreateNestedManyWithoutStudentInput
+  workExperiences?: Prisma.WorkExperienceCreateNestedManyWithoutStudentInput
+  careerGoals?: Prisma.CareerGoalCreateNestedManyWithoutStudentInput
+  staffNotes?: Prisma.StaffNoteCreateNestedManyWithoutStudentInput
+}
+
+export type StudentUncheckedCreateWithoutDocumentsInput = {
+  id?: string
+  fullName: string
+  formLevel: $Enums.FormLevel
+  graduationYear: number
+  schoolStudentId: string
+  studentEmail?: string | null
+  studentPhone?: string | null
+  parentEmail?: string | null
+  parentPhone?: string | null
+  transcriptStatus?: $Enums.TranscriptStatus
+  archivedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  academicResults?: Prisma.AcademicResultUncheckedCreateNestedManyWithoutStudentInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutStudentInput
+  awards?: Prisma.AwardUncheckedCreateNestedManyWithoutStudentInput
+  workExperiences?: Prisma.WorkExperienceUncheckedCreateNestedManyWithoutStudentInput
+  careerGoals?: Prisma.CareerGoalUncheckedCreateNestedManyWithoutStudentInput
+  staffNotes?: Prisma.StaffNoteUncheckedCreateNestedManyWithoutStudentInput
+}
+
+export type StudentCreateOrConnectWithoutDocumentsInput = {
+  where: Prisma.StudentWhereUniqueInput
+  create: Prisma.XOR<Prisma.StudentCreateWithoutDocumentsInput, Prisma.StudentUncheckedCreateWithoutDocumentsInput>
+}
+
+export type StudentUpsertWithoutDocumentsInput = {
+  update: Prisma.XOR<Prisma.StudentUpdateWithoutDocumentsInput, Prisma.StudentUncheckedUpdateWithoutDocumentsInput>
+  create: Prisma.XOR<Prisma.StudentCreateWithoutDocumentsInput, Prisma.StudentUncheckedCreateWithoutDocumentsInput>
+  where?: Prisma.StudentWhereInput
+}
+
+export type StudentUpdateToOneWithWhereWithoutDocumentsInput = {
+  where?: Prisma.StudentWhereInput
+  data: Prisma.XOR<Prisma.StudentUpdateWithoutDocumentsInput, Prisma.StudentUncheckedUpdateWithoutDocumentsInput>
+}
+
+export type StudentUpdateWithoutDocumentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  formLevel?: Prisma.EnumFormLevelFieldUpdateOperationsInput | $Enums.FormLevel
+  graduationYear?: Prisma.IntFieldUpdateOperationsInput | number
+  schoolStudentId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  academicResults?: Prisma.AcademicResultUpdateManyWithoutStudentNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutStudentNestedInput
+  awards?: Prisma.AwardUpdateManyWithoutStudentNestedInput
+  workExperiences?: Prisma.WorkExperienceUpdateManyWithoutStudentNestedInput
+  careerGoals?: Prisma.CareerGoalUpdateManyWithoutStudentNestedInput
+  staffNotes?: Prisma.StaffNoteUpdateManyWithoutStudentNestedInput
+}
+
+export type StudentUncheckedUpdateWithoutDocumentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  formLevel?: Prisma.EnumFormLevelFieldUpdateOperationsInput | $Enums.FormLevel
+  graduationYear?: Prisma.IntFieldUpdateOperationsInput | number
+  schoolStudentId?: Prisma.StringFieldUpdateOperationsInput | string
+  studentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  studentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transcriptStatus?: Prisma.EnumTranscriptStatusFieldUpdateOperationsInput | $Enums.TranscriptStatus
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  academicResults?: Prisma.AcademicResultUncheckedUpdateManyWithoutStudentNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutStudentNestedInput
+  awards?: Prisma.AwardUncheckedUpdateManyWithoutStudentNestedInput
+  workExperiences?: Prisma.WorkExperienceUncheckedUpdateManyWithoutStudentNestedInput
+  careerGoals?: Prisma.CareerGoalUncheckedUpdateManyWithoutStudentNestedInput
+  staffNotes?: Prisma.StaffNoteUncheckedUpdateManyWithoutStudentNestedInput
 }
 
 
@@ -1288,6 +1437,7 @@ export type StudentCountOutputType = {
   workExperiences: number
   careerGoals: number
   staffNotes: number
+  documents: number
 }
 
 export type StudentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1297,6 +1447,7 @@ export type StudentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   workExperiences?: boolean | StudentCountOutputTypeCountWorkExperiencesArgs
   careerGoals?: boolean | StudentCountOutputTypeCountCareerGoalsArgs
   staffNotes?: boolean | StudentCountOutputTypeCountStaffNotesArgs
+  documents?: boolean | StudentCountOutputTypeCountDocumentsArgs
 }
 
 /**
@@ -1351,6 +1502,13 @@ export type StudentCountOutputTypeCountStaffNotesArgs<ExtArgs extends runtime.Ty
   where?: Prisma.StaffNoteWhereInput
 }
 
+/**
+ * StudentCountOutputType without action
+ */
+export type StudentCountOutputTypeCountDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DocumentWhereInput
+}
+
 
 export type StudentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1372,6 +1530,7 @@ export type StudentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   workExperiences?: boolean | Prisma.Student$workExperiencesArgs<ExtArgs>
   careerGoals?: boolean | Prisma.Student$careerGoalsArgs<ExtArgs>
   staffNotes?: boolean | Prisma.Student$staffNotesArgs<ExtArgs>
+  documents?: boolean | Prisma.Student$documentsArgs<ExtArgs>
   _count?: boolean | Prisma.StudentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["student"]>
 
@@ -1431,6 +1590,7 @@ export type StudentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   workExperiences?: boolean | Prisma.Student$workExperiencesArgs<ExtArgs>
   careerGoals?: boolean | Prisma.Student$careerGoalsArgs<ExtArgs>
   staffNotes?: boolean | Prisma.Student$staffNotesArgs<ExtArgs>
+  documents?: boolean | Prisma.Student$documentsArgs<ExtArgs>
   _count?: boolean | Prisma.StudentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type StudentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1445,6 +1605,7 @@ export type $StudentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     workExperiences: Prisma.$WorkExperiencePayload<ExtArgs>[]
     careerGoals: Prisma.$CareerGoalPayload<ExtArgs>[]
     staffNotes: Prisma.$StaffNotePayload<ExtArgs>[]
+    documents: Prisma.$DocumentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1860,6 +2021,7 @@ export interface Prisma__StudentClient<T, Null = never, ExtArgs extends runtime.
   workExperiences<T extends Prisma.Student$workExperiencesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$workExperiencesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkExperiencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   careerGoals<T extends Prisma.Student$careerGoalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$careerGoalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CareerGoalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   staffNotes<T extends Prisma.Student$staffNotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$staffNotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StaffNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  documents<T extends Prisma.Student$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Student$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2436,6 +2598,30 @@ export type Student$staffNotesArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.StaffNoteScalarFieldEnum | Prisma.StaffNoteScalarFieldEnum[]
+}
+
+/**
+ * Student.documents
+ */
+export type Student$documentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Document
+   */
+  select?: Prisma.DocumentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Document
+   */
+  omit?: Prisma.DocumentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DocumentInclude<ExtArgs> | null
+  where?: Prisma.DocumentWhereInput
+  orderBy?: Prisma.DocumentOrderByWithRelationInput | Prisma.DocumentOrderByWithRelationInput[]
+  cursor?: Prisma.DocumentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DocumentScalarFieldEnum | Prisma.DocumentScalarFieldEnum[]
 }
 
 /**

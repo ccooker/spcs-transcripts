@@ -74,3 +74,15 @@ export const CareerInterest = {
 } as const
 
 export type CareerInterest = (typeof CareerInterest)[keyof typeof CareerInterest]
+
+
+export const DocumentType = {
+  REPORT_CARD: 'REPORT_CARD',
+  CERTIFICATE: 'CERTIFICATE',
+  AWARD_LETTER: 'AWARD_LETTER',
+  WORK_EXPERIENCE_LETTER: 'WORK_EXPERIENCE_LETTER',
+  REFERENCE_LETTER: 'REFERENCE_LETTER',
+  OTHER: 'OTHER'
+} as const
+
+export type DocumentType = (typeof DocumentType)[keyof typeof DocumentType]

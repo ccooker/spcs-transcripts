@@ -1,5 +1,4 @@
 import { PrismaClient } from '../generated/prisma/client.js'
-// @ts-ignore — DocumentType not yet in generated client; available after prisma generate in 04-02
 import type { DocumentType } from '../generated/prisma/client.js'
 import { logAudit } from './audit.js'
 import { mkdir, writeFile } from 'node:fs/promises'
@@ -29,7 +28,6 @@ export async function uploadDocument(
   const storedPath = path.join('students', studentId, `${uuid}.pdf`)
   await writeFile(path.join(UPLOAD_ROOT, storedPath), buffer)
 
-  // @ts-ignore — Document model not yet in generated client; available after prisma generate in 04-02
   const doc = await prisma.document.create({
     data: { studentId, uploaderId, originalFilename, storedPath, typeTag },
     include: { uploader: { select: { displayName: true } } },
@@ -50,7 +48,6 @@ export async function listDocuments(
   prisma: InstanceType<typeof PrismaClient>,
   studentId: string,
 ) {
-  // @ts-ignore — Document model not yet in generated client; available after prisma generate in 04-02
   return prisma.document.findMany({
     where: { studentId, deletedAt: null },
     include: { uploader: { select: { displayName: true } } },
@@ -64,13 +61,11 @@ export async function softDeleteDocument(
   studentId: string,
   userId: string,
 ) {
-  // @ts-ignore — Document model not yet in generated client; available after prisma generate in 04-02
   const existing = await prisma.document.findUnique({ where: { id: docId } })
   if (!existing || existing.studentId !== studentId || existing.deletedAt !== null) {
     throw new DocumentNotFoundError()
   }
 
-  // @ts-ignore — Document model not yet in generated client; available after prisma generate in 04-02
   const doc = await prisma.document.update({
     where: { id: docId },
     data: { deletedAt: new Date() },
@@ -92,7 +87,6 @@ export async function getDocumentForDownload(
   docId: string,
   studentId: string,
 ) {
-  // @ts-ignore — Document model not yet in generated client; available after prisma generate in 04-02
   const doc = await prisma.document.findUnique({ where: { id: docId } })
   if (!doc || doc.studentId !== studentId || doc.deletedAt !== null) {
     throw new DocumentNotFoundError()

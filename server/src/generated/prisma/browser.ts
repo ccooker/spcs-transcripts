@@ -62,3 +62,8 @@ export type CareerGoal = Prisma.CareerGoalModel
  * 
  */
 export type StaffNote = Prisma.StaffNoteModel
+/**
+ * Model Document
+ * 
+ */
+export type Document = Prisma.DocumentModel
