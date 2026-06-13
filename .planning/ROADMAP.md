@@ -11,7 +11,8 @@
 - [ ] **Phase 1: Infrastructure & Auth** — Microsoft Entra ID SSO, role-based access, audit logging, on-premise deployment
 - [x] **Phase 2: Student Profiles & Search** — Student directory CRUD, name search, year/status filtering, cohort overview (completed 2026-06-12)
 - [x] **Phase 3: Student Records UI** — All six record types: academics, activities, awards, work experience, career goals, notes (completed 2026-06-13)
-- [x] **Phase 4: Document Management** — PDF upload, secure storage, document listing/download/soft-delete, type tagging (completed 2026-06-13)
+- [x] **Phase 4: Document Management** — PDF upload, secure storage, document listing/download/soft-delete, type tagging
+ (completed 2026-06-13)
 - [ ] **Phase 5: Transcript Assembly & Export** — Narrative template, draft/finalised status, school-branded PDF export
 
 ---
@@ -155,7 +156,7 @@ Plans:
 4. Staff can export a completed transcript as a formatted PDF containing the school logo and letterhead, suitable for sending to universities or employers.
 5. Admin can configure the school logo and letterhead used across all exported transcripts.
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 **UI hint**: yes
 
 ---
@@ -168,7 +169,7 @@ Plans:
 | 2. Student Profiles & Search | 3/3 | Complete   | 2026-06-12 |
 | 3. Student Records UI | 0/? | Not started | — |
 | 4. Document Management | 3/3 | Complete    | 2026-06-13 |
-| 5. Transcript Assembly & Export | 1/2 | In Progress|  |
+| 5. Transcript Assembly & Export | 2/2 | In Progress|  |
 
 ---
 

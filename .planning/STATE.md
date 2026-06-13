@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 05
 status: Executing Phase 05
-last_updated: "2026-06-14T07:47:00.000Z"
+last_updated: "2026-06-14T07:30:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 19
-  completed_plans: 18
-  percent: 95
+  completed_plans: 19
+  percent: 100
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 ## Current Status
 
 - Roadmap: created
-- Active phase: Phase 5 — transcript assembly & export (Plan 01 complete)
-- Last action: Phase 5 Plan 01 complete 2026-06-14 — Transcript/SchoolSettings schema, packages, 12 RED test stubs
+- Active phase: Phase 5 — transcript assembly & export (Plan 02 complete; service layer ready for routes)
+- Last action: Phase 5 Plan 02 complete 2026-06-14 — DB push, transcript/pdf/settings services, listStudents Transcript JOIN
 
 ## Phase History
 
@@ -52,6 +52,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 || 04-document-management | 02 (db-push+tests) | prisma db push (DocumentType enum + Document table live in PostgreSQL); prisma generate (full typed client); @ts-ignore stubs removed; docker-compose.override.yml; all 11 document integration tests GREEN; full suite 73 passing | 2026-06-13 |
 || 04-document-management | 03 (client-ui) | shadcn progress installed; DocumentsSection.tsx (XHR upload, fetch+blob download, AlertDialog delete, DOCUMENT_TYPE_LABELS, 5-column table); DocumentsSection added as 7th section in StudentDetailPage; DOC-01 through DOC-04 fully wired end-to-end | 2026-06-13 |
 || 05-transcript-assembly-export | 01 (wave-0-foundation) | Transcript + SchoolSettings Prisma models; puppeteer/TipTap/shadcn Switch installed; PUPPETEER_CACHE_DIR; 8 transcript + 4 settings RED integration test stubs | 2026-06-14 |
+|| 05-transcript-assembly-export | 02 (server-services) | prisma db push + generate; transcript/pdf/settings services; listStudents Transcript JOIN; 22 students tests GREEN | 2026-06-14 |
 
 ---
 
@@ -88,7 +89,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 ---
 *State initialised: 2026-06-11*
-*Last updated: 2026-06-13 after Phase 3 Plan 02b — AwardsSection + WorkExperienceSection client slice complete*
+*Last updated: 2026-06-14 after Phase 5 Plan 02 — transcript/pdf/settings services and Transcript JOIN*
 
 ## Performance Metrics
 
@@ -102,6 +103,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | Phase 03-student-records-ui P02 | 15min | 2 tasks | 10 files |
 | Phase 03-student-records-ui P02b | 8min | 1 task | 3 files |
 | Phase 05-transcript-assembly-export P01 | 25min | 2 tasks | 11 files |
+| Phase 05-transcript-assembly-export P02 | 18min | 2 tasks | 16 files |
 
 ## Decisions
 
@@ -155,3 +157,8 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 - [Phase 05-01]: adminToken for settings tests uses BOOTSTRAP_ADMIN_EMAIL pattern not JWT roles claim
 
 | Phase 05-transcript-assembly-export P01 | 25min | 2 tasks | 11 files |
+| Phase 05-transcript-assembly-export P02 | 18min | 2 tasks | 16 files |
+
+- [Phase 05-02]: listStudents filters NONE via transcript is null; DRAFT/FINALISED via transcript.status join
+- [Phase 05-02]: createStudent/getStudentById return transcriptStatus NONE for backward compat after column removal
+- [Phase 05-02]: buildAutoPopulatedContent uses year-only formatPeriod (YYYY–present) for activities and work experience
