@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 05
 status: Executing Phase 05
-last_updated: "2026-06-14T07:41:00.000Z"
+last_updated: "2026-06-14T08:15:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 22
   completed_plans: 21
-  percent: 91
+  percent: 95
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 ## Current Status
 
 - Roadmap: created
-- Active phase: Phase 5 — transcript assembly & export (Plan 03 complete; API routes ready for client UI)
-- Last action: Phase 5 Plan 03 complete 2026-06-14 — transcript/settings API routes mounted; 12 integration tests GREEN
+- Active phase: Phase 5 — transcript assembly & export (Plan 04 complete; Settings client UI next)
+- Last action: Phase 5 Plan 04 complete 2026-06-14 — TranscriptPage with TipTap sections, auto-save, PDF export; View transcript CTA wired
 
 ## Phase History
 
@@ -54,6 +54,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 || 05-transcript-assembly-export | 01 (wave-0-foundation) | Transcript + SchoolSettings Prisma models; puppeteer/TipTap/shadcn Switch installed; PUPPETEER_CACHE_DIR; 8 transcript + 4 settings RED integration test stubs | 2026-06-14 |
 || 05-transcript-assembly-export | 02 (server-services) | prisma db push + generate; transcript/pdf/settings services; listStudents Transcript JOIN; 22 students tests GREEN | 2026-06-14 |
 || 05-transcript-assembly-export | 03 (api-routes) | transcript GET/PUT/export + settings GET/PUT/logo routes; branding dir; 12 transcript+settings tests GREEN; full suite 85 passing | 2026-06-14 |
+|| 05-transcript-assembly-export | 04 (client-editor) | TranscriptPage with six TipTap sections, debounced PUT auto-save, status select, PDF export, RecordsUpdatedBanner; View transcript CTA + App route | 2026-06-14 |
 
 ---
 
@@ -90,7 +91,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 ---
 *State initialised: 2026-06-11*
-*Last updated: 2026-06-14 after Phase 5 Plan 03 — transcript/settings API routes mounted*
+*Last updated: 2026-06-14 after Phase 5 Plan 04 — transcript editor client slice complete*
 
 ## Performance Metrics
 
@@ -106,6 +107,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | Phase 05-transcript-assembly-export P01 | 25min | 2 tasks | 11 files |
 | Phase 05-transcript-assembly-export P02 | 18min | 2 tasks | 16 files |
 | Phase 05-transcript-assembly-export P03 | 10min | 2 tasks | 7 files |
+| Phase 05-transcript-assembly-export P04 | 15min | 2 tasks | 7 files |
 
 ## Decisions
 
@@ -167,3 +169,6 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 - [Phase 05-03]: UPLOAD_ROOT read from process.env in route files avoids app.ts circular import with settings router
 - [Phase 05-03]: GET transcript maps transcript?.status ?? NONE when no saved Transcript row exists
 - [Phase 05-03]: transcript.test.ts academic seed subjects must use PRESET_SUBJECTS enum values
+- [Phase 05-04]: apiFetch PUT (not PATCH) for all transcript saves per Plan 03 upsert endpoint
+- [Phase 05-04]: TipTap editorKey remount on load/regenerate avoids controlled content re-sync anti-pattern
+- [Phase 05-04]: Status select maps NONE to DRAFT display; first status PUT persists Transcript row

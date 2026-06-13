@@ -157,7 +157,7 @@ Plans:
 4. Staff can export a completed transcript as a formatted PDF containing the school logo and letterhead, suitable for sending to universities or employers.
 5. Admin can configure the school logo and letterhead used across all exported transcripts.
 
-**Plans:** 3/5 plans executed
+**Plans:** 4/5 plans executed
 
 Plans:
 
@@ -175,7 +175,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 05-04-PLAN.md — Transcript editor client slice: TipTap sections, auto-save, status select, Export PDF, View transcript CTA, /students/:id/transcript route
+- [x] 05-04-PLAN.md — Transcript editor client slice: TipTap sections, auto-save, status select, Export PDF, View transcript CTA, /students/:id/transcript route
 
 **Wave 5** *(blocked on Wave 3 + 04 completion)*
 
@@ -193,7 +193,7 @@ Plans:
 | 2. Student Profiles & Search | 3/3 | Complete   | 2026-06-12 |
 | 3. Student Records UI | 6/6 | Complete    | 2026-06-13 |
 | 4. Document Management | 3/3 | Complete    | 2026-06-13 |
-| 5. Transcript Assembly & Export | 3/5 | In Progress|  |
+| 5. Transcript Assembly & Export | 4/5 | In Progress|  |
 
 ---
 
