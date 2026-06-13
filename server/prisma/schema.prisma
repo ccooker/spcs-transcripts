@@ -56,6 +56,15 @@ enum CareerInterest {
   UNDECIDED
 }
 
+enum DocumentType {
+  REPORT_CARD
+  CERTIFICATE
+  AWARD_LETTER
+  WORK_EXPERIENCE_LETTER
+  REFERENCE_LETTER
+  OTHER
+}
+
 model User {
   id          String     @id @default(uuid())
   email       String     @unique
@@ -66,6 +75,7 @@ model User {
   auditLogs            AuditLog[]   @relation("ActingUser")
   careerGoalsAuthored  CareerGoal[] @relation("CareerGoalAuthor")
   staffNotesAuthored   StaffNote[]  @relation("StaffNoteAuthor")
+  documentsUploaded    Document[]   @relation("DocumentUploader")
 }
 
 model AuditLog {
@@ -104,6 +114,7 @@ model Student {
   workExperiences  WorkExperience[]
   careerGoals      CareerGoal[]
   staffNotes       StaffNote[]
+  documents        Document[]
 
   @@index([fullName])
   @@index([formLevel, archivedAt])
@@ -201,5 +212,21 @@ model StaffNote {
   author    User     @relation("StaffNoteAuthor", fields: [authorId], references: [id])
   createdAt DateTime @default(now())
 
+  @@index([studentId, createdAt(sort: Desc)])
+}
+
+model Document {
+  id               String       @id @default(uuid())
+  studentId        String
+  student          Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  uploaderId       String
+  uploader         User         @relation("DocumentUploader", fields: [uploaderId], references: [id])
+  originalFilename String
+  storedPath       String
+  typeTag          DocumentType
+  deletedAt        DateTime?
+  createdAt        DateTime     @default(now())
+
+  @@index([studentId, deletedAt])
   @@index([studentId, createdAt(sort: Desc)])
 }
