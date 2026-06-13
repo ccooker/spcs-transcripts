@@ -123,7 +123,22 @@ Plans:
 3. Staff can soft-delete a document; the file disappears from the active list but is retained on disk with an audit trail entry.
 4. Staff can assign a document type tag (Report Card, Certificate, Award Letter, Work Experience Letter, Reference Letter, Other) to each uploaded file.
 
-**Plans:** TBD
+**Plans:** 3 plans
+
+Plans:
+
+**Wave 1**
+
+- [ ] 04-01-PLAN.md — Server slice: install multer, Wave 0 RED tests (11 stubs), Prisma schema (DocumentType enum + Document model), Zod schemas, document service (upload/list/softDelete/download + IDOR guards), documents router (POST/GET/download/soft-delete), mount in students.ts, app.ts startup dir creation, docker-compose.yml bind mount
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 04-02-PLAN.md — DB push + tests GREEN: [BLOCKING] npx prisma db push + npx prisma generate, replace 11 RED stubs with real supertest implementations, full suite GREEN (73+ tests)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 04-03-PLAN.md — Client slice: shadcn progress install, DocumentsSection.tsx (RecordSectionCard + document table + upload Dialog with XHR progress + fetch+blob download + delete AlertDialog), DocumentsSection wired into StudentDetailPage as 7th section card
+
 **UI hint**: yes
 
 ### Phase 5: Transcript Assembly & Export
