@@ -24,10 +24,10 @@
 
 ### Document Management
 
-- [ ] **DOC-01**: Staff can upload one or more PDF files to a student's record
-- [ ] **DOC-02**: Staff can view the document list for a student (file name, document type tag, upload date, uploader) and download original files
-- [ ] **DOC-03**: Staff can soft-delete an uploaded document (retained with audit trail entry, not permanently destroyed)
-- [ ] **DOC-04**: Staff can assign a document type tag to each uploaded file from a predefined list (Report Card, Certificate, Award Letter, Work Experience Letter, Reference Letter, Other)
+- [x] **DOC-01**: Staff can upload one or more PDF files to a student's record
+- [x] **DOC-02**: Staff can view the document list for a student (file name, document type tag, upload date, uploader) and download original files
+- [x] **DOC-03**: Staff can soft-delete an uploaded document (retained with audit trail entry, not permanently destroyed)
+- [x] **DOC-04**: Staff can assign a document type tag to each uploaded file from a predefined list (Report Card, Certificate, Award Letter, Work Experience Letter, Reference Letter, Other)
 
 ### Transcript Generation
 
@@ -101,10 +101,10 @@
 | STU-06 | Phase 3: Student Records UI | Pending |
 | STU-07 | Phase 3: Student Records UI | Pending |
 | STU-08 | Phase 3: Student Records UI | Pending |
-| DOC-01 | Phase 4: Document Management | Pending |
-| DOC-02 | Phase 4: Document Management | Pending |
-| DOC-03 | Phase 4: Document Management | Pending |
-| DOC-04 | Phase 4: Document Management | Pending |
+| DOC-01 | Phase 4: Document Management | Complete |
+| DOC-02 | Phase 4: Document Management | Complete |
+| DOC-03 | Phase 4: Document Management | Complete |
+| DOC-04 | Phase 4: Document Management | Complete |
 | TRN-01 | Phase 5: Transcript Assembly & Export | Pending |
 | TRN-02 | Phase 5: Transcript Assembly & Export | Pending |
 | TRN-03 | Phase 5: Transcript Assembly & Export | Pending |

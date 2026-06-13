@@ -129,15 +129,15 @@ Plans:
 
 **Wave 1**
 
-- [ ] 04-01-PLAN.md — Server slice: install multer, Wave 0 RED tests (11 stubs), Prisma schema (DocumentType enum + Document model), Zod schemas, document service (upload/list/softDelete/download + IDOR guards), documents router (POST/GET/download/soft-delete), mount in students.ts, app.ts startup dir creation, docker-compose.yml bind mount
+- [x] 04-01-PLAN.md — Server slice: install multer, Wave 0 RED tests (11 stubs), Prisma schema (DocumentType enum + Document model), Zod schemas, document service (upload/list/softDelete/download + IDOR guards), documents router (POST/GET/download/soft-delete), mount in students.ts, app.ts startup dir creation, docker-compose.yml bind mount
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 04-02-PLAN.md — DB push + tests GREEN: [BLOCKING] npx prisma db push + npx prisma generate, replace 11 RED stubs with real supertest implementations, full suite GREEN (73+ tests)
+- [x] 04-02-PLAN.md — DB push + tests GREEN: [BLOCKING] npx prisma db push + npx prisma generate, replace 11 RED stubs with real supertest implementations, full suite GREEN (73+ tests)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 04-03-PLAN.md — Client slice: shadcn progress install, DocumentsSection.tsx (RecordSectionCard + document table + upload Dialog with XHR progress + fetch+blob download + delete AlertDialog), DocumentsSection wired into StudentDetailPage as 7th section card
+- [x] 04-03-PLAN.md — Client slice: shadcn progress install, DocumentsSection.tsx (RecordSectionCard + document table + upload Dialog with XHR progress + fetch+blob download + delete AlertDialog), DocumentsSection wired into StudentDetailPage as 7th section card
 
 **UI hint**: yes
 
@@ -167,7 +167,7 @@ Plans:
 | 1. Infrastructure & Auth | 5/5 (checkpoint pending) | In Progress | — |
 | 2. Student Profiles & Search | 3/3 | Complete   | 2026-06-12 |
 | 3. Student Records UI | 0/? | Not started | — |
-| 4. Document Management | 2/3 | In Progress | — |
+| 4. Document Management | 3/3 | Complete | 2026-06-13 |
 | 5. Transcript Assembly & Export | 0/? | Not started | — |
 
 ---

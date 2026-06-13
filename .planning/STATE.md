@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 04
 status: Executing Phase 04
-last_updated: "2026-06-13T03:07:00.000Z"
+last_updated: "2026-06-13T03:20:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 17
-  completed_plans: 15
-  percent: 60
+  completed_plans: 16
+  percent: 65
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 - Roadmap: created
 - Active phase: Phase 4 — document management
-- Last action: Phase 4 Plan 04-02 — DB push (DocumentType enum + Document table live in PostgreSQL); prisma generate (full typed client); @ts-ignore stubs removed; all 11 document integration tests turned GREEN; full suite 73 passing
+- Last action: Phase 4 Plan 04-03 — shadcn progress installed; DocumentsSection.tsx created (XHR upload+progress, fetch+blob download, delete AlertDialog, DOCUMENT_TYPE_LABELS, 5-column table); DocumentsSection wired as 7th section in StudentDetailPage; tsc clean
 
 ## Phase History
 
@@ -50,6 +50,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 || 03-student-records-ui | 03b (db-push+client-complete) | DB push (all 6 tables live in PostgreSQL); shadcn checkbox/textarea/tooltip/scroll-area installed; CareerGoalsSection (versioned POST-only, D-16) + NotesSection (append-only, D-17) + CareerInterestsChecklist (12-item grid, D-14); StudentDetailPage complete with all 6 sections in D-02 order; all 62 integration tests GREEN | 2026-06-13 |
 || 04-document-management | 01 (server-slice) | multer@2.1.1 + @types/multer@2.1.0; DocumentType enum + Document Prisma model; Zod schemas; document service (upload/list/soft-delete/download); documents router (POST/GET/download/DELETE) with MIME+magic bytes validation, MulterError handler; mounted in students.ts; app.ts startup dir creation; docker-compose bind mount; 11 RED test stubs | 2026-06-13 |
 || 04-document-management | 02 (db-push+tests) | prisma db push (DocumentType enum + Document table live in PostgreSQL); prisma generate (full typed client); @ts-ignore stubs removed; docker-compose.override.yml; all 11 document integration tests GREEN; full suite 73 passing | 2026-06-13 |
+|| 04-document-management | 03 (client-ui) | shadcn progress installed; DocumentsSection.tsx (XHR upload, fetch+blob download, AlertDialog delete, DOCUMENT_TYPE_LABELS, 5-column table); DocumentsSection added as 7th section in StudentDetailPage; DOC-01 through DOC-04 fully wired end-to-end | 2026-06-13 |
 
 ---
 
@@ -138,3 +139,8 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 - [Phase 04-02]: doc-04-all-types creates unique student per type tag to avoid schoolStudentId uniqueness conflicts
 
 | Phase 04-document-management P02 | ~10min | 2 tasks | 8 files |
+- [Phase 04-03]: Download uses fetch+blob+anchor (not window.open) — all /api/students routes require JWT Bearer token
+- [Phase 04-03]: AlertDialog inlined in DocumentsSection per UI-SPEC — delete copy differs from Phase 3 RecordDeleteDialog
+- [Phase 04-03]: Date formatted via toLocaleDateString (en-GB) — date-fns not in project dependencies
+
+| Phase 04-document-management P03 | ~15min | 2 tasks | 5 files |
