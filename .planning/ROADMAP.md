@@ -155,7 +155,7 @@ Plans:
 4. Staff can export a completed transcript as a formatted PDF containing the school logo and letterhead, suitable for sending to universities or employers.
 5. Admin can configure the school logo and letterhead used across all exported transcripts.
 
-**Plans:** TBD
+**Plans:** 1/2 plans executed
 **UI hint**: yes
 
 ---
@@ -168,7 +168,7 @@ Plans:
 | 2. Student Profiles & Search | 3/3 | Complete   | 2026-06-12 |
 | 3. Student Records UI | 0/? | Not started | — |
 | 4. Document Management | 3/3 | Complete    | 2026-06-13 |
-| 5. Transcript Assembly & Export | 0/? | Not started | — |
+| 5. Transcript Assembly & Export | 1/2 | In Progress|  |
 
 ---
 

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 5
-status: Ready to plan
-last_updated: "2026-06-13T14:27:37.686Z"
+current_phase: 05
+status: Executing Phase 05
+last_updated: "2026-06-14T07:47:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 17
-  completed_plans: 17
-  percent: 80
+  total_plans: 19
+  completed_plans: 18
+  percent: 95
 ---
 
 # Project State
@@ -21,13 +21,13 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 **Core value:** A careers staff member can open any student's record and produce a completed, professional transcript PDF in a single session — no hunting through spreadsheets, emails, or paper.
 **Current milestone:** v1.0
-**Current phase:** 5
+**Current phase:** 05
 
 ## Current Status
 
 - Roadmap: created
-- Active phase: Phase 5 — transcript assembly & export (not started)
-- Last action: Phase 4 complete 2026-06-13 — UAT passed; DocumentsSection (upload/list/download/soft-delete), 73 tests GREEN
+- Active phase: Phase 5 — transcript assembly & export (Plan 01 complete)
+- Last action: Phase 5 Plan 01 complete 2026-06-14 — Transcript/SchoolSettings schema, packages, 12 RED test stubs
 
 ## Phase History
 
@@ -51,6 +51,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 || 04-document-management | 01 (server-slice) | multer@2.1.1 + @types/multer@2.1.0; DocumentType enum + Document Prisma model; Zod schemas; document service (upload/list/soft-delete/download); documents router (POST/GET/download/DELETE) with MIME+magic bytes validation, MulterError handler; mounted in students.ts; app.ts startup dir creation; docker-compose bind mount; 11 RED test stubs | 2026-06-13 |
 || 04-document-management | 02 (db-push+tests) | prisma db push (DocumentType enum + Document table live in PostgreSQL); prisma generate (full typed client); @ts-ignore stubs removed; docker-compose.override.yml; all 11 document integration tests GREEN; full suite 73 passing | 2026-06-13 |
 || 04-document-management | 03 (client-ui) | shadcn progress installed; DocumentsSection.tsx (XHR upload, fetch+blob download, AlertDialog delete, DOCUMENT_TYPE_LABELS, 5-column table); DocumentsSection added as 7th section in StudentDetailPage; DOC-01 through DOC-04 fully wired end-to-end | 2026-06-13 |
+|| 05-transcript-assembly-export | 01 (wave-0-foundation) | Transcript + SchoolSettings Prisma models; puppeteer/TipTap/shadcn Switch installed; PUPPETEER_CACHE_DIR; 8 transcript + 4 settings RED integration test stubs | 2026-06-14 |
 
 ---
 
@@ -100,6 +101,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | Phase 03-student-records-ui P01b | 18min | 2 tasks | 10 files |
 | Phase 03-student-records-ui P02 | 15min | 2 tasks | 10 files |
 | Phase 03-student-records-ui P02b | 8min | 1 task | 3 files |
+| Phase 05-transcript-assembly-export P01 | 25min | 2 tasks | 11 files |
 
 ## Decisions
 
@@ -146,3 +148,10 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 - [Phase 04-03]: Date formatted via toLocaleDateString (en-GB) — date-fns not in project dependencies
 
 | Phase 04-document-management P03 | ~15min | 2 tasks | 5 files |
+
+- [Phase 05-01]: Transcript status on Transcript model not Student per D-16; Student.transcriptStatus field and index removed from schema
+- [Phase 05-01]: Section columns use *Content suffix per plan (academicsContent etc.) not *Html from research draft
+- [Phase 05-01]: clearDb uses optional chaining on transcript/schoolSettings deleteMany until Plan 02 prisma generate
+- [Phase 05-01]: adminToken for settings tests uses BOOTSTRAP_ADMIN_EMAIL pattern not JWT roles claim
+
+| Phase 05-transcript-assembly-export P01 | 25min | 2 tasks | 11 files |
