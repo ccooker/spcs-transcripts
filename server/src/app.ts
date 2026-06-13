@@ -1,11 +1,16 @@
 import express from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
+import fs from 'node:fs'
+import path from 'node:path'
 import { validateJwt, resolveUser } from './middleware/auth.js'
 import { requireRole } from './middleware/requireRole.js'
 import { Role } from './generated/prisma/client.js'
 import authRouter from './routes/auth.js'
 import studentsRouter from './routes/students.js'
+
+export const UPLOAD_ROOT = process.env.UPLOAD_ROOT ?? 'uploads'
+fs.mkdirSync(path.join(UPLOAD_ROOT, 'students'), { recursive: true })
 
 export const app = express()
 
