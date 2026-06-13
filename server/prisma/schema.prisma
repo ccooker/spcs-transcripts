@@ -103,7 +103,6 @@ model Student {
   studentPhone    String?
   parentEmail     String?
   parentPhone     String?
-  transcriptStatus TranscriptStatus @default(NONE)
   archivedAt      DateTime?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
@@ -115,10 +114,10 @@ model Student {
   careerGoals      CareerGoal[]
   staffNotes       StaffNote[]
   documents        Document[]
+  transcript       Transcript?
 
   @@index([fullName])
   @@index([formLevel, archivedAt])
-  @@index([transcriptStatus])
   @@index([archivedAt])
 }
 
@@ -229,4 +228,40 @@ model Document {
 
   @@index([studentId, deletedAt])
   @@index([studentId, createdAt(sort: Desc)])
+}
+
+model Transcript {
+  id                      String           @id @default(uuid())
+  studentId               String           @unique
+  student                 Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status                  TranscriptStatus @default(DRAFT)
+
+  academicsContent        String?          @db.Text
+  activitiesContent       String?          @db.Text
+  awardsContent           String?          @db.Text
+  workExperienceContent   String?          @db.Text
+  careerGoalsContent      String?          @db.Text
+  staffEndorsementContent String?          @db.Text
+
+  academicsVisible        Boolean          @default(true)
+  activitiesVisible       Boolean          @default(true)
+  awardsVisible           Boolean          @default(true)
+  workExperienceVisible   Boolean          @default(true)
+  careerGoalsVisible      Boolean          @default(true)
+  staffEndorsementVisible Boolean          @default(true)
+
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
+
+  @@index([studentId])
+  @@index([status])
+}
+
+model SchoolSettings {
+  id             String   @id @default("singleton")
+  schoolName     String
+  schoolAddress  String?  @db.Text
+  letterheadHtml String?  @db.Text
+  logoPath       String?
+  updatedAt      DateTime @updatedAt
 }

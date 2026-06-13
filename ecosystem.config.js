@@ -25,6 +25,7 @@ module.exports = {
         AZURE_TENANT_ID: 'ef6ae8ee-9884-4ff6-9ebc-86f882c072c7',
         AZURE_CLIENT_ID: 'a9692133-25c0-434d-9afe-436905139548',
         BOOTSTRAP_ADMIN_EMAIL: 'spcscky@spcs.edu.hk',
+        PUPPETEER_CACHE_DIR: 'C:/ProgramData/puppeteer',
       },
 
       // System-level log path — readable only by Administrators (T-05-05)
