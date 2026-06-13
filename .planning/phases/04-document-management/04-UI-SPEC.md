@@ -86,7 +86,7 @@ npx shadcn@latest add progress
 
 **Table column headers:** `text-sm font-semibold` (600 — matches Phase 2/3 data tables).
 
-**File name cell:** `text-sm font-medium` — slightly heavier than regular label to serve as the primary row identifier; truncated to `max-w-[240px] truncate` with tooltip on hover for long filenames.
+**File name cell:** `text-sm font-semibold` — semibold (600) weight to serve as the primary row identifier; truncated to `max-w-[240px] truncate` with tooltip on hover for long filenames.
 
 ---
 
@@ -106,7 +106,7 @@ npx shadcn@latest add progress
 **Accent (`--primary`) reserved for Phase 4:**
 
 1. "Upload document" primary button in DocumentsSection card header
-2. "Upload" submit button inside the upload Dialog
+2. "Upload document" submit button inside the upload Dialog
 3. Focus rings on all interactive elements (inherited)
 
 **Accent is NOT used for:** document table row hover, type tag badges, download icon buttons, delete icon buttons.
@@ -223,7 +223,7 @@ Section order per D-11 (CONTEXT.md):
 
 | Column | Field | Component | Notes |
 |--------|-------|-----------|-------|
-| File name | `originalFilename` | `text-sm font-medium` truncated | `max-w-[240px] truncate`; full filename in `Tooltip` on hover |
+| File name | `originalFilename` | `text-sm font-semibold` truncated | `max-w-[240px] truncate`; full filename in `Tooltip` on hover |
 | Type | `typeTag` | `Badge variant="secondary"` | Display label from Document Type Tag table above |
 | Uploaded | `createdAt` | `text-sm text-muted-foreground` | Format: "12 Jun 2026" (`d MMM yyyy`) |
 | Uploader | `uploader.displayName` | `text-sm text-muted-foreground` | Staff display name |
@@ -263,7 +263,7 @@ Both action buttons use `Button variant="ghost" size="icon"` — consistent with
 │  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  64%        [uploading]      │
 │  (progress bar — hidden until upload starts)                           │
 │                                                                        │
-│                           [ Cancel ]  [ Upload ]                      │
+│                [ Discard upload ]  [ Upload document ]                │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -287,15 +287,15 @@ Both action buttons use `Button variant="ghost" size="icon"` — consistent with
 
 | State | Controls | Submit label |
 |-------|----------|-------------|
-| Idle (no file selected) | All enabled; Submit disabled | "Upload" (disabled) |
-| File selected, type selected | All enabled; Submit enabled | "Upload" |
-| Uploading | File input + type select + Cancel + Submit all disabled | "Uploading…" |
-| Upload error | Controls re-enabled; error toast displayed; progress bar hidden | "Upload" |
+| Idle (no file selected) | All enabled; Submit disabled | "Upload document" (disabled) |
+| File selected, type selected | All enabled; Submit enabled | "Upload document" |
+| Uploading | File input + type select + Discard upload + Submit all disabled | "Uploading…" |
+| Upload error | Controls re-enabled; error toast displayed; progress bar hidden | "Upload document" |
 | Upload success | Dialog closes; progress bar hidden | — |
 
 **Submit flow:** `fetch` with `XMLHttpRequest` wrapping (for progress events) → `POST /api/students/:id/documents` with `Content-Type: multipart/form-data` → on success: close dialog, `toast.success("Document uploaded")`, refetch document list.
 
-**Cancel button:** `Button variant="outline"` label "Cancel". Disabled while uploading.
+**Cancel button:** `Button variant="outline"` label "Discard upload". Disabled while uploading.
 
 **File validation (client-side, before submit):**
 
@@ -379,9 +379,9 @@ Server-side validation mirrors these checks; errors surfaced as toast if client-
 | Type field label | "Document type" | Required asterisk on label |
 | Type placeholder | "Select type…" | |
 | Type options | "Report Card", "Certificate", "Award Letter", "Work Experience Letter", "Reference Letter", "Other" | D-20 |
-| Upload CTA | "Upload" | `Button variant="default"` |
+| Upload CTA | "Upload document" | `Button variant="default"` |
 | Uploading state | "Uploading…" | Submit button; controls disabled |
-| Cancel button | "Cancel" | `Button variant="outline"`; disabled while uploading |
+| Cancel button | "Discard upload" | `Button variant="outline"`; disabled while uploading |
 | Upload success toast | "Document uploaded" | Sonner |
 | Validation — no file | "Select a PDF file to upload." | Inline below file button |
 | Validation — not PDF | "Only PDF files are accepted." | Inline below file button |
