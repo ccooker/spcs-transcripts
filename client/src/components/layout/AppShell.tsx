@@ -1,4 +1,5 @@
 import { useMsal } from '@azure/msal-react';
+import { Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -16,7 +17,7 @@ import { cn } from '@/lib/utils';
 
 interface AppShellProps {
   userInfo: UserInfo | null;
-  activeNav?: 'home' | 'students';
+  activeNav?: 'home' | 'students' | 'settings';
   children: React.ReactNode;
 }
 
@@ -58,12 +59,14 @@ export function AppShell({ userInfo, activeNav = 'home', children }: AppShellPro
               {userInfo?.role === 'ADMIN' && (
                 <Link
                   to="/settings"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  aria-disabled="true"
-                  tabIndex={-1}
-                  onClick={(e) => e.preventDefault()}
+                  className={navLinkClass(activeNav === 'settings')}
+                  aria-label="Admin settings"
+                  aria-current={activeNav === 'settings' ? 'page' : undefined}
                 >
-                  Settings
+                  <span className="inline-flex items-center gap-1.5">
+                    <Settings className="h-4 w-4" aria-hidden="true" />
+                    Settings
+                  </span>
                 </Link>
               )}
             </nav>

@@ -234,7 +234,7 @@ export function SettingsPage({ userInfo }: SettingsPageProps) {
   const showServerLogo = logoPath && !selectedLogoFile;
 
   return (
-    <AppShell userInfo={userInfo} activeNav={'settings' as 'home'}>
+    <AppShell userInfo={userInfo} activeNav="settings">
       <h1 className="text-2xl font-semibold leading-tight">Settings</h1>
 
       <form onSubmit={(e) => void handleSubmit(e)} className="mt-6 max-w-2xl">
