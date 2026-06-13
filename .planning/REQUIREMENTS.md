@@ -31,9 +31,9 @@
 
 ### Transcript Generation
 
-- [ ] **TRN-01**: Staff can open a transcript template for any student and fill in narrative text sections (one section per record type: academics, activities, awards, work experience, career goals, staff endorsement)
-- [ ] **TRN-02**: Staff can set a per-student transcript status to Draft or Finalised
-- [ ] **TRN-03**: Staff can export a student's transcript as a formatted PDF with school branding (logo and letterhead configurable by Admin)
+- [x] **TRN-01**: Staff can open a transcript template for any student and fill in narrative text sections (one section per record type: academics, activities, awards, work experience, career goals, staff endorsement)
+- [x] **TRN-02**: Staff can set a per-student transcript status to Draft or Finalised
+- [x] **TRN-03**: Staff can export a student's transcript as a formatted PDF with school branding (logo and letterhead configurable by Admin)
 
 ### Search & Navigation
 
@@ -105,9 +105,9 @@
 | DOC-02 | Phase 4: Document Management | Complete |
 | DOC-03 | Phase 4: Document Management | Complete |
 | DOC-04 | Phase 4: Document Management | Complete |
-| TRN-01 | Phase 5: Transcript Assembly & Export | Pending |
-| TRN-02 | Phase 5: Transcript Assembly & Export | Pending |
-| TRN-03 | Phase 5: Transcript Assembly & Export | Pending |
+| TRN-01 | Phase 5: Transcript Assembly & Export | Complete |
+| TRN-02 | Phase 5: Transcript Assembly & Export | Complete |
+| TRN-03 | Phase 5: Transcript Assembly & Export | Complete |
 | NAV-01 | Phase 2: Student Profiles & Search | Complete |
 | NAV-02 | Phase 2: Student Profiles & Search | Complete |
 | NAV-03 | Phase 2: Student Profiles & Search | Complete |

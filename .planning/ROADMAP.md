@@ -13,6 +13,7 @@
 - [x] **Phase 3: Student Records UI** — All six record types: academics, activities, awards, work experience, career goals, notes (completed 2026-06-13)
 - [x] **Phase 4: Document Management** — PDF upload, secure storage, document listing/download/soft-delete, type tagging
  (completed 2026-06-13)
+
 - [ ] **Phase 5: Transcript Assembly & Export** — Narrative template, draft/finalised status, school-branded PDF export
 
 ---
@@ -156,7 +157,7 @@ Plans:
 4. Staff can export a completed transcript as a formatted PDF containing the school logo and letterhead, suitable for sending to universities or employers.
 5. Admin can configure the school logo and letterhead used across all exported transcripts.
 
-**Plans:** 5 plans
+**Plans:** 3/5 plans executed
 
 Plans:
 
@@ -170,7 +171,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 05-03-PLAN.md — API routes: GET/PUT /transcript, POST /export, GET/PUT /settings, GET /logo — turn transcript.test.ts + settings.test.ts GREEN
+- [x] 05-03-PLAN.md — API routes: GET/PUT /transcript, POST /export, GET/PUT /settings, GET /logo — turn transcript.test.ts + settings.test.ts GREEN
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -192,7 +193,7 @@ Plans:
 | 2. Student Profiles & Search | 3/3 | Complete   | 2026-06-12 |
 | 3. Student Records UI | 6/6 | Complete    | 2026-06-13 |
 | 4. Document Management | 3/3 | Complete    | 2026-06-13 |
-| 5. Transcript Assembly & Export | 2/5 | In Progress | — |
+| 5. Transcript Assembly & Export | 3/5 | In Progress|  |
 
 ---
 
