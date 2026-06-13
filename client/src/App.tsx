@@ -13,6 +13,7 @@ import { HomePage } from '@/pages/HomePage';
 import { StudentsListPage } from '@/pages/StudentsListPage';
 import { StudentNewPage } from '@/pages/StudentNewPage';
 import { StudentDetailPage } from '@/pages/StudentDetailPage';
+import { TranscriptPage } from '@/pages/TranscriptPage';
 import { UnauthorizedPage } from '@/pages/UnauthorizedPage';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { apiGet, AuthRedirectInProgressError } from '@/api/apiClient';
@@ -111,6 +112,14 @@ function App() {
         element={
           <ProtectedRoute>
             <StudentDetailPage userInfo={userInfo} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/students/:id/transcript"
+        element={
+          <ProtectedRoute>
+            <TranscriptPage userInfo={userInfo} />
           </ProtectedRoute>
         }
       />

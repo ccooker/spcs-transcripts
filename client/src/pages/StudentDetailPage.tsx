@@ -7,7 +7,7 @@ import { CareerGoalsSection } from '@/components/records/CareerGoalsSection';
 import { NotesSection } from '@/components/records/NotesSection';
 import { DocumentsSection } from '@/components/records/DocumentsSection';
 import { WorkExperienceSection } from '@/components/records/WorkExperienceSection';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import type { UserInfo } from '@/App';
 import { apiGet, apiPatch, apiPost } from '@/api/apiClient';
@@ -212,9 +212,17 @@ export function StudentDetailPage({ userInfo }: StudentDetailPageProps) {
                 </Button>
               )}
               {!isArchived && (
-                <Button variant="destructive" onClick={() => setArchiveOpen(true)}>
-                  Archive
-                </Button>
+                <>
+                  <Button variant="outline" asChild>
+                    <Link to={`/students/${student.id}/transcript`}>
+                      <FileText className="h-4 w-4 mr-2" />
+                      View transcript
+                    </Link>
+                  </Button>
+                  <Button variant="destructive" onClick={() => setArchiveOpen(true)}>
+                    Archive
+                  </Button>
+                </>
               )}
             </div>
           </div>
