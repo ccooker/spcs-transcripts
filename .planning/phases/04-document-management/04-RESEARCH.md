@@ -930,17 +930,17 @@ All test cases for DOC-01 through DOC-04 require new test infrastructure:
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **UPLOAD_ROOT env var in docker-compose.yml**
    - What we know: D-01 specifies `./data/uploads` on host → `/app/uploads` in container
    - What's unclear: Does the server Dockerfile expose `/app/uploads` as a volume mount, or does `docker-compose.yml` handle it entirely?
-   - Recommendation: Add `UPLOAD_ROOT=/app/uploads` to the `api` service environment in `docker-compose.yml` + `volumes` bind-mount entry. Server reads `UPLOAD_ROOT` env var at startup.
+   - RESOLVED: `docker-compose.yml` handles it entirely. Plan 04-01 Task 3 adds `UPLOAD_ROOT: /app/uploads` to the `api` service environment block and adds the bind-mount `./data/uploads:/app/uploads` under the `volumes` key. No Dockerfile change needed.
 
 2. **Filename sanitisation for `Content-Disposition`**
    - What we know: D-15 specifies `filename="{originalFilename}"`. School staff upload named PDFs.
    - What's unclear: Whether to sanitise quotes/backslashes in originalFilename before inserting into header.
-   - Recommendation: Apply `originalFilename.replace(/["\\]/g, '_')` in the header to prevent header injection. Store the original unmodified filename in the DB.
+   - RESOLVED: Plan 04-01 Task 3 uses RFC 5987 encoding (`filename*=UTF-8''${encodeURIComponent(originalFilename)}`) in the `Content-Disposition` header, which handles all special characters without lossy replacement. Original unmodified filename stored in DB (D-03).
 
 ---
 
