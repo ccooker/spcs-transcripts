@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 05
-status: Executing Phase 05
-last_updated: "2026-06-14T08:15:00.000Z"
+status: Phase 05 Complete
+last_updated: "2026-06-14T08:32:00.000Z"
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 22
-  completed_plans: 21
-  percent: 95
+  completed_plans: 22
+  percent: 100
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 ## Current Status
 
 - Roadmap: created
-- Active phase: Phase 5 — transcript assembly & export (Plan 04 complete; Settings client UI next)
-- Last action: Phase 5 Plan 04 complete 2026-06-14 — TranscriptPage with TipTap sections, auto-save, PDF export; View transcript CTA wired
+- Active phase: Phase 5 — transcript assembly & export (complete)
+- Last action: Phase 5 Plan 05 complete 2026-06-14 — SettingsPage branding form, Admin Settings nav, XHR logo upload, blob preview
 
 ## Phase History
 
@@ -55,6 +55,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 || 05-transcript-assembly-export | 02 (server-services) | prisma db push + generate; transcript/pdf/settings services; listStudents Transcript JOIN; 22 students tests GREEN | 2026-06-14 |
 || 05-transcript-assembly-export | 03 (api-routes) | transcript GET/PUT/export + settings GET/PUT/logo routes; branding dir; 12 transcript+settings tests GREEN; full suite 85 passing | 2026-06-14 |
 || 05-transcript-assembly-export | 04 (client-editor) | TranscriptPage with six TipTap sections, debounced PUT auto-save, status select, PDF export, RecordsUpdatedBanner; View transcript CTA + App route | 2026-06-14 |
+|| 05-transcript-assembly-export | 05 (client-settings) | SettingsPage branding form, XHR logo upload, fetch+blob logo preview, Admin Settings nav, /settings route, Staff 403 redirect | 2026-06-14 |
 
 ---
 
@@ -91,7 +92,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 ---
 *State initialised: 2026-06-11*
-*Last updated: 2026-06-14 after Phase 5 Plan 04 — transcript editor client slice complete*
+*Last updated: 2026-06-14 after Phase 5 Plan 05 — settings admin client slice complete; Phase 5 complete*
 
 ## Performance Metrics
 
@@ -108,6 +109,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 | Phase 05-transcript-assembly-export P02 | 18min | 2 tasks | 16 files |
 | Phase 05-transcript-assembly-export P03 | 10min | 2 tasks | 7 files |
 | Phase 05-transcript-assembly-export P04 | 15min | 2 tasks | 7 files |
+| Phase 05-transcript-assembly-export P05 | 12min | 2 tasks | 3 files |
 
 ## Decisions
 
@@ -172,3 +174,6 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 - [Phase 05-04]: apiFetch PUT (not PATCH) for all transcript saves per Plan 03 upsert endpoint
 - [Phase 05-04]: TipTap editorKey remount on load/regenerate avoids controlled content re-sync anti-pattern
 - [Phase 05-04]: Status select maps NONE to DRAFT display; first status PUT persists Transcript row
+- [Phase 05-05]: Logo multipart upload uses XMLHttpRequest PUT — apiFetch Content-Type override breaks multipart boundary
+- [Phase 05-05]: Logo preview uses fetch+blob+createObjectURL — img src cannot attach Bearer Authorization header
+- [Phase 05-05]: JSON-only settings save uses apiFetch PUT when no new logo file selected

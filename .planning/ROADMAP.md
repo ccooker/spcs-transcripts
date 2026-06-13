@@ -179,7 +179,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 3 + 04 completion)*
 
-- [ ] 05-05-PLAN.md — Settings admin client slice: /settings branding form, AppShell Admin nav, Staff guard
+- [x] 05-05-PLAN.md — Settings admin client slice: /settings branding form, AppShell Admin nav, Staff guard
 
 **UI hint**: yes
 
@@ -193,7 +193,7 @@ Plans:
 | 2. Student Profiles & Search | 3/3 | Complete   | 2026-06-12 |
 | 3. Student Records UI | 6/6 | Complete    | 2026-06-13 |
 | 4. Document Management | 3/3 | Complete    | 2026-06-13 |
-| 5. Transcript Assembly & Export | 4/5 | In Progress|  |
+| 5. Transcript Assembly & Export | 5/5 | Complete    | 2026-06-14 |
 
 ---
 
