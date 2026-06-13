@@ -49,7 +49,7 @@ describe('Transcript', () => {
       .post(`/api/students/${student.id}/academics`)
       .set('Authorization', `Bearer ${token}`)
       .send({
-        subject: 'Mathematics',
+        subject: 'Mathematics (Compulsory)',
         grade: 'A',
         calendarYear: 2025,
         formLevel: 'FORM_4',
@@ -120,7 +120,7 @@ describe('Transcript', () => {
       .post(`/api/students/${student.id}/academics`)
       .set('Authorization', `Bearer ${token}`)
       .send({
-        subject: 'English',
+        subject: 'English Language',
         grade: 'B',
         calendarYear: 2025,
         formLevel: 'FORM_4',

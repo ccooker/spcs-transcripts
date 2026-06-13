@@ -159,6 +159,7 @@ import workExperienceRouter from './workExperience.js'
 import careerGoalsRouter from './careerGoals.js'
 import notesRouter from './notes.js'
 import documentsRouter from './documents.js'
+import transcriptRouter from './transcript.js'
 
 router.use('/:studentId/academics', academicResultsRouter)
 router.use('/:studentId/activities', activitiesRouter)
@@ -167,5 +168,6 @@ router.use('/:studentId/work-experience', workExperienceRouter)
 router.use('/:studentId/career-goals', careerGoalsRouter)
 router.use('/:studentId/notes', notesRouter)
 router.use('/:studentId/documents', documentsRouter)
+router.use('/:studentId/transcript', transcriptRouter)
 
 export default router
