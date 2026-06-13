@@ -31,6 +31,16 @@ export class StudentAlreadyActiveError extends Error {
   }
 }
 
+function mapStudentWithTranscriptStatus<
+  T extends { transcript?: { status: string } | null },
+>(student: T) {
+  const { transcript, ...rest } = student
+  return {
+    ...rest,
+    transcriptStatus: transcript?.status ?? 'NONE',
+  }
+}
+
 export async function createStudent(
   prisma: InstanceType<typeof PrismaClient>,
   data: CreateStudentInput,
@@ -56,7 +66,7 @@ export async function createStudent(
     recordId: student.id,
   })
 
-  return student
+  return { ...student, transcriptStatus: 'NONE' as const }
 }
 
 function escapeLikePattern(value: string): string {
@@ -82,14 +92,19 @@ export async function listStudents(
       ? { fullName: { contains: escapeLikePattern(q), mode: 'insensitive' as const } }
       : {}),
     ...(formLevel ? { formLevel } : {}),
-    ...(transcriptStatus ? { transcriptStatus } : {}),
+    ...(transcriptStatus === 'NONE'
+      ? { transcript: { is: null } }
+      : transcriptStatus === 'DRAFT' || transcriptStatus === 'FINALISED'
+        ? { transcript: { status: transcriptStatus } }
+        : {}),
   }
 
   const skip = (page - 1) * pageSize
 
-  const [data, total] = await prisma.$transaction([
+  const [rows, total] = await prisma.$transaction([
     prisma.student.findMany({
       where,
+      include: { transcript: { select: { status: true } } },
       orderBy: buildListOrderBy(sort, order),
       skip,
       take: pageSize,
@@ -98,7 +113,7 @@ export async function listStudents(
   ])
 
   return {
-    data,
+    data: rows.map(mapStudentWithTranscriptStatus),
     meta: {
       page,
       pageSize,
@@ -112,11 +127,14 @@ export async function getStudentById(
   prisma: InstanceType<typeof PrismaClient>,
   id: string,
 ) {
-  const student = await prisma.student.findUnique({ where: { id } })
+  const student = await prisma.student.findUnique({
+    where: { id },
+    include: { transcript: { select: { status: true } } },
+  })
   if (!student) {
     throw new StudentNotFoundError()
   }
-  return student
+  return mapStudentWithTranscriptStatus(student)
 }
 
 export async function updateStudent(
