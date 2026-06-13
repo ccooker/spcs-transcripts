@@ -5,6 +5,7 @@ import { ActivitiesSection } from '@/components/records/ActivitiesSection';
 import { AwardsSection } from '@/components/records/AwardsSection';
 import { CareerGoalsSection } from '@/components/records/CareerGoalsSection';
 import { NotesSection } from '@/components/records/NotesSection';
+import { DocumentsSection } from '@/components/records/DocumentsSection';
 import { WorkExperienceSection } from '@/components/records/WorkExperienceSection';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
@@ -277,6 +278,7 @@ export function StudentDetailPage({ userInfo }: StudentDetailPageProps) {
             <WorkExperienceSection studentId={student.id} />
             <CareerGoalsSection studentId={student.id} />
             <NotesSection studentId={student.id} />
+            <DocumentsSection studentId={student.id} />
           </div>
 
           <ArchiveStudentDialog
