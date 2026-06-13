@@ -8,9 +8,11 @@ import { requireRole } from './middleware/requireRole.js'
 import { Role } from './generated/prisma/client.js'
 import authRouter from './routes/auth.js'
 import studentsRouter from './routes/students.js'
+import settingsRouter from './routes/settings.js'
 
 export const UPLOAD_ROOT = process.env.UPLOAD_ROOT ?? 'uploads'
 fs.mkdirSync(path.join(UPLOAD_ROOT, 'students'), { recursive: true })
+fs.mkdirSync(path.join(UPLOAD_ROOT, 'branding'), { recursive: true })
 
 export const app = express()
 
@@ -26,6 +28,7 @@ app.use('/api', resolveUser)
 
 app.use('/api/auth', authRouter)
 app.use('/api/students', studentsRouter)
+app.use('/api/settings', settingsRouter)
 
 // Admin-only test route used by auth-02-admin-route integration test
 app.get('/api/admin/test', requireRole(Role.ADMIN), (_req, res) => res.json({ ok: true }))
