@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 
 - Roadmap: created
 - Active phase: Phase 4 — document management
-- Last action: Phase 4 Plan 04-01 — multer install, Document Prisma model, Zod schemas, document service, documents router, students.ts mount, app.ts startup dir, docker-compose bind mount; 11 RED test stubs committed
+- Last action: Phase 4 Plan 04-02 — DB push (DocumentType enum + Document table live in PostgreSQL); prisma generate (full typed client); @ts-ignore stubs removed; all 11 document integration tests turned GREEN; full suite 73 passing
 
 ## Phase History
 
@@ -49,6 +49,7 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 || 03-student-records-ui | 03a (server-careergoals-staffnotes) | CareerGoal + StaffNote Prisma models (no updatedAt, D-16/D-17), Zod schemas, list+create-only services, GET+POST-only routes mounted; RED tests stu-07+stu-08 | 2026-06-13 |
 || 03-student-records-ui | 03b (db-push+client-complete) | DB push (all 6 tables live in PostgreSQL); shadcn checkbox/textarea/tooltip/scroll-area installed; CareerGoalsSection (versioned POST-only, D-16) + NotesSection (append-only, D-17) + CareerInterestsChecklist (12-item grid, D-14); StudentDetailPage complete with all 6 sections in D-02 order; all 62 integration tests GREEN | 2026-06-13 |
 || 04-document-management | 01 (server-slice) | multer@2.1.1 + @types/multer@2.1.0; DocumentType enum + Document Prisma model; Zod schemas; document service (upload/list/soft-delete/download); documents router (POST/GET/download/DELETE) with MIME+magic bytes validation, MulterError handler; mounted in students.ts; app.ts startup dir creation; docker-compose bind mount; 11 RED test stubs | 2026-06-13 |
+|| 04-document-management | 02 (db-push+tests) | prisma db push (DocumentType enum + Document table live in PostgreSQL); prisma generate (full typed client); @ts-ignore stubs removed; docker-compose.override.yml; all 11 document integration tests GREEN; full suite 73 passing | 2026-06-13 |
 
 ---
 
@@ -132,3 +133,8 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 - [Phase 04-01]: storedPath stored relative to UPLOAD_ROOT (not absolute) to survive container remounts
 
 | Phase 04-document-management P01 | ~15min | 3 tasks | 10 files |
+- [Phase 04-02]: docker-compose.override.yml created to expose postgres:5432 to host for prisma db push
+- [Phase 04-02]: doc-01-idor uses fake UUID non-existent student ID to trigger 404 IDOR guard
+- [Phase 04-02]: doc-04-all-types creates unique student per type tag to avoid schoolStudentId uniqueness conflicts
+
+| Phase 04-document-management P02 | ~10min | 2 tasks | 8 files |

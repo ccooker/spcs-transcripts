@@ -167,7 +167,7 @@ Plans:
 | 1. Infrastructure & Auth | 5/5 (checkpoint pending) | In Progress | — |
 | 2. Student Profiles & Search | 3/3 | Complete   | 2026-06-12 |
 | 3. Student Records UI | 0/? | Not started | — |
-| 4. Document Management | 0/? | Not started | — |
+| 4. Document Management | 2/3 | In Progress | — |
 | 5. Transcript Assembly & Export | 0/? | Not started | — |
 
 ---
