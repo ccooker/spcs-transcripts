@@ -1,8 +1,10 @@
 # Phase 5: Transcript Assembly & Export — Research
 
-**Researched:** 2026-06-13
+**Researched:** 2026-06-14 (refreshed from 2026-06-13)
 **Domain:** PDF generation (Puppeteer), rich text editing (TipTap v3), Prisma schema extension
-**Confidence:** MEDIUM — TipTap v3 and Puppeteer v25 APIs verified against official docs and npm registry; Prisma patterns cross-checked against existing project patterns.
+**Confidence:** MEDIUM — TipTap v3.26.1 and Puppeteer v25.1.0 APIs verified against npm registry 2026-06-14; Prisma patterns cross-checked against existing project patterns; students.test.ts transcriptStatus references confirmed via codebase grep.
+
+> **⚠ TipTap version note:** `05-UI-SPEC.md` Design System table says "TipTap v2 (headless)" — this is an error in the UI-SPEC. TipTap v3.26.1 is the current release (confirmed `npm view @tiptap/react version → 3.26.1`). All patterns in this research use v3 APIs. The planner and executor must install `@tiptap/react@3.26.1` and `@tiptap/starter-kit@3.26.1`, not v2.
 
 ---
 
@@ -333,8 +335,10 @@ export function TipTapEditor({ initialContent, onChange, placeholder }: TipTapEd
       isFirstRender.current = false
       return
     }
+    // TipTap v3 API: setContent(content, options) — options object as 2nd arg (NOT boolean)
     // { emitUpdate: false } prevents triggering onUpdate → auto-save loop
-    editor.commands.setContent(initialContent || '', false, { emitUpdate: false })
+    // v2 had setContent(content, emitUpdate_bool) — DO NOT use boolean 2nd arg in v3
+    editor.commands.setContent(initialContent || '', { emitUpdate: false })
   }, [initialContent, editor])
 
   // useEditorState for toolbar active state (v3: shouldRerenderOnTransaction defaults to false)
@@ -697,7 +701,7 @@ export function useDebouncedCallback<T extends unknown[]>(
 |--------------|------------------|--------------|--------|
 | `headless: 'new'` string literal | `headless: true` (boolean) | Puppeteer v21+ | `headless: true` now maps to headless shell; string literal deprecated |
 | Puppeteer stores Chromium in `node_modules/.local-chromium` | Puppeteer stores Chromium in `~/.cache/puppeteer` | Puppeteer v20 | Cache survives `npm ci` re-runs; but breaks SYSTEM-account deployments without explicit `PUPPETEER_CACHE_DIR` |
-| TipTap `setContent(html, emitUpdate)` (boolean 2nd arg) | `setContent(content, options)` where options is an object | TipTap v3.0 | Must update call sites; v2 boolean second arg no longer accepted |
+| TipTap `setContent(html, emitUpdate)` (boolean 2nd arg) | `setContent(content, options)` where options is an object `{ emitUpdate?: boolean }` | TipTap v3.0 | **Must use options object, not boolean.** `setContent(html, { emitUpdate: false })` — the boolean second arg from v2 is no longer accepted |
 | TipTap re-renders on every transaction by default | `shouldRerenderOnTransaction: false` default | TipTap v3.0 | Must use `useEditorState` for toolbar active states |
 
 **Deprecated/outdated:**
@@ -804,17 +808,15 @@ export function useDebouncedCallback<T extends unknown[]>(
 
 ## Open Questions
 
-1. **`Student.transcriptStatus` removal**
+1. **`Student.transcriptStatus` removal — RESOLVED**
    - What we know: Existing schema has this column; D-16 says status goes on Transcript model; student list filter currently reads from Student
-   - What's unclear: Do any Phase 2/3 tests rely on `Student.transcriptStatus` being set directly?
-   - Recommendation: Check `server/src/__tests__/students.test.ts` for `transcriptStatus` assertions before migration. Update those tests to seed a `Transcript` record instead.
+   - **Confirmed via grep (2026-06-14):** `server/src/__tests__/students.test.ts` references `transcriptStatus` at **7 locations**: lines 40 (type assertion), 61 and 131 (response assertion `transcriptStatus: 'NONE'`), 335 (`prisma.student.update data: { transcriptStatus: 'DRAFT' }`), 372–383 (`nav-02-status` test filters `GET /api/students?transcriptStatus=NONE` and asserts `row.transcriptStatus`).
+   - **Action required for planner:** The Phase 5 plan must include a task to update `students.test.ts` — the `nav-02-status` test must be changed to create a `Transcript` record (with `status: 'NONE'` default) rather than setting `Student.transcriptStatus` directly. The list API response shape must return `transcriptStatus` (renamed from `Transcript.status`) for backward compatibility with the existing test assertions, or the test assertions must be updated.
 
-2. **Logo MIME type serving**
-   - What we know: Logo is stored as `logo.{ext}` where ext is jpg/png/gif per D-13
-   - What's unclear: Should GET /api/settings/logo infer MIME from file extension, or store MIME in DB?
+2. **Logo MIME type serving — RESOLVED**
    - Recommendation: Infer from `path.extname(logoPath)` — simple, no schema change needed.
 
-3. **Concurrent PDF export requests**
+3. **Concurrent PDF export requests — OPEN**
    - What we know: 3–8 staff users; one export per request; launch-per-request approach chosen
    - What's unclear: How long does Puppeteer take per request on this server's hardware?
    - Recommendation: Instrument with `Date.now()` in the service; if > 10 seconds, add a 30s request timeout; pooling deferred to v2.
@@ -848,5 +850,15 @@ export function useDebouncedCallback<T extends unknown[]>(
 - Architecture: MEDIUM — patterns derived from official docs and direct analogy to existing Phase 4 patterns
 - Pitfalls: MEDIUM — Puppeteer Windows pitfalls verified against official GitHub issues; TipTap v3 breaking changes verified against upgrade guide
 
-**Research date:** 2026-06-13
-**Valid until:** 2026-07-13 (TipTap and Puppeteer are actively maintained; check for patch releases)
+**Research date:** 2026-06-14 (refreshed; original 2026-06-13)
+**Valid until:** 2026-07-14 (TipTap and Puppeteer are actively maintained; check for patch releases)
+
+---
+
+## Refresh Notes (2026-06-14)
+
+**Changes from original 2026-06-13 version:**
+- **Fixed `setContent` API:** Code example now correctly uses `setContent(content, { emitUpdate: false })` — the v2 boolean second argument form was incorrectly shown in the original.
+- **TipTap v2 vs v3 warning added** to document header — `05-UI-SPEC.md` Design System table incorrectly states "TipTap v2" but v3.26.1 is current (confirmed `npm view`).
+- **Open Question 1 resolved:** `students.test.ts` has 7 references to `transcriptStatus` (lines 40, 61, 131, 335, 372, 377, 383). The nav-02-status test must be rewritten to seed Transcript records.
+- **Package versions re-verified:** puppeteer@25.1.0, @tiptap/react@3.26.1, @tiptap/starter-kit@3.26.1 confirmed via `npm view` 2026-06-14.
