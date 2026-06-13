@@ -67,8 +67,8 @@ const DOCUMENT_TYPE_LABELS: Record<string, string> = {
 
 const API_SCOPE = `api://${import.meta.env.VITE_CLIENT_ID}/access_as_user`;
 
-// Do NOT set Content-Type manually — browser adds the multipart/form-data boundary automatically.
-// Setting it manually would corrupt the boundary and the server cannot parse the upload.
+// Do NOT set the multipart header manually — browser adds the correct boundary automatically.
+// Manually overriding it corrupts the boundary and the server cannot parse the upload.
 async function uploadDocumentWithProgress(
   studentId: string,
   file: File,
