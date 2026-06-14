@@ -3,8 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 05
-status: Phase 05 Complete
-last_updated: "2026-06-14T08:32:00.000Z"
+status: Awaiting next milestone
+last_updated: "2026-06-14T14:09:58.565Z"
+last_activity: 2026-06-14 — Milestone v1.0 completed and archived
 progress:
   total_phases: 5
   completed_phases: 5
@@ -17,11 +18,10 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-11)
+See: .planning/PROJECT.md (updated 2026-06-14)
 
 **Core value:** A careers staff member can open any student's record and produce a completed, professional transcript PDF in a single session — no hunting through spreadsheets, emails, or paper.
-**Current milestone:** v1.0
-**Current phase:** 05
+**Current focus:** Planning next milestone (`/gsd-new-milestone`)
 
 ## Current Status
 
@@ -89,6 +89,16 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 ### Blockers
 
 (none yet)
+
+## Deferred Items
+
+Items acknowledged and deferred at milestone close on 2026-06-14:
+
+| Category | Item | Status |
+|----------|------|--------|
+| uat_gap | Phase 01 — 01-UAT.md (partial; Test 8 Production HTTPS blocked — no certificate) | partial |
+| uat_gap | Phase 03 — 03-UAT.md (5 pending browser scenarios) | testing |
+| verification_gap | Phase 03 — 03-VERIFICATION.md (human_needed pending UAT) | human_needed |
 
 ---
 *State initialised: 2026-06-11*
@@ -177,3 +187,14 @@ See: .planning/PROJECT.md (updated 2026-06-11)
 - [Phase 05-05]: Logo multipart upload uses XMLHttpRequest PUT — apiFetch Content-Type override breaks multipart boundary
 - [Phase 05-05]: Logo preview uses fetch+blob+createObjectURL — img src cannot attach Bearer Authorization header
 - [Phase 05-05]: JSON-only settings save uses apiFetch PUT when no new logo file selected
+
+## Current Position
+
+Phase: Milestone v1.0 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-14 — Milestone v1.0 completed and archived
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone
