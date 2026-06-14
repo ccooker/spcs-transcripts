@@ -1,7 +1,7 @@
 ---
 phase: 04-document-management
 verified: 2026-06-13T03:35:00Z
-status: human_needed
+status: passed
 score: 24/24 must-haves verified (automated)
 overrides_applied: 0
 human_verification:
@@ -26,7 +26,7 @@ human_verification:
 
 **Phase Goal:** Staff can upload, organise, and retrieve supporting PDF documents attached to a student's record.
 **Verified:** 2026-06-13T03:35:00Z
-**Status:** human_needed
+**Status:** passed
 **Re-verification:** No — initial verification
 
 ---
@@ -198,7 +198,7 @@ The following items require a running browser session with dev server. They cann
 
 **No gaps.** All 24 automated must-haves are verified. All 4 phase requirements (DOC-01 through DOC-04) are satisfied. No anti-pattern blockers found. No debt markers (TBD/FIXME/XXX) in any modified file.
 
-The phase is in `human_needed` status because browser verification of upload/download/delete flows cannot be done programmatically. Automated code evidence is complete and conclusive for all server-side and structural truths.
+Human verification completed via `04-UAT.md` (5/5 pass, 2026-06-13). Automated code evidence is complete and conclusive for all server-side and structural truths.
 
 ---
 
