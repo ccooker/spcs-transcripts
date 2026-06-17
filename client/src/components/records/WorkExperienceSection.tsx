@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -262,6 +263,9 @@ export function WorkExperienceSection({ studentId }: WorkExperienceSectionProps)
             <DialogTitle>
               {isEditing ? 'Edit work experience' : 'Add work experience'}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              {isEditing ? 'Edit the work experience details below.' : 'Fill in the work experience details below.'}
+            </DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

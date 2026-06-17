@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -262,6 +263,9 @@ export function ActivitiesSection({ studentId }: ActivitiesSectionProps) {
             <DialogTitle>
               {isEditing ? 'Edit activity' : 'Add activity'}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              {isEditing ? 'Edit the activity details below.' : 'Fill in the activity details below.'}
+            </DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

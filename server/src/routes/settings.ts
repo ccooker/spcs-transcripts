@@ -74,6 +74,7 @@ router.put('/', logoUpload.single('logo'), async (req, res, next) => {
     )
     res.json(settings)
   } catch (err) {
+    console.error('Settings save failed:', err)
     next(err)
   }
 })

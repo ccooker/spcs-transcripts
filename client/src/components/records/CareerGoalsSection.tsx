@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -190,6 +191,9 @@ export function CareerGoalsSection({ studentId }: CareerGoalsSectionProps) {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Update career goals</DialogTitle>
+            <DialogDescription className="sr-only">
+              Update this student's career goals and interests below.
+            </DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

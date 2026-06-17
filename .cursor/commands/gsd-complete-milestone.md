@@ -12,6 +12,7 @@ Output: Milestone archived (roadmap + requirements), PROJECT.md evolved, git tag
 - @C:/@code/spcs-transcripts/.cursor/gsd-core/templates/milestone-archive.md (archive template)
   </execution_context>
 
+
 <context>
 **Project files:**
 - `.planning/ROADMAP.md`

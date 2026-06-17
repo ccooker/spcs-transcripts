@@ -107,8 +107,7 @@ describe('Transcript', () => {
     const token = staffToken()
 
     const pastDate = new Date('2020-01-01T00:00:00.000Z')
-    // @ts-expect-error — transcript model not in generated client until Plan 02
-    await (prisma as any).transcript.create({
+    await prisma.transcript.create({
       data: {
         studentId: student.id,
         status: 'DRAFT',

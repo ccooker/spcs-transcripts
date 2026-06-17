@@ -1,8 +1,10 @@
 import puppeteer from 'puppeteer'
 
 export async function generatePdf(html: string): Promise<Buffer> {
+  const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH
   const browser = await puppeteer.launch({
     headless: true,
+    ...(executablePath ? { executablePath } : {}),
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',

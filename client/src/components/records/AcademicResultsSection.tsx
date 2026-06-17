@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -80,7 +81,7 @@ const calendarYearOptions = Array.from({ length: 11 }, (_, i) => currentYear - i
 const academicResultFormSchema = z
   .object({
     subject: z.enum(PRESET_SUBJECTS),
-    subjectOther: z.string().trim().min(1).max(100).optional(),
+    subjectOther: z.string().trim().max(100).optional(),
     grade: z.string().trim().min(1, 'Grade is required').max(20),
     calendarYear: z.number().int().min(2010).max(2040),
     formLevel: z.enum(FORM_LEVELS),
@@ -89,7 +90,7 @@ const academicResultFormSchema = z
   .refine(
     (data) =>
       data.subject !== 'OTHER' ||
-      (data.subjectOther !== undefined && data.subjectOther.length > 0),
+      (data.subjectOther !== undefined && data.subjectOther.trim().length > 0),
     { message: "Subject name is required when 'Other' is selected", path: ['subjectOther'] },
   );
 
@@ -287,6 +288,9 @@ export function AcademicResultsSection({ studentId }: AcademicResultsSectionProp
             <DialogTitle>
               {isEditing ? 'Edit academic result' : 'Add academic result'}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              {isEditing ? 'Edit the academic result details below.' : 'Fill in the academic result details below.'}
+            </DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

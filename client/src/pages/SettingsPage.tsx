@@ -52,6 +52,8 @@ async function uploadSettingsWithLogo(
         } catch {
           reject(new Error('Invalid JSON response'));
         }
+      } else if (xhr.status === 413) {
+        reject(new Error('File exceeds the upload size limit (5 MB).'));
       } else {
         reject(new Error(`Upload failed: ${xhr.status}`));
       }
@@ -224,8 +226,13 @@ export function SettingsPage({ userInfo }: SettingsPageProps) {
 
       toast.success('Settings saved');
       await loadSettings();
-    } catch {
-      toast.error("Couldn't save settings. Please try again.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '';
+      if (message.includes('5 MB')) {
+        toast.error(message);
+      } else {
+        toast.error("Couldn't save settings. Please try again.");
+      }
     } finally {
       setSaving(false);
     }

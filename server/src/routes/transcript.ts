@@ -135,6 +135,7 @@ router.post('/export', async (req, res, next) => {
     res.setHeader('Content-Length', pdfBuffer.length)
     res.send(pdfBuffer)
   } catch (err) {
+    console.error('Transcript export failed:', err)
     next(err)
   }
 })

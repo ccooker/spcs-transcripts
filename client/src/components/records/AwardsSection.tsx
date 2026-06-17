@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -273,6 +274,9 @@ export function AwardsSection({ studentId }: AwardsSectionProps) {
             <DialogTitle>
               {isEditing ? 'Edit award' : 'Add award'}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              {isEditing ? 'Edit the award details below.' : 'Fill in the award details below.'}
+            </DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
