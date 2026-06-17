@@ -1,268 +1,242 @@
 # Stack Research
 
-**Domain:** School records/transcript web app with on-premise infrastructure
-**Researched:** 2026-06-11
+**Domain:** v2.0 Network Document Linking — SMB share discovery, path references, authenticated proxy (extends existing SPCS Transcript System)
+**Researched:** 2026-06-16
 **Confidence:** HIGH
+
+> **Scope:** This document covers **stack additions and changes only** for v2.0. The existing baseline is fixed and not re-researched: Express 5.2.1 ESM, Prisma 7.8 + `@prisma/adapter-pg`, PostgreSQL, React + Vite 8, MSAL v5 PKCE, `express-jwt`, Windows Server + IIS + PM2, on-premise only.
 
 ---
 
 ## Recommended Stack
 
-### Core Technologies
+### Core Technologies (New for v2.0)
 
 | Technology | Version | Purpose | Why Recommended |
 |------------|---------|---------|----------------|
-| **Next.js** | 16.2.x | Full-stack framework (App Router) | Current stable (Oct 2025 release); Turbopack default; React 19.2 bundled; `proxy.ts` replaces middleware; Server Actions for mutations; self-hostable with `output: 'standalone'` |
-| **TypeScript** | 6.x | Type safety | Current stable; required for reliability in school data systems |
-| **Node.js** | 22 LTS | Server runtime | Current LTS; required by Next.js 16 (dropped Node 18 support) |
-| **React** | 19.2.x | UI library | Bundled with Next.js 16; Server/Client Components; React Compiler stable |
-| **PostgreSQL** | 17.x | Primary database | Open-source, no licensing cost vs SQL Server; superior JSON/JSONB for unstructured student data; runs on any Linux/Windows on-premise host |
+| **Node.js `fs` / `fs/promises`** | 22 LTS (built-in) | Read-only UNC/SMB access, streaming | On Windows Server, Node's native filesystem APIs work against UNC paths (`\\spcs-fs\...`) when the **PM2 process identity** has share ACL — no SMB client library required. Same APIs used for `stat`, `readdir`, and `createReadStream`. |
+| **Prisma schema extensions** | 7.8.0 (existing) | Store path references, scan runs, evidence joins | No new ORM — add `LinkedDocument`, `ShareScanRun`, and evidence join models. Paths stored as normalized relative strings under share root; never store full UNC in DB rows exposed to client. |
+| **Express `res.download` / `res.sendFile`** | 5.2.1 (existing) | Authenticated file proxy to browser | Built on the `send` module (already bundled with Express 5): streaming, Range requests, ETag, MIME detection. JWT middleware runs before any byte is read — raw UNC never reaches the browser. |
+| **PM2 worker process** | (existing PM2 install) | Isolated discovery scan runner | Separate `ecosystem.config.js` app entry (`spcs-worker`) prevents long share walks from blocking HTTP. Same service account as API — share ACL applies once at OS level. |
 
-> **SQL Server note:** If the school's IT already runs SQL Server, Prisma supports it via `@prisma/adapter-mssql`. See Alternatives section. PostgreSQL is recommended for greenfield builds.
-
----
-
-### Authentication
-
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|----------------|
-| **Better Auth** | 1.6.x | Auth library | Auth.js (NextAuth) is now maintained by Better Auth team and has been in beta since 2023; Better Auth is the recommended path for new projects; built-in Microsoft social provider handles Entra ID OAuth 2.0 OIDC |
-| **@better-auth/sso** | 1.6.x | Enterprise SSO plugin | Optional: use if school requires SAML or full OIDC discovery (enterprise SSO flows); for simple single-tenant Entra ID the built-in Microsoft provider is sufficient |
-
-**Auth flow:** Better Auth with the Microsoft Entra ID social provider — OAuth 2.0 authorization code flow with PKCE, single-tenant (`https://login.microsoftonline.com/<tenant-id>/v2.0`). Staff are redirected to Microsoft login, consent, and return with a session cookie. Better Auth stores sessions in the database (same PostgreSQL instance).
-
-**Azure App Registration settings required:**
-- Platform: Web (not SPA)
-- Redirect URI: `https://<your-domain>/api/auth/callback/microsoft`
-- Account types: "Accounts in this organizational directory only" (single-tenant)
-- Required scopes: `openid`, `profile`, `email`
-
----
-
-### Database & ORM
-
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|----------------|
-| **Prisma ORM** | 7.8.x | Database access layer | Current stable; Rust-free TypeScript runtime (3× faster queries vs v6); 90% smaller bundle; full PostgreSQL support |
-| **@prisma/adapter-pg** | 7.8.x | Prisma PostgreSQL driver adapter | Required in Prisma 7+ for all direct database connections |
-| **pg** | 8.21.x | PostgreSQL Node.js driver | Underlying driver for adapter-pg; battle-tested, wide adoption |
-
-**Prisma 7 setup note:** Prisma 7 mandates driver adapters for all connections. The `prisma.config.ts` file replaces the old datasource-only pattern. ESM (`"type": "module"` in package.json) is required.
-
----
-
-### PDF Generation (Transcript Export)
-
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|----------------|
-| **@react-pdf/renderer** | 4.5.x | Server-side transcript PDF generation | No Chromium/browser dependency; sub-500ms generation; ~3MB bundle; React-like API with `<Document>`, `<Page>`, `<View>`, `<Text>`; paginated by design; runs on plain Node.js server |
-
-**Why not Puppeteer/Playwright for generation:** 100MB+ Chromium bundle, 2–5 second generation per document, browser process lifecycle management complexity. This is avoidable — transcripts are structured paginated documents, not HTML pages needing pixel-perfect browser rendering.
-
-**Template approach:** Define the transcript layout as a `@react-pdf/renderer` component. Staff-authored narrative sections are passed as props. The server action renders to a `Buffer` and streams as `application/pdf`.
-
-**CSS limitation:** `@react-pdf/renderer` supports Flexbox layout (Yoga engine) but not CSS Grid, `@media`, or pseudo-selectors. Design the transcript template using Flex — this is not a constraint in practice for document layouts.
-
----
-
-### PDF Parsing (Document Upload & Data Extraction)
-
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|----------------|
-| **unpdf** | 1.6.x | Extract text from uploaded PDFs | Modern actively-maintained wrapper around PDF.js; works in Node.js without browser globals; supercedes deprecated `pdf-parse`; extract text, links, and metadata |
-| **@napi-rs/canvas** | 1.0.x | Node.js canvas polyfill for PDF.js | Required when using pdfjs-dist's font rendering on Node; install alongside unpdf for complete compatibility |
-
-**Extraction reality:** None of these libraries do AI-powered structured extraction. They extract raw text from PDF pages. For varied document layouts (report cards with different formats from different schools, award letters, etc.), the application will need:
-1. Text extraction via `unpdf`
-2. Pattern matching / heuristic parsing to find grades, dates, names
-3. Staff review and correction UI — do not assume 100% accurate auto-extraction
-
-**Why not pdf-parse:** Internally wraps `pdfjs-dist` but hides it, causing `window is not defined` errors in production Node.js environments. Known footgun. Unmaintained. `unpdf` is its modern replacement.
-
----
-
-### Supporting Libraries
+### Supporting Libraries (New npm packages)
 
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
-| **Tailwind CSS** | 4.3.x | Utility-first CSS | Default with `create-next-app` for Next.js 16; CSS-first config (no `tailwind.config.ts`; theme in `globals.css` `@theme` block) |
-| **shadcn/ui** | latest | Accessible UI components | Component primitives (forms, tables, dialogs, badges, cards); installed per-component, code lives in `components/ui/`; updated for Tailwind v4 + React 19 |
-| **Radix UI** | (via shadcn) | Accessible primitives | Underlying shadcn/ui layer; handles a11y, keyboard nav, ARIA automatically |
-| **React Hook Form** | 7.78.x | Form state management | Student profile forms, transcript template forms; integrates with Zod via `@hookform/resolvers` |
-| **Zod** | 4.4.x | Schema validation | Validate all form inputs and API payloads; v4 is the current major; faster than v3 |
-| **@tanstack/react-table** | 8.21.x | Headless data table | Student list with search/filter/sort/pagination; pairs with shadcn `<Table>` components |
-| **sonner** | 2.0.x | Toast notifications | Success/error feedback for uploads, saves, exports; shadcn recommends sonner over deprecated `<Toast>` |
-| **lucide-react** | 1.17.x | Icon library | Default icon set for shadcn/ui components |
-| **@hookform/resolvers** | latest | React Hook Form + Zod bridge | Required to connect Zod schemas to react-hook-form `validate` |
+| **fast-glob** | 3.3.3 | Recursive share tree walk for discovery | Discovery job: `fg.glob('**/*', { cwd: shareRoot, onlyFiles: true, absolute: true })`. Official UNC support via `cwd` option or `fg.convertPathToPattern()`. Replaces hand-rolled recursive `readdir`. |
+| **node-cron** | 4.2.1 | Schedule discovery scans | Worker process: `cron.schedule('0 2 * * *', runDiscoveryScan, { timezone: 'Asia/Hong_Kong', noOverlap: true })`. v4 is TypeScript-native, ESM-compatible (`import cron from 'node-cron'`), matches server's `"type": "module"`. |
+| **mime-types** | 3.0.2 | Content-Type for proxied files | Document proxy route: `mime.lookup(filename) ?? 'application/octet-stream'`. Lightweight; Express `send` also detects MIME but explicit lookup gives control for `Content-Disposition: inline` vs `attachment`. |
+| **@cityssm/windows-unc-path-connect** | 1.1.0 | Fallback UNC credential connect at startup | **Only if** domain service account alone cannot reach the share (legacy ACL, cross-domain). Call once at process boot — not per HTTP request. Avoid if PM2 runs as a dedicated AD account with read-only share permissions (preferred). |
 
----
+### Infrastructure / Deployment (Not npm — required configuration)
+
+| Component | Purpose | Why Required |
+|-----------|---------|--------------|
+| **AD service account** | SMB authentication identity | PM2 API + worker must run as a domain user with **read-only** NTFS + share permissions on `\\spcs-fs\Private\Administration\Office\Student`. `LocalSystem` and `Network Service` fail or map to guest for remote UNC (ServerFault, Microsoft docs). |
+| **`SHARE_ROOT` env var** | Configurable share root path | `\\spcs-fs\Private\Administration\Office\Student` in production; overridable for dev/test. Validated once at startup. |
+| **IIS ARR proxy (existing)** | HTTPS termination, `/api/*` → Express | No change to IIS stack. File bytes stream through Express on loopback — no IIS static mapping to UNC. |
+| **Windows Firewall (existing)** | Block direct Express access | Port 3001 loopback-only; staff never hit UNC directly. |
 
 ### Development Tools
 
-| Tool | Version | Purpose | Notes |
-|------|---------|---------|-------|
-| **pnpm** | 9.x | Package manager | Faster, disk-efficient vs npm; use `pnpm create next-app` |
-| **ESLint** | 9.x | Linting | Bundled with Next.js 16; flat config format |
-| **Prettier** | 3.x | Code formatting | Standard setup |
-| **Prisma Studio** | (via prisma 7) | Database GUI | New Studio in Prisma 7 supports PostgreSQL; run `prisma studio` for local data inspection |
-| **Docker** | 27.x | PostgreSQL local dev container | `docker compose up` for local Postgres during development; not required in production (school runs Postgres on-premise) |
+| Tool | Purpose | Notes |
+|------|---------|-------|
+| **Vitest + mocks** | Test shareAccess without live UNC | Mock `fs/promises` and `fast-glob` in unit tests; integration test against a local test folder on dev machines. Already in `server/package.json`. |
+| **tsx** | Run worker entry locally | `tsx watch src/worker.ts` alongside API during dev. Existing dev dependency. |
+
+---
+
+## Integration with Existing Express + Prisma
+
+### Express request pipeline (unchanged auth, new routes)
+
+```
+GET /api/documents/:id/content
+  → validateJwt (express-jwt 8.5.1)
+  → resolveUser (Prisma upsert)
+  → linkedDocumentService.getById(id)     // Prisma — returns relativePath only
+  → shareAccess.resolveSafePath(relative)  // path traversal guard
+  → shareAccess.createReadStream(absolute) // fs.createReadStream
+  → res.set('Content-Type', mime.lookup(...))
+  → stream.pipe(res)
+```
+
+Mount new routers in `server/src/app.ts` under existing `/api` prefix — same `validateJwt` + `resolveUser` chain as `studentsRouter`.
+
+### Prisma — no new packages, schema-only change
+
+```prisma
+// New models — migration via existing `prisma migrate`
+model LinkedDocument {
+  id              String   @id @default(uuid())
+  studentId       String?
+  student         Student? @relation(fields: [studentId], references: [id])
+  relativePath    String   @unique   // normalized path under SHARE_ROOT
+  fileName        String
+  fileSizeBytes   BigInt?
+  fileModifiedAt  DateTime?
+  status          LinkedDocumentStatus
+  matchConfidence Float?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+```
+
+Use existing `@prisma/client` 7.8.0 generated client — no adapter change.
+
+### PM2 ecosystem (second app entry)
+
+```javascript
+// ecosystem.config.js — add alongside spcs-api
+{
+  name: 'spcs-worker',
+  script: './server/dist/worker.js',
+  instances: 1,
+  exec_mode: 'fork',
+  env_production: {
+    NODE_ENV: 'production',
+    DATABASE_URL: '...',           // same as API
+    SHARE_ROOT: '\\\\spcs-fs\\Private\\Administration\\Office\\Student',
+    DISCOVERY_CRON: '0 2 * * *',   // 02:00 daily
+  },
+}
+```
+
+Worker imports `discoveryScan.ts` which calls `fast-glob` + Prisma upsert — no HTTP server.
+
+### Client (React + Vite — no new npm packages)
+
+Use existing `apiFetch` pattern with `response.blob()` for download/open:
+
+```typescript
+const res = await apiFetch(`/documents/${id}/content?disposition=inline`)
+const blob = await res.blob()
+window.open(URL.createObjectURL(blob))
+```
+
+MSAL Bearer token already attached by `apiClient.ts` — no CORS or cookie changes needed.
 
 ---
 
 ## Installation
 
 ```bash
-# 1. Scaffold the project
-pnpm create next-app@latest spcs-transcripts --typescript --tailwind --app --src-dir
-cd spcs-transcripts
+cd server
 
-# 2. shadcn/ui
-pnpm dlx shadcn@latest init
-pnpm dlx shadcn@latest add button input form dialog table badge card dropdown-menu sonner skeleton separator sheet
+# v2.0 supporting libraries
+npm install fast-glob@3.3.3 node-cron@4.2.1 mime-types@3.0.2
 
-# 3. Authentication — Better Auth
-pnpm add better-auth
-pnpm add @better-auth/sso          # only if SAML/full OIDC discovery needed
+# Fallback UNC connect — install only if service-account-only access fails smoke test
+npm install @cityssm/windows-unc-path-connect@1.1.0
 
-# 4. Database — Prisma 7 + PostgreSQL
-pnpm add prisma @prisma/client @prisma/adapter-pg pg
-pnpm add -D prisma
-pnpm dlx prisma init --datasource-provider postgresql
-
-# 5. Form validation
-pnpm add zod react-hook-form @hookform/resolvers
-
-# 6. Data table
-pnpm add @tanstack/react-table
-
-# 7. PDF generation (transcript export)
-pnpm add @react-pdf/renderer
-
-# 8. PDF parsing (document upload extraction)
-pnpm add unpdf @napi-rs/canvas
-
-# 9. Icons and utilities
-pnpm add lucide-react sonner clsx tailwind-merge
-
-# 10. Dev tools
-pnpm add -D @types/pg prettier eslint-config-prettier
+# Dev types (node-cron ships its own; mime-types has @types via package)
+npm install -D @types/mime-types@3.0.1
 ```
 
-**Next.js config for PDF uploads** (`next.config.ts`):
-```typescript
-const nextConfig = {
-  experimental: {
-    proxyClientMaxBodySize: '50mb',  // Next.js 16 standalone proxy layer
-  },
-  serverActions: {
-    bodySizeLimit: '35mb',           // individual action body limit
-  },
-};
-export default nextConfig;
-```
+**No client-side npm additions required** for document open/download.
 
-**Prisma 7 `prisma.config.ts`** (new required file):
-```typescript
-import { defineConfig } from 'prisma/config';
-import { PrismaPg } from '@prisma/adapter-pg';
+**Environment variables to add** (API + worker):
 
-export default defineConfig({
-  earlyAccess: true,
-  schema: './prisma/schema.prisma',
-  migrate: {
-    async adapter(env) {
-      return new PrismaPg({ connectionString: env.DATABASE_URL });
-    },
-  },
-});
+| Variable | Example | Purpose |
+|----------|---------|---------|
+| `SHARE_ROOT` | `\\spcs-fs\Private\Administration\Office\Student` | UNC root for discovery and proxy |
+| `DISCOVERY_CRON` | `0 2 * * *` | Cron expression for worker (optional override) |
+| `SHARE_CONNECT_USER` | (fallback only) | Username for `@cityssm/windows-unc-path-connect` |
+| `SHARE_CONNECT_PASSWORD` | (fallback only) | Password — use Windows Credential Manager or machine env, never commit |
+
+**Prisma migration** (existing toolchain):
+
+```bash
+npx prisma migrate dev --name add-linked-documents
 ```
 
 ---
 
 ## Alternatives Considered
 
-| Category | Recommended | Alternative | Why Not |
-|----------|-------------|-------------|---------|
-| Auth | Better Auth 1.6.x | Auth.js v5 (next-auth@beta) | Auth.js v5 has been in beta since Oct 2023 and never reached stable; Better Auth team now maintains Auth.js; new projects should use Better Auth directly |
-| Auth | Better Auth 1.6.x | `@chemmangat/msal-next` (thin MSAL wrapper) | Community package, ~100 GitHub stars; no session database; Better Auth is more complete for a school system needing audit-grade session management |
-| Auth | Better Auth 1.6.x | Raw MSAL.js (`@azure/msal-browser`) | Not designed for App Router SSR; causes hydration mismatches; requires 50+ lines of boilerplate before a login button renders |
-| Database | PostgreSQL 17 | SQL Server (MSSQL) | SQL Server requires licensing; Prisma supports it via `@prisma/adapter-mssql` + `mssql` 12.x if the school already runs SQL Server infrastructure |
-| ORM | Prisma 7.8 | Drizzle ORM | Drizzle is valid but requires writing SQL-like query builder syntax; Prisma's auto-generated client is faster to iterate on for this domain size |
-| PDF gen | @react-pdf/renderer | Puppeteer / Playwright | 100MB+ Chromium, 2–5s/doc, browser lifecycle management — unjustified complexity for structured transcript documents |
-| PDF gen | @react-pdf/renderer | pdfmake | JSON document definition (not JSX); different mental model; weaker community; harder to design pixel-precise layouts |
-| PDF parsing | unpdf | pdf-parse | `pdf-parse` wraps `pdfjs-dist` with hidden browser globals; causes `window is not defined` in Next.js standalone production; unmaintained |
-| UI | shadcn/ui | MUI (Material UI) | MUI requires installing and updating a full component package; shadcn components are owned code, editable, no version lock-in |
-| Styling | Tailwind CSS 4 | Tailwind CSS 3 | Tailwind 4 is the new default with `create-next-app` for Next.js 16; 5–10× faster builds via Rust engine; no `tailwind.config.ts` needed |
+| Recommended | Alternative | When to Use Alternative |
+|-------------|-------------|-------------------------|
+| Native `fs` + service account | **smb2** npm (0.2.11) | Never for this deployment — unmaintained, last publish years ago, adds credential-in-code temptation. Only consider if app must run on Linux accessing SMB (not this project). |
+| Native `fs` + service account | **`NET USE` / mapped drive letter** | Avoid — drive mappings are session-scoped, invisible to Windows services/PM2, break on reboot. Map via service account ACL instead. |
+| **fast-glob** 3.3.3 | Hand-rolled `fs.readdir` recursion | Valid for flat folders; fast-glob handles `**`, ignore patterns, UNC `cwd`, and is battle-tested at 3.3.x with `convertPathToPattern`. |
+| **node-cron** 4.2.1 | **node-schedule** 2.x | node-cron is simpler for fixed cron strings; node-schedule better for one-off Date triggers — discovery needs recurring cron. |
+| **node-cron** 4.2.1 | **pg-boss** / **Bull + Redis** | Job queues add Redis infrastructure the school doesn't have. Overkill for one nightly scan on a single server. Revisit only if scan frequency or retry complexity grows. |
+| Express stream proxy | **IIS virtual directory → UNC** | Exposes share without app-level JWT audit; browsers can't authenticate to UNC from HTTPS pages anyway. |
+| Path references in PostgreSQL | **Copy files to local `/uploads`** | Contradicts v2.0 goal — duplicates authoritative data, creates sync drift. |
+| **mime-types** 3.0.2 | Manual extension map | mime-types covers edge cases (`.docx`, `.pdf`, `.jpg`) without maintenance burden. |
 
 ---
 
 ## What NOT to Use
 
-| Library / Approach | Why Avoid |
-|-------------------|-----------|
-| **Vercel cloud hosting** | Project constraint: on-premise only. Deploy with `output: 'standalone'` on the school's own server (Linux VM, Windows IIS, or Docker container) |
-| **Supabase / PlanetScale / Neon** | Cloud-hosted databases. Project constraint: on-premise data only. All database connections must point to school infrastructure |
-| **NextAuth v4 (`next-auth@^4`)** | Last stable v4 release is 4.24.14 (no longer actively developed); the project is now Better Auth; fine for existing apps but don't start new projects on it |
-| **Auth.js v5 beta** | 5.0.0-beta.31 — still beta as of June 2026; no stable release has shipped; use Better Auth instead |
-| **Lucia Auth** | Deprecated on npm; project abandoned |
-| **pdf-parse** | Wraps `pdfjs-dist` with hidden browser globals; breaks in Next.js standalone production builds; use `unpdf` instead |
-| **jsPDF** | Imperative canvas API (`doc.text("...", x, y)`); not maintainable for a document with dynamic student data; no page-break support |
-| **react-to-print** | Screenshot-based; clipped to single page; text becomes rasterized image (not searchable in PDF); not suitable for professional transcripts |
-| **SaaS auth (Clerk, Auth0, WorkOS)** | Data residency constraint: student identity and session data must stay on-premise; these services process data in their cloud |
-| **MongoDB** | Prisma 7 does not yet support MongoDB (delayed); also a poor fit for relational student records with structured schemas |
-| **Next.js Pages Router** | Replaced by App Router; new projects should use App Router only |
+| Avoid | Why | Use Instead |
+|-------|-----|-------------|
+| **smb2**, **@awslabs/smithy** SMB clients | Unmaintained or wrong protocol layer; Node on Windows with service account doesn't need SMB wire protocol in userspace | Native `fs` against UNC |
+| **multer**, **busboy**, **formidable** | v2.0 is read-only linking — no upload pipeline | Remove/defer v1 upload code paths |
+| **express.static** pointed at share root | Bypasses JWT; directory traversal risk if misconfigured | Authenticated `/api/documents/:id/content` route |
+| **AWS S3 SDK**, **Azure Blob**, **@azure/storage-file-share** | Cloud storage APIs — on-premise constraint; share already exists on `spcs-fs` | UNC via native fs |
+| **Redis + Bull** | New infrastructure for a single-server nightly job | node-cron in PM2 worker |
+| **NET USE in request handlers** | Session-scoped, race-prone, credential exposure | AD service account on PM2 |
+| **Exposing UNC paths in API JSON** | Security leak; browsers can't open them from HTTPS | Opaque document UUID + proxy |
+| **iisnode** | Deprecated pattern; project already uses IIS ARR → Express | Keep existing ARR proxy |
+| **pdf-parse / unpdf** (for v2.0) | Discovery/linking doesn't require text extraction — deferred enhancement | Add only if OCR phase is scoped later |
 
 ---
 
 ## Stack Patterns by Variant
 
-### PostgreSQL (recommended greenfield)
+### Standard (recommended): Domain service account + native fs
 
 ```
-Next.js 16 App Router
-  └── Better Auth (Microsoft Entra ID social provider)
-        └── PostgreSQL 17 on-premise (Better Auth sessions + app data)
-              └── Prisma 7.8 via @prisma/adapter-pg
+PM2 (spcs-api + spcs-worker) → runs as DOMAIN\svc-spcs-transcripts
+  → fs.readdir / fs.createReadStream on \\spcs-fs\...\Student
+  → Prisma 7.8 → PostgreSQL (relativePath metadata)
+  → Express JWT proxy → IIS → Browser
 ```
 
-### SQL Server (if school already has MSSQL infrastructure)
+**Because:** Simplest, most reliable on Windows Server; credentials managed by AD/IT, not application code.
+
+### Fallback: Explicit UNC connect at startup
 
 ```
-Next.js 16 App Router
-  └── Better Auth (Microsoft Entra ID social provider)
-        └── SQL Server on-premise (Better Auth sessions + app data)
-              └── Prisma 7.8 via @prisma/adapter-mssql + mssql 12.x
+Process boot → @cityssm/windows-unc-path-connect(SHARE_ROOT, user, pass)
+  → then native fs for all I/O
 ```
 
-Only change from the PostgreSQL variant: swap `@prisma/adapter-pg` + `pg` for `@prisma/adapter-mssql` + `mssql`. Better Auth and Next.js configuration are identical.
+**Because:** Some legacy shares require explicit session credentials even when service account is configured. Call once at startup in both API and worker — never per request.
 
-### File storage pattern
+### Discovery scan flow
 
 ```
-Client browser
-  └── [form submit with PDF attachment]
-        └── Next.js Server Action
-              └── fs.writeFile → /var/spcs-uploads/<student-id>/<uuid>.pdf
-                    └── Prisma → INSERT document record (path, filename, student_id)
+node-cron (worker) → discoveryScan.ts
+  → fast-glob('**/*', { cwd: SHARE_ROOT, onlyFiles: true })
+  → matching.ts (schoolStudentId rules from shareLayout.ts)
+  → Prisma upsert LinkedDocument
+  → logAudit(SCAN_COMPLETE)
 ```
 
-Files are stored on the application server's local filesystem. A dedicated upload directory outside `public/` is recommended (files are served via a protected API route, not directly). For large PDFs (>10MB): consider increasing `bodySizeLimit` further or implementing chunked upload.
+### Document open flow
+
+```
+Browser → apiFetch(/documents/:id/content) + Bearer JWT
+  → Express validateJwt → shareAccess.createReadStream
+  → Content-Type via mime-types
+  → pipe to response (inline PDF preview or attachment download)
+```
 
 ---
 
-## Version Compatibility Matrix
+## Version Compatibility
 
-| Package | Version | Node.js min | React min | Notes |
-|---------|---------|-------------|-----------|-------|
-| Next.js | 16.2.x | 20.x (rec 22 LTS) | 19.x | Dropped Node 18; proxy.ts replaces middleware.ts |
-| Better Auth | 1.6.x | 18.x | any | Works with Next.js 16 proxy pattern |
-| Prisma | 7.8.x | 18.18+ (rec 22) | N/A | Requires ESM (`"type": "module"`) |
-| @react-pdf/renderer | 4.5.x | 16+ | 19.x | Server-side only; no browser globals |
-| unpdf | 1.6.x | 22+ preferred | N/A | PDF.js v5 uses `Promise.withResolvers` (Node 22 native) |
-| Tailwind CSS | 4.3.x | N/A | N/A | Safari 16.4+, Chrome 111+, Firefox 128+ minimum |
-| Zod | 4.4.x | 18+ | any | Breaking changes from v3: `z.string().email()` etc. still work |
-| React Hook Form | 7.78.x | N/A | 18+ | Works with React 19 |
-| @tanstack/react-table | 8.21.x | N/A | 18+ | Works with React 19 |
+| Package | Version | Compatible With | Notes |
+|---------|---------|-----------------|-------|
+| fast-glob | 3.3.3 | Node 18+ | UNC via `cwd`; use forward slashes in glob patterns |
+| node-cron | 4.2.1 | Node 18+, ESM | v4 breaking: `scheduled`/`runOnInit` removed; tasks auto-start; use `noOverlap: true` for long scans |
+| mime-types | 3.0.2 | Node 18+ | ESM/CJS dual package |
+| @cityssm/windows-unc-path-connect | 1.1.0 | Windows only | No-op on non-Windows; optional dependency |
+| Express | 5.2.1 (existing) | send 1.2.x (transitive) | `res.download` / `res.sendFile` handle Range + streaming |
+| Prisma | 7.8.0 (existing) | `@prisma/adapter-pg` 7.8 | `BigInt` for `fileSizeBytes` — serialize to string in JSON responses |
+| Node.js | 22 LTS (existing) | Windows Server 2019+ | UNC long-path support: prefer `\\?\UNC\server\share\...` if paths exceed 260 chars |
 
 ---
 
@@ -270,14 +244,15 @@ Files are stored on the application server's local filesystem. A dedicated uploa
 
 | Source | Confidence | Notes |
 |--------|------------|-------|
-| npm registry (direct version queries) | HIGH | Queried 2026-06-11 |
-| Next.js 16 official blog (nextjs.org/blog/next-16) | HIGH | Primary source |
-| Next.js 16.2 changelog (nandann.com, makerkit.dev) | HIGH | Cross-verified |
-| Better Auth docs (better-auth.com/docs) | HIGH | Primary source |
-| Auth.js migration notice (github.com/nextauthjs/next-auth/discussions/13252) | HIGH | Official announcement |
-| Prisma 7.0.0 release (prisma.io/docs, gitclear.com) | HIGH | Primary source |
-| PkgPulse: unpdf vs pdf-parse vs pdfjs-dist 2026 (pkgpulse.com) | MEDIUM | Community analysis, cross-checked with npm |
-| Puppeteer vs @react-pdf/renderer (iurii.rogulia.fi, dev.to) | MEDIUM | Production comparison articles |
-| shadcn/ui Tailwind v4 docs (ui.shadcn.com/docs/tailwind-v4) | HIGH | Primary source |
-| Auth.js Microsoft Entra ID docs (authjs.dev) | HIGH | Primary source (still valid for Better Auth migration) |
-| Next.js file upload patterns (oneuptime.com/blog, cadence.withremote.ai) | MEDIUM | Community articles, patterns verified against Next.js docs |
+| npm registry (direct `npm view` queries, 2026-06-16) | HIGH | fast-glob 3.3.3, node-cron 4.2.1, mime-types 3.0.2, send 1.2.1, @cityssm/windows-unc-path-connect 1.1.0 |
+| fast-glob README — UNC path section | HIGH | `cwd` option and `convertPathToPattern` for Windows UNC |
+| node-cron v4 migration guide (nodecron.com) | HIGH | ESM import, v4 API changes, `noOverlap` |
+| Express 5 API / DeepWiki file operations | HIGH | `res.download`, `send` module streaming |
+| ServerFault / Stack Overflow — Windows service UNC access | MEDIUM | Service account vs Network Service vs NET USE |
+| nodejs/help #4390 — UNC limitations without credentials | MEDIUM | Confirms fs works when OS identity has ACL; no programmatic credential pass-through |
+| Existing repo: `DEPLOYMENT-RUNBOOK.md`, `ecosystem.config.js`, `server/package.json` | HIGH | Confirms Express 5 + Prisma 7 + PM2 + IIS deployment pattern |
+| `.planning/research/ARCHITECTURE.md` (v2.0) | HIGH | Component boundaries and integration points |
+
+---
+*Stack research for: v2.0 Network Document Linking milestone*
+*Researched: 2026-06-16*

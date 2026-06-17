@@ -1,278 +1,206 @@
 # Project Research Summary
 
-**Project:** SPCS Student Transcript System
-**Domain:** School careers student transcript web app with on-premise infrastructure
-**Researched:** 2026-06-11
+**Project:** SPCS Student Transcript System — v2.0 Network Document Linking
+**Domain:** On-premise school careers transcript app with SMB share discovery, path-reference linking, and authenticated document proxy
+**Researched:** 2026-06-16
 **Confidence:** HIGH
 
 ## Executive Summary
 
-The SPCS Student Transcript System is a staff-facing internal tool for a school Careers Team — not a SaaS platform, not a public product. Experts build this type of system as a conventional server-rendered web app with a narrow user base (3–8 staff), a well-understood data model (students, academic records, activities, documents), and one primary output artefact (a professional PDF). The recommended approach is Next.js 16 App Router deployed on-premise behind IIS, with Better Auth handling Microsoft Entra ID SSO, Prisma 7 + PostgreSQL for data, filesystem storage for PDF binaries, and `@react-pdf/renderer` for transcript export. This stack minimises operational complexity and licensing cost while satisfying the school's data residency requirements completely — no student data ever leaves the school network.
+SPCS v2.0 is not a document management system — it is a **thin linking layer** that connects an existing Windows SMB share (`\\spcs-fs\Private\Administration\Office\Student`) to the careers transcript workflow. Experts build this pattern by storing normalized relative paths in PostgreSQL, walking the share with a background worker under a dedicated AD service account, and serving file bytes through an authenticated Express proxy. The share remains authoritative; the app holds metadata, match confidence, and evidence join rows only. This replaces the deferred v1 upload model entirely.
 
-The most consequential architectural decision is treating PDF upload and extraction as an asynchronous pipeline, not a synchronous HTTP operation. Scanned document OCR can take 30–60 seconds; running it inline blocks the server and times out. A `pg-boss` queue (PostgreSQL-backed, no Redis needed) decouples upload acknowledgment from extraction processing and enables the mandatory staff review step before any extracted data enters a student record. The second major decision is using `@react-pdf/renderer` for transcript generation rather than Puppeteer/headless Chromium — this eliminates a 100MB+ Chromium dependency, reduces generation time to sub-500ms, and removes the browser lifecycle management problem from what is, at its core, a structured paginated document.
+The recommended approach extends the existing stack without new infrastructure: native Node.js `fs` against UNC paths (no SMB client libraries), **fast-glob** for discovery walks, **node-cron** in a second PM2 worker process, Prisma schema extensions for `LinkedDocument` / `ShareScanRun` / `DocumentEvidence`, and Express streaming via `createReadStream` behind existing JWT middleware. No Redis, no cloud storage, no client-side npm additions. Deployment hinges on a read-only AD service account running PM2 — not `LocalSystem`, not mapped drive letters, not per-request `NET USE`.
 
-The top risks are: (1) Azure AD tenant consent not configured before go-live — school IT Global Administrators must explicitly grant admin consent in M365 EDU tenants where per-user consent is disabled by policy; (2) PDF extraction over-promise — extraction output from varied school document layouts will contain errors and must always go through a staff review step before being committed to any student record; and (3) on-premise deployment failure — the school's Windows Server / IIS environment is meaningfully different from a developer laptop, and a deployment runbook must be written and tested against equivalent infrastructure before the first production release.
-
----
+The dominant risks are operational and organizational, not technical. **Discovery before share layout is documented** produces mass wrong-links and staff distrust. **PM2 service identity without share ACL** causes "works on my machine" failures in production. **Fuzzy name matching without disambiguation** can attach evidence to wrong students on formal transcripts. Mitigation is strict phase ordering: human share reconnaissance first, then SMB access verification, then worker-based scan/match, then proxy UI, then evidence linking after record types exist.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The stack research surfaced three important choices that differ from what a developer might reach for by default. **Better Auth 1.6** (not NextAuth/Auth.js) is the correct choice for new projects: Auth.js v5 has been in beta since October 2023 and has still not shipped a stable release as of June 2026; the Auth.js team now maintains Better Auth, and the community recommendation is to start new projects there. **`@react-pdf/renderer` 4.5** (not Puppeteer) is the right tool for transcript PDF generation: transcripts are structured paginated documents, not HTML pages requiring pixel-perfect browser rendering; `@react-pdf/renderer` produces PDFs in under 500ms with a 3MB bundle versus Chromium's 100MB+ and 2–5 second generation time. **`unpdf` 1.6** (not `pdf-parse`) is the correct PDF parsing library: `pdf-parse` internally wraps `pdfjs-dist` with hidden browser globals that cause `window is not defined` errors in Next.js standalone production builds and is unmaintained; `unpdf` is its modern actively-maintained replacement.
-
-The full stack runs on Node.js 22 LTS. Next.js 16 dropped support for Node 18; `unpdf` uses `Promise.withResolvers` which is Node 22 native. PostgreSQL is preferred over SQL Server for greenfield builds (no licensing cost, superior JSONB support for extracted data), though Prisma 7 supports SQL Server via `@prisma/adapter-mssql` if the school already has MSSQL infrastructure. Tailwind CSS 4 (no `tailwind.config.ts`, CSS-first configuration) is bundled with `create-next-app` for Next.js 16 and is a significant build speed improvement over v3.
+v2.0 adds minimal npm packages to the existing Express 5.2 + Prisma 7.8 + React/Vite + MSAL stack. No new ORM, no job queue infrastructure, no client dependencies.
 
 **Core technologies:**
-- **Next.js 16.2** (App Router): Full-stack framework — current stable (Oct 2025); Turbopack default; `output: 'standalone'` for self-hosted deployment; `proxy.ts` replaces `middleware.ts`
-- **TypeScript 6 / React 19.2**: Type safety + UI — bundled with Next.js 16; React Compiler stable; required for reliability in student data systems
-- **Node.js 22 LTS**: Server runtime — required by Next.js 16 (dropped Node 18); required by `unpdf` for native `Promise.withResolvers`
-- **Better Auth 1.6** (Microsoft social provider): Authentication — replaces Auth.js; handles Entra ID OAuth 2.0 OIDC with built-in session database storage; single-tenant configuration
-- **PostgreSQL 17 + Prisma 7.8** (`@prisma/adapter-pg`): Database + ORM — open-source; JSONB for extracted PDF data; Prisma 7 mandates driver adapters + ESM (`"type": "module"`)
-- **`@react-pdf/renderer` 4.5**: Transcript PDF generation — no Chromium dependency; sub-500ms; Flexbox layout (Yoga engine); server-side only
-- **`unpdf` 1.6** + **`@napi-rs/canvas`**: PDF text extraction — modern replacement for deprecated `pdf-parse`; works in Node.js without browser globals
-- **`pg-boss`**: Background job queue — PostgreSQL-backed; no Redis required; handles async extraction pipeline
-- **Tailwind CSS 4.3** + **shadcn/ui**: Styling + components — CSS-first config; `@theme` in `globals.css`; shadcn components are owned code (no version lock-in)
-- **React Hook Form 7.78** + **Zod 4.4** + **@tanstack/react-table 8.21**: Forms, validation, data tables — standard stack for admin UIs of this type
-- **pnpm 9**: Package manager — faster and disk-efficient; use `pnpm create next-app`
+- **Node.js `fs` / `fs/promises`:** Read-only UNC access and streaming — works on Windows Server when PM2 process identity has share ACL; no SMB wire-protocol library needed
+- **fast-glob 3.3.3:** Recursive share tree walk for discovery — UNC support via `cwd` option; replaces hand-rolled `readdir` recursion
+- **node-cron 4.2.1:** Schedule nightly discovery scans in PM2 worker — ESM-compatible, `noOverlap: true` for long scans
+- **mime-types 3.0.2:** Content-Type for proxied files — explicit control for inline PDF vs attachment download
+- **Prisma schema extensions:** `LinkedDocument`, `ShareScanRun`, `DocumentEvidence` — path metadata only, `BigInt` for file size serialized to string in JSON
+- **PM2 worker process (`spcs-worker`):** Isolated discovery runner — prevents share walks from blocking HTTP event loop
+- **AD service account + `SHARE_ROOT` env:** Read-only ACL on share; full UNC paths only — never mapped drive letters
 
-**What NOT to use:**
-- `pdf-parse` — broken in Next.js standalone production builds; use `unpdf`
-- Auth.js v5 / NextAuth — still in beta (v5.0.0-beta.31) as of June 2026; use Better Auth
-- Puppeteer / Playwright for PDF generation — 100MB+ Chromium, 2–5s/doc; unjustified for structured document output
-- Supabase / Neon / PlanetScale / any cloud database — data residency constraint
-- Clerk / Auth0 / WorkOS — SaaS auth; student identity cannot leave the school network
-- `jsPDF` / `react-to-print` — imperative canvas API / screenshot-based; not suitable for professional multi-page transcripts
-
----
+**Avoid:** smb2 npm, Redis/Bull, multer/upload pipelines, `express.static` on share root, copying files to `/uploads/`, exposing UNC paths in API JSON, `NET USE` in request handlers.
 
 ### Expected Features
 
-Feature research was corroborated against Parchment, Transcend, SchoolPoint, Rediker AdminPlus, Symplicity CSM, and comparable careers advisor tooling. The MVP is clearly bounded: the core value proposition is "a staff member opens a student record and produces a completed professional transcript PDF in a single session."
+**Must have (table stakes — v2.0 launch):**
+- Share folder reconnaissance and documented layout rules (`shareLayout.ts`) — P0 blocker before any scan code
+- Background discovery scan (scheduled + admin trigger) with idempotent rescans
+- Rule-based auto-match to student via `schoolStudentId` / folder / filename patterns
+- Orphan/unmatched queue with manual link/unlink override
+- Stale file detection on rescan (`STALE` status when path absent)
+- Per-student linked document list on profile (name, type inference, modified date, status)
+- Authenticated open/download via server proxy (`GET /api/documents/:id/content`)
+- Read-only share enforcement — no write/delete SMB operations
+- Evidence linking: staff attach linked document to award/activity/work record entry
+- Audit log for document views, downloads, and evidence link/unlink
 
-**Must have (table stakes) — v1:**
-- **Microsoft Entra ID SSO** — gate feature; nothing else works without authentication; school is already on M365
-- **Student profile CRUD** (name, year level, contact) — foundational entity; all records attach to this
-- **Academic results entry** (subject, grade, year, notes) — core transcript content; must handle letter grades, percentages, pass/fail
-- **Extracurricular activities** (org, role, dates, hours, description) — Common App data model; universities expect this
-- **Awards and achievements** (title, issuer, date, level) — staff currently hunt through emails for these; level matters (school/regional/state/national)
-- **Work experience entries** (employer, role, dates, description) — distinguishes serious applicants for employer and university transcripts
-- **Career interests and goals** (structured areas + free-text) — Careers team's core purpose; personalises transcript narrative
-- **Staff notes** (timestamped, attributed to entering staff member) — running log replacing paper notes
-- **PDF upload per student** (multiple files: report cards, certificates, award letters) — evidence documents must be centralised with the record
-- **Document listing, download, deletion, type tagging** — without tagging, documents become an unorganised pile; soft delete preferred
-- **PDF data extraction** (digital-native text + scanned OCR pipeline) — key differentiator for reducing manual data entry pain; HIGH complexity
-- **Side-by-side extraction review UI** — extracted data is suggestions only; staff must confirm before committing to record
-- **Transcript template with fillable narrative sections** — staff-authored prose; template ensures consistency
-- **Template auto-population from stored records** — eliminates copy-paste errors; must handle empty sections gracefully
-- **PDF transcript export** with school branding (logo, header) — only acceptable format for universities and employers
-- **Draft / finalised status flag** — staff need to know which transcripts are approved for sending
-- **Student list** with search (name) and filter (year level, transcript status) — 200–600 students requires fast navigation
-- **Role-based access** (Admin / Staff) — not all staff should delete records or manage templates
-- **Immutable audit trail** (who changed what and when) — legal/governance requirement for student records; must be in schema from day one
+**Should have (v2.x soon after launch):**
+- Match confidence UI ("Auto-linked" vs "Needs review")
+- Cohort-wide unmatched files dashboard with bulk assign
+- Scan run history and stats for admins
+- Inline PDF preview via `Content-Disposition: inline`
+- Manual document type override when inference is wrong
 
-**Should have (competitive) — v1.x after validation:**
-- **Evidence linking** — attach specific uploaded PDFs as evidence for specific award/activity record entries
-- **Transcript version archive** — store prior generated PDFs with date, generator, recipient type; immutable archived renders
-- **Record completeness indicators** — flag students with sparse records before transcript season
-- **Bulk / cohort transcript generation** — queue-based; zip download; validate at first ATAR season whether one-by-one is the actual bottleneck
-- **Internal draft review workflow** — "send for review" flag for two-staff sign-off on sensitive transcripts
-
-**Defer (v2+):**
-- Multi-recipient transcript variants (university vs employer vs student copy) — build after single-template usage reveals actual differences needed
-- SIS integration (SIMON, Compass) — defer until manual entry pain is confirmed and school IT is ready
-- Reporting / analytics dashboards — filtered list is sufficient for 3–8 staff
-- Custom template editor for non-developer staff
-- Bulk student CSV import
-
-**Anti-features to avoid:**
-- Student self-service portal (doubles auth complexity, raises privacy governance requirements)
-- AI-generated narrative text (liability for formal documents; staff must own tone and content)
-- Email delivery from within the system (SMTP/API configuration adds scope with minimal benefit at this scale)
-- Digital signature / QR verification codes (overkill for ~500 documents/year sent by known staff)
-
----
+**Defer (v3+ / if validated):**
+- OCR / structured extraction from share PDFs (EXT-01..03)
+- Real-time filesystem watch on SMB share
+- Full share browser / generic file manager
+- Automatic AI evidence linking
+- Upload/copy files into app storage (v1 DOC-01 model — explicitly superseded)
+- Two-way metadata sync back to share
 
 ### Architecture Approach
 
-The system is a conventional N-tier web app deployed entirely on-premise on a single Windows Server: IIS acts as reverse proxy (SSL termination, port 443 → localhost:3000), Next.js runs under PM2, PostgreSQL provides the database, and the local filesystem holds PDF binaries in a path outside the web root. Microsoft Entra ID is contacted for authentication only — no student data ever leaves the school network. The architecture decomposes into four main patterns: a Confidential Client MSAL flow (server-side OAuth 2.0 with HTTP-only encrypted session cookies — never localStorage); a Database-as-Truth / Filesystem-as-Storage pattern for PDFs (metadata and paths in PostgreSQL; binaries on disk via `/uploads/{studentId}/{uuid}.pdf`); an async queue-based extraction pipeline via `pg-boss`; and server-side transcript assembly via `@react-pdf/renderer`.
-
-The data model segments student records into separate tables from the start (academic results, extracurriculars, awards, work experience, documents, notes) rather than a single wide student table — this enables granular access controls, retention policies, and clean extension without schema surgery later.
+v2.0 extends the decoupled React SPA + Express API architecture with a read-only SMB integration layer and two-phase discovery pipeline (scan filesystem truth → apply business matching rules). Documents shift from upload + local storage to reference + proxy. A separate PM2 worker runs discovery asynchronously; HTTP handlers enqueue scans and return `202` with `scanRunId`.
 
 **Major components:**
-1. **IIS Reverse Proxy** — SSL termination, port 443 → localhost:3000; requires URL Rewrite + ARR modules; must disable `Accept-Encoding` forwarding to prevent 500.52 compression errors
-2. **Next.js App (App Router, SSR)** — serves all pages server-side; API routes for uploads and exports; Server Actions for data mutations; `proxy.ts` for session validation on every protected request
-3. **Better Auth + Microsoft Entra ID** — OAuth 2.0 Authorization Code flow; single-tenant; sessions stored in PostgreSQL; HTTP-only Secure SameSite=Strict cookies; `openid`, `profile`, `email` scopes only
-4. **Student + Records Module** — CRUD for all student data types; UUID public IDs; server-side auth on every data endpoint; immutable audit log table in schema
-5. **PDF Upload Service** — validates by magic bytes (`%PDF` header); renames to UUID; writes outside web root; inserts DB row (status=`pending`); enqueues `pg-boss` job; returns 201 immediately
-6. **PDF Extraction Pipeline** — `pg-boss` background worker; detects digital-native vs scanned; `unpdf` for text extraction; Tesseract.js for OCR on scanned pages; results stored as JSONB; status polled by UI
-7. **Extraction Review UI** — side-by-side: source PDF viewer left, extracted fields right; explicit Accept/Edit per field; extracted data never auto-saves to student record
-8. **Transcript Assembler + Export** — aggregates all student data in single batch query (no N+1); renders via `@react-pdf/renderer` React component; streams `application/pdf` buffer; serve only via authenticated route
-9. **PostgreSQL + Prisma 7** — structured data + file metadata + Better Auth sessions + `pg-boss` queue tables; `prisma.config.ts` with `PrismaPg` adapter; ESM required
-10. **File System** — PDF binaries at `/uploads/{studentId}/{uuid}.pdf` (or `D:\transcripts-uploads\` on Windows); never in web root; included in school backup schedule
-
----
+1. **shareAccess service** — UNC path join, traversal guard (`resolveSafePath`), `createReadStream`; shared by proxy route and worker
+2. **discoveryScan job** — `fast-glob` walk, upsert `LinkedDocument` by `relativePath`, mark `STALE` on rescan
+3. **matching engine** — Priority rules from `shareLayout.ts`: `schoolStudentId` in folder/filename → exact name → fuzzy (manual review only)
+4. **linkedDocument service** — CRUD metadata; list by student; no binary writes
+5. **Document proxy route** — JWT-gated stream; opaque UUID in API; never client-supplied paths
+6. **DocumentEvidence join** — Polymorphic many-to-many: one `LinkedDocument` → multiple record entries
+7. **React documents components** — `DocumentList`, `DocumentOpenButton`, `EvidenceLinkPicker` on `StudentDetailPage`
 
 ### Critical Pitfalls
 
-Research identified 9 critical pitfalls. The top 6 are listed with prevention strategies; all must be addressed proactively — none can be retrofitted:
-
-1. **PDF Extraction Over-Promise** — School documents vary enormously; naive extractors produce garbled output on grid-layout report cards, and produce nothing on scanned certificates. *Prevention:* Build the review-and-confirm UI from day one. All extracted data is a suggestion, not authoritative. Fail gracefully to manual entry. Never auto-save extraction results. Detect digital-native vs scanned before attempting extraction.
-
-2. **Azure AD Tenant Consent Block** — M365 EDU tenants disable per-user consent by policy; the Global Administrator must explicitly grant admin consent via `https://login.microsoftonline.com/{tenant-id}/adminconsent?client_id={app-id}` before any staff can log in. This step is frequently missed and causes go-live failure. *Prevention:* Document the admin consent URL as a mandatory deployment step in the runbook. Request only minimal permissions. Test against a trial M365 EDU tenant (not a personal Azure subscription — they have different consent policies).
-
-3. **MSAL Token Lifecycle Mishandled** — Access tokens expire after ~60–75 minutes; skipping `acquireTokenSilent` first causes disruptive redirect loops that lose unsaved form data. Multiple `PublicClientApplication` instances cause cache corruption and `interaction_in_progress` errors. *Prevention:* Centralise token acquisition into a single module; one instance across the app lifecycle; always try silent first, then fall back to interactive on `InteractionRequiredAuthError`; test explicitly on Safari where iframe-based silent refresh fails.
-
-4. **IDOR on Student Records** — Sequential integer PKs in URLs allow enumeration of all student records by incrementing the ID. The small staff user base creates false confidence that this is not a real exposure. *Prevention:* Use UUIDs as public-facing identifiers from schema design. Enforce server-side authorization on every data endpoint in the service layer, not just at the route level. Never expose integer DB PKs in URLs or API responses.
-
-5. **No Immutable Audit Trail** — Without an append-only audit log, "who changed this?" cannot be answered — a legal/governance requirement for student records. Retrofitting requires re-examining every write path in the codebase. *Prevention:* Audit log table in the database schema from day one. Log every create/update/delete with: timestamp, actor (user ID + display name), record type, record ID, before/after snapshot. Application code must not be able to update or delete audit rows. Expose a read-only audit view in the admin section.
-
-6. **On-Premise Deployment "Works On My Machine" Failure** — School Windows Servers are hardened, managed by IT, may have Group Policy restrictions, no internet access, and specific IIS ARR configuration requirements (disable `Accept-Encoding` forwarding; enable `preserveHostHeader`). *Prevention:* Write the deployment runbook before any feature work begins. Bundle all runtime dependencies — no `npm install` at deploy time. All file paths via environment variables. Provide a Docker-based alternative if IT prefers it. Test the runbook on equivalent Windows Server hardware before production release.
-
-**Additional pitfalls to track:**
-7. **PDF Upload Security** — Validate by magic bytes, not `Content-Type`; UUID-rename all files on disk; store outside web root; enforce 20MB size limit; serve via authenticated endpoint only
-8. **Transcript PDF Page Break Failures** — Use `break-inside: avoid` (not deprecated `page-break-inside`); avoid `overflow: auto` on section containers; embed fonts as base64 data URIs; test with real production-length data (long extracurricular lists, many awards)
-9. **Student Data in Cloud Services** — Audit every dependency for network calls; PDF extraction must use only on-premise libraries; configure error tracking to scrub PII from payloads; log only opaque record IDs
-
----
+1. **Discovery before share layout documented** — Walk share with careers staff first; derive matching rules from real samples; get sign-off before first auto-link; output `shareLayout.ts` config
+2. **PM2/LocalSystem cannot see network share** — Dedicated AD service account with read-only ACL; PM2 runs as that account; smoke test `readdir(SHARE_ROOT)` at startup under production identity
+3. **UNC exposure / path traversal in proxy** — Opaque document ID only; `resolveSafePath` rejects `..`; never return absolute UNC to client; audit every content stream
+4. **Aggressive fuzzy name matching** — `schoolStudentId` match auto-links; fuzzy name never auto-links; persist `matchRule` + `matchConfidence`; block auto-link on duplicate-name ambiguity
+5. **Synchronous full-share scan in HTTP handler** — Worker process only; `POST /api/admin/scans` returns `202`; UI polls `ShareScanRun` status
+6. **Matching before student directory populated** — Gate first auto-match on student data readiness; support re-match-only job without full tree walk
+7. **Copying share files to app storage** — Path reference only; deprecate v1 upload path; proxy reads live from share at open time
 
 ## Implications for Roadmap
 
-Architecture research provides a clear build-order dependency graph. The system must be built bottom-up: each layer must be stable and testable before the layer above it is added. Seven phases map directly to the dependency chain.
+Based on combined research, v2.0 should be structured as six phases (6–11) building bottom-up from share understanding through evidence linking. v1 Phase 4 (upload/storage) is superseded — do not build dual storage paths.
 
-### Phase 1: Infrastructure & Auth Foundation
-**Rationale:** Nothing else works without authenticated context. Azure AD SSO is the gate for every feature. On-premise deployment configuration must be established before any feature is built, or deployment failure is discovered too late. IIS + PM2 + PostgreSQL + Better Auth must all be operational together as the foundation.
-**Delivers:** Working login via Microsoft account; session management; route protection middleware; deployment runbook for school IT; admin consent workflow documented and tested; role-based access scaffolding (Admin / Staff)
-**Features (FEATURES.md):** Microsoft Entra ID SSO, role-based access
-**Pitfalls to avoid:** Azure AD tenant consent block (Pitfall 2), MSAL token lifecycle (Pitfall 3), on-premise deployment failure (Pitfall 8), data sent to cloud services (Pitfall 9)
-**Research flag:** Needs planning research — Azure AD app registration, Better Auth Microsoft provider config, IIS ARR setup, Windows Server PM2 service setup
+### Phase 6: Share Reconnaissance & Matching Rules
+**Rationale:** PROJECT.md gates discovery on documented layout; all matching depends on real folder conventions — cannot be guessed from code
+**Delivers:** Written layout spec, `shareLayout.ts` config, matching rule priority, careers staff sign-off, recon statistics script
+**Addresses:** Share folder reconnaissance (P0), auto-match rule foundation, document type inference heuristics
+**Avoids:** Discovery before layout documented (Pitfall 1), fuzzy match wrong student (Pitfall 4 — rules design)
 
-### Phase 2: Database Schema & Student CRUD
-**Rationale:** The core data model must exist before any feature is built on top of it. Schema mistakes (monolithic student table, integer IDs, missing audit log, missing soft delete) are expensive to fix once data exists. This phase establishes all the structural decisions that downstream phases depend on.
-**Delivers:** Complete Prisma schema (students, academic results, extracurriculars, awards, work experience, career goals, staff notes, documents, audit log, users); PostgreSQL migrations; student profile CRUD API; student list with search and pagination; UUID public IDs throughout; audit log on all writes
-**Features (FEATURES.md):** Student profile CRUD, student list search/filter, cohort overview, staff notes, audit trail
-**Pitfalls to avoid:** IDOR via sequential IDs (Pitfall 4), no immutable audit trail (Pitfall 5), monolithic student record table (technical debt), missing soft delete (technical debt)
-**Research flag:** Standard patterns — well-documented; Prisma 7 schema design is straightforward
+### Phase 7: LinkedDocument Schema & SMB Access
+**Rationale:** Worker and API need Prisma models and verified UNC I/O before any scan; deployment blocker for all filesystem operations
+**Delivers:** Prisma migration (`LinkedDocument`, `ShareScanRun`), `shareAccess.ts`, `SHARE_ROOT` env, PM2 service account setup, UNC smoke test in runbook
+**Uses:** Native `fs`, Prisma 7.8, optional `@cityssm/windows-unc-path-connect` fallback at startup
+**Implements:** shareAccess service, read-only ACL enforcement
+**Avoids:** PM2/LocalSystem share failure (Pitfall 2), write access to share (Pitfall 10)
 
-### Phase 3: Student Records UI
-**Rationale:** With auth and the data model solid, staff can start entering data immediately. This phase validates the UI patterns and data model before the more complex PDF features are layered on top. Entry forms for all record types (academic results, extracurriculars, awards, work experience, career goals) are individually low-complexity but must collectively feel cohesive.
-**Delivers:** Full CRUD UI for all student record types; student profile page with tabbed record sections; form validation (Zod + React Hook Form); TanStack Table for data listings; record completeness visibility (which sections have entries vs empty)
-**Features (FEATURES.md):** Academic results, extracurriculars, awards, work experience, career goals, staff notes
-**Stack (STACK.md):** shadcn/ui, React Hook Form, Zod, @tanstack/react-table, sonner toasts
-**Pitfalls to avoid:** N+1 queries on record fetch (performance trap), no pagination on lists (performance trap)
-**Research flag:** Standard patterns — CRUD UI is well-understood; no deep research needed
+### Phase 8: Discovery Engine & Link Persistence
+**Rationale:** Populates `LinkedDocument` rows from share truth; must run in worker, not HTTP thread
+**Delivers:** `discoveryScan.ts`, PM2 `spcs-worker` entry, `node-cron` schedule, admin scan trigger (`202` + poll), `ShareScanRun` history, stale detection, re-match-only job
+**Addresses:** Background discovery scan, stale/missing file detection, scan run stats
+**Avoids:** Synchronous scan in HTTP (Pitfall 5), copying files to `/uploads/` (Pitfall 6), no stale handling (Pitfall 8), matching before students exist (Pitfall 7)
 
-### Phase 4: PDF Upload & Document Management
-**Rationale:** Document upload depends on the student entity and the filesystem storage pattern established in Phase 2. This phase introduces the PDF binary pipeline (upload → validate → store → queue), which Phase 5 (extraction) builds directly on top of. File security must be correct from the first upload.
-**Delivers:** Multi-file PDF upload per student; magic-byte validation; UUID rename on disk; storage outside web root; authenticated file serving endpoint; document listing with type tagging; soft delete; upload directory environment variable configuration; `pg-boss` queue initialisation
-**Features (FEATURES.md):** PDF upload, document listing/download/deletion, document type tagging
-**Pitfalls to avoid:** PDF upload security failures (Pitfall 6), files in web root (security), synchronous extraction blocking HTTP (Pitfall 1 / architecture anti-pattern)
-**Research flag:** Standard patterns for upload handling; `pg-boss` integration is straightforward
+### Phase 9: Matching Engine & Orphan Queue
+**Rationale:** Separates business rules from filesystem enumeration; requires scan output and populated `Student` rows with `schoolStudentId`
+**Delivers:** `matching.ts` rule engine, auto-link by ID/folder/filename, `ORPHAN` status queue, manual link/unlink API, admin orphan routes with role gate
+**Addresses:** Automated student matching, manual link/unlink override, orphan/unmatched queue
+**Avoids:** Fuzzy match wrong student (Pitfall 4), matching before students exist (Pitfall 7)
 
-### Phase 5: PDF Extraction Pipeline
-**Rationale:** Extraction is the highest-complexity feature in the system. It must be async (queue-based), handle two document types (digital-native and scanned), produce suggestions only, and have a mandatory staff review step. This phase cannot be simplified by skipping the review UI — that is the feature, not a nice-to-have.
-**Delivers:** `pg-boss` background worker; `unpdf` text extraction for digital-native PDFs; Tesseract.js OCR for scanned documents; structured JSONB extraction output; extraction status polling endpoint; side-by-side extraction review UI (source PDF viewer + extracted fields + Accept/Edit per field); graceful fallback to manual entry on extraction failure
-**Features (FEATURES.md):** PDF data extraction, extraction result review and editing, store original alongside extracted data
-**Stack (STACK.md):** `unpdf`, `@napi-rs/canvas`, `pg-boss`
-**Pitfalls to avoid:** PDF extraction over-promise (Pitfall 1), synchronous extraction (performance trap), extraction auto-save without review (UX pitfall), data sent to cloud OCR API (Pitfall 9)
-**Research flag:** Needs planning research — Tesseract.js configuration on Windows Server, OCR accuracy expectations for school document types, side-by-side PDF viewer component options
+### Phase 10: Document List & Auth Proxy
+**Rationale:** Staff-facing value — open student profile and see/share-open documents; requires linked rows from Phase 9
+**Delivers:** `GET /api/documents/:id/content` streaming proxy, student profile document list UI, `apiGetBlob` client helper, document view audit logging, read-only enforcement, v1 upload deprecation/migration messaging
+**Uses:** `mime-types`, Express `createReadStream` pipe, MSAL Bearer via `apiFetch`
+**Implements:** Document proxy route, `DocumentList` / `DocumentOpenButton` components
+**Avoids:** UNC exposure / path traversal (Pitfall 3), document IDOR (Pitfall 9), client-side open without auth header, memory exhaustion on large PDFs
 
-### Phase 6: Transcript Assembly & PDF Export
-**Rationale:** The capstone feature. Depends on all student data being present (Phases 2–5) and the auth layer (Phase 1). This phase assembles all structured data + staff-authored narrative into the `@react-pdf/renderer` template and exports a school-branded PDF. Page break behaviour and empty-section handling must be explicitly tested with real production-length data.
-**Delivers:** Transcript template as `@react-pdf/renderer` React component; template with fillable narrative sections (staff-authored prose per data category); template auto-population from stored records; draft / finalised status flag; PDF export endpoint streaming `application/pdf`; school branding (logo + header via configuration); HTML preview before export; empty-section graceful handling
-**Features (FEATURES.md):** Transcript template, template auto-population, draft/finalised status, PDF export, school branding
-**Stack (STACK.md):** `@react-pdf/renderer` 4.5
-**Pitfalls to avoid:** Transcript PDF page break failures (Pitfall 7), N+1 queries on assembly (aggregate all data in single batch query), PDF preview generating full PDF on every click (performance trap), transcript template locked in code (technical debt)
-**Research flag:** Needs planning research — `@react-pdf/renderer` Flexbox layout patterns for multi-section transcript, font embedding as base64 data URIs, empty-section conditional rendering
-
-### Phase 7: Polish, Hardening & Deployment Runbook
-**Rationale:** The final pass before school use. Covers all the "looks done but isn't" checklist items from PITFALLS.md: session expiry handling, HTTPS with school-CA-signed certificate, IIS ARR configuration verification, backup integration for the uploads directory, audit log admin view, error handling with PII-scrubbed logging, and the deployment runbook tested end-to-end on equivalent Windows Server hardware.
-**Delivers:** Graceful session expiry with re-authentication (no lost form data); HTTPS verified with school CA certificate; IIS ARR configuration documented and tested; uploads directory included in school backup schedule; read-only audit log view in admin section; error boundaries and toast notifications throughout; log scrubbing (no student PII in log statements); complete deployment runbook; PM2 Windows startup service configuration
-**Pitfalls to avoid:** All "Looks Done But Isn't" checklist items from PITFALLS.md
-**Research flag:** IIS ARR Windows Server configuration — standard patterns exist but school-specific config needs validation with school IT
-
----
+### Phase 11: Evidence Linking
+**Rationale:** Core v2 differentiator; requires both `LinkedDocument` rows staff can view AND Phase 3 record entry tables (awards, activities, work experience)
+**Delivers:** `DocumentEvidence` join table, evidence attach/detach API, `EvidenceLinkPicker` UI on record entries, evidence badge on record cards and document list
+**Addresses:** Evidence linking (network document → specific record entry), audit for link/unlink
+**Avoids:** Auto-commit AI evidence links (anti-feature), duplicate path strings on records
 
 ### Phase Ordering Rationale
 
-- **Auth first:** Every subsequent feature requires an authenticated session. Building anything else first produces code that must be refactored when auth is added.
-- **Schema before UI:** Database schema mistakes (integer IDs, missing audit log, monolithic table) become expensive once data exists. The schema must be established and stable before UI features are built on it.
-- **Records UI before PDF:** The records UI validates the data model and UI patterns with low complexity. Discovering schema issues at this stage is much cheaper than discovering them during the PDF extraction pipeline build.
-- **Upload before extraction:** Extraction depends on the upload pipeline (filesystem storage, `pg-boss` queue). Building them together increases complexity and testing surface.
-- **Extraction before transcript:** The transcript assembler's value depends on student records being populated — including via extraction. Staff need to see real extraction results working before the transcript feature is meaningful.
-- **Transcript last (except polish):** The capstone feature. Requires all upstream data to be correct and complete. Any rework in earlier phases would contaminate the transcript template if built earlier.
-- **Polish as dedicated phase:** Security hardening, deployment runbook, and error handling are not afterthoughts — they have their own pitfalls. A dedicated final phase ensures they receive the attention they require.
+```
+Phase 6 (rules) ──▶ Phase 7 (schema + SMB)
+                         │
+                         ▼
+                   Phase 8 (scan)
+                         │
+                         ▼
+              Phase 9 (match) ◀── requires Student rows (Phase 2)
+                         │
+                         ▼
+                   Phase 10 (proxy + UI)
+                         │
+                         ▼
+              Phase 11 (evidence) ◀── requires record entry tables (Phase 3)
+```
 
----
+- **Phase 6 is human-first, not code-first** — prevents garbage-in matching that destroys staff trust
+- **Phase 7 unblocks all I/O** — no scan or proxy work until service account ACL verified on production server
+- **Phases 8–9 split scan from match** — allows re-matching when students are bulk-imported without re-walking entire share tree
+- **Phase 10 delivers standalone value** — document list + open/download works before evidence linking
+- **Phase 11 is the transcript workflow payoff** — but correctly deferred until record types exist
+- **v1 upload path must be deprecated** — dual storage creates sync drift and contradicts v2 goal
 
 ### Research Flags
 
-**Phases needing deeper research during planning:**
+Phases likely needing deeper research during planning:
+- **Phase 6:** Human — on-site share inspection with careers staff; naming conventions unknown until walked
+- **Phase 9:** Medium — fuzzy name matching edge cases (twins, preferred vs legal name, duplicate surnames)
 
-- **Phase 1 (Auth + Infrastructure):** Azure AD Better Auth Microsoft provider configuration specifics; IIS ARR module setup for Next.js 16 `proxy.ts`; PM2 Windows service startup via NSSM; admin consent URL and M365 EDU tenant testing procedure
-- **Phase 5 (PDF Extraction):** Tesseract.js configuration and language pack installation on Windows Server; OCR accuracy benchmarks on typical school document types (report card grids, certificate layouts); side-by-side PDF viewer component for the review UI (`react-pdf` viewer or iframe); extraction failure rate expectations to set staff expectations correctly
-- **Phase 6 (Transcript Export):** `@react-pdf/renderer` Flexbox layout for multi-section transcript with conditional empty sections; school logo embedding as base64 data URI; font selection and embedding for professional output; page break behaviour with `@react-pdf/renderer`'s Yoga engine
-
-**Phases with standard, well-documented patterns (skip deep research):**
-
-- **Phase 2 (Schema + CRUD):** Prisma 7 schema design is thoroughly documented; UUID strategy and audit log patterns are well-established
-- **Phase 3 (Records UI):** CRUD UI with shadcn/ui, React Hook Form, Zod, and TanStack Table is a standard pattern with extensive community examples
-- **Phase 4 (PDF Upload):** File upload with `pg-boss` queue and filesystem storage is a standard Node.js pattern; `unpdf` documentation is clear
-
----
+Phases with standard patterns (skip research-phase):
+- **Phase 7:** Low — PM2 service account + native `fs` on UNC well-documented for Windows Server
+- **Phase 8:** Low — `node-cron` + `fast-glob` patterns established; no Redis needed for single-server nightly scan
+- **Phase 10:** Low — Express stream proxy + React blob URL pattern standard
+- **Phase 11:** Low — Polymorphic join table sufficient at this scale
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All technology recommendations verified against primary sources (official docs, npm registry) as of 2026-06-11. Version compatibility matrix cross-checked. |
-| Features | HIGH | Domain is well-understood; corroborated against 10+ comparable school records and careers advisor systems; anti-features derive from project constraints, not inference |
-| Architecture | HIGH | Standard patterns (N-tier web app, filesystem storage, async queue, MSAL confidential client flow) are thoroughly documented; on-premise Windows Server deployment is well-understood |
-| Pitfalls | HIGH (Azure AD, file security) / MEDIUM (PDF extraction accuracy, on-premise ops) | Azure AD pitfalls are from official Microsoft documentation; PDF extraction accuracy pitfalls are from practitioner accounts and empirical testing articles |
+| Stack | HIGH | npm versions verified 2026-06-16; extends proven v1 stack; native fs on Windows UNC confirmed by Microsoft/community sources |
+| Features | HIGH | School DMS patterns well-documented (OpenEduCat, DocumentLOK); project-specific requirements in PROJECT.md; share layout is the one unknown |
+| Architecture | HIGH | Integrates cleanly with existing Express + Prisma + PM2 + IIS deployment; component boundaries clear |
+| Pitfalls | HIGH | Windows SMB service identity, browser UNC restrictions, path traversal well-documented; matching pitfalls validated against school DMS patterns |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **PDF extraction accuracy on real school documents:** Research can document the approach and the review-UI requirement, but actual extraction accuracy for SPCS's specific document corpus (which schools supply report cards, what formats certificates take) can only be validated with real samples. *Handle during Phase 5 planning:* obtain 5–10 representative documents from the school and run extraction benchmarks before committing to heuristic vs ML-based structuring.
-
-- **School IT environment specifics:** Windows Server version, existing SQL Server vs fresh PostgreSQL installation, IIS version, network proxy configuration, Group Policy restrictions — these vary by school and affect the deployment runbook. *Handle during Phase 1 planning:* initiate a discovery call with school IT before writing the runbook; document actual server configuration.
-
-- **M365 EDU tenant consent policy:** Whether the school's EDU tenant has per-user consent disabled (likely) or allows it must be confirmed before auth phase begins. *Handle during Phase 1:* ask school IT to confirm consent policy and identify the Global Administrator who will perform admin consent before go-live.
-
-- **Transcript template content and layout:** The specific sections, ordering, and formatting of the SPCS transcript are not defined in research. *Handle during Phase 6 planning:* obtain an existing SPCS transcript or brief from the Careers Team before designing the `@react-pdf/renderer` template.
-
----
+- **SPCS share folder layout unknown:** Must be resolved in Phase 6 via on-site reconnaissance with careers staff — matching rules cannot be finalized until real folder tree is walked
+- **`schoolStudentId` alignment with share naming:** Validate that share folders/files use the same ID format as `Student.schoolStudentId` in the database — if not, primary match rule must be adjusted
+- **v1 upload migration path:** If any v1 uploaded documents exist in production, need explicit migration/deprecation plan in Phase 10 — not researched in detail
+- **Service account provisioning timeline:** School IT must create read-only AD account before Phase 7 go-live — deployment dependency, not a code feature but a launch blocker
+- **Antivirus interaction on proxy reads:** Large PDF streaming may hit double AV scan latency — coordinate with IT during Phase 10 performance validation
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- npm registry (direct version queries, 2026-06-11) — all package versions
-- Next.js 16 official blog (nextjs.org/blog/next-16) — framework features, standalone output, proxy.ts
-- Better Auth docs (better-auth.com/docs) — Microsoft social provider, Auth.js deprecation, session management
-- Auth.js migration notice (github.com/nextauthjs/next-auth/discussions/13252) — official Better Auth handover
-- Prisma 7.0.0 release notes (prisma.io/docs) — driver adapter pattern, ESM requirement, prisma.config.ts
-- shadcn/ui Tailwind v4 docs (ui.shadcn.com/docs/tailwind-v4) — CSS-first config, component updates
-- Microsoft Learn — MSAL Node overview, admin consent, error codes (HIGH confidence — official source)
-- OWASP File Upload Cheat Sheet — magic-byte validation, file storage security
-- Microsoft Learn — MSAL error handling, redirect URI best practices, AADSTS error codes
-- IIS reverse proxy pitfalls (techcommunity.microsoft.com) — ARR configuration, 500.52 errors
+- npm registry (`npm view` queries, 2026-06-16) — fast-glob 3.3.3, node-cron 4.2.1, mime-types 3.0.2
+- [Microsoft Learn — SMB file sharing overview](https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-smb-overview) — SMB access patterns
+- [Microsoft Q&A — SMB share service account access](https://learn.microsoft.com/en-us/answers/questions/5830388/how-to-get-a-task-scheduler-task-to-access-an-smb) — service account requirements
+- Existing codebase — `server/src/app.ts`, `schema.prisma`, `apiClient.ts`, `DEPLOYMENT-RUNBOOK.md`, `ecosystem.config.js`
+- `.planning/PROJECT.md`, `.planning/REQUIREMENTS.md` — v2.0 milestone scope and constraints
 
 ### Secondary (MEDIUM confidence)
-- PkgPulse: unpdf vs pdf-parse vs pdfjs-dist 2026 — community analysis cross-checked with npm
-- DEV Community — PDF Generation: Puppeteer vs @react-pdf/renderer (production comparison)
-- Medium — Deploying Node.js in IIS with PM2 reverse proxy
-- Travis Horn — Reverse-proxying Node.js apps on Windows with IIS
-- Next.js file upload patterns (oneuptime.com/blog, cadence.withremote.ai) — verified against Next.js docs
-- FPF EdTech Service Provider's Guide to Student Privacy (2025) — data residency and privacy governance
-- PDF generation best practices (pdf4.dev) — page break CSS, font embedding
-- "I Tested 12 Best-in-Class PDF Table Extraction Tools" (Medium) — empirical extraction accuracy data
+- [OpenEduCat DMS docs](https://newdocs.openeducat.org/features/advanced/documents/) — student file organization, share migration patterns
+- [DocumentLOK](https://www.documentlok.com/) — SIS-embedded document access, auto-indexing patterns
+- [DBOMS evidence linking](https://dboms.com/solutions/evidence-linking) — link-once-reference-everywhere pattern
+- ServerFault / Stack Overflow — Windows service UNC access, `LocalSystem` limitations, secure file proxy patterns
+- [node-cron v4 migration guide](https://nodecron.com) — ESM import, `noOverlap` for long scans
+- fast-glob README — UNC path via `cwd` and `convertPathToPattern`
 
-### Tertiary (MEDIUM–LOW confidence)
-- School software feature benchmarking (Parchment, Transcend, SchoolPoint, Rediker, Symplicity CSM, OpenEduCat, ampEducator, CoreCampus, Prentus, Evocos) — feature expectations cross-referenced across platforms; specific implementation details not verified
-- PostgreSQL Wiki — BinaryFilesInDB (filesystem vs BYTEA tradeoffs) — foundational reference, not school-specific
-- DocuWare System Architecture White Paper — N-tier document management reference model
+### Tertiary (LOW confidence)
+- School-specific share naming conventions — requires Phase 6 validation on-site
+- Antivirus exclusion feasibility for service account read pattern — IT policy dependent
 
 ---
-*Research completed: 2026-06-11*
+*Research completed: 2026-06-16*
 *Ready for roadmap: yes*

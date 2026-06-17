@@ -1,8 +1,8 @@
 # Feature Research
 
-**Domain:** School careers student transcript management
-**Researched:** 2026-06-11
-**Confidence:** HIGH — domain is well-understood; small-team school software patterns are stable; research corroborated by analysis of Parchment, Transcend, SchoolPoint, Rediker AdminPlus, Symplicity CSM, and comparable careers advisor tooling
+**Domain:** Network file-share document linking for school careers transcript system (v2.0 milestone)
+**Researched:** 2026-06-16
+**Confidence:** HIGH (school DMS patterns, SMB/UNC integration patterns well-documented); MEDIUM (SPCS share folder layout unknown — matching rules TBD after inspection)
 
 ---
 
@@ -10,225 +10,232 @@
 
 ### Table Stakes (Users Expect These)
 
-#### Student Records
+Features careers staff assume when documents "live on the share and show up in the app." Missing these = product feels broken or no better than opening File Explorer.
+
+#### Share Discovery & Matching
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Student profile CRUD (name, year, contact) | Any record system needs a subject entity | Low | Year level drives filtering and grouping |
-| Academic results entry (subject, grade, year) | Core output of a school record; transcript always has grades | Low | Need to handle pass/fail, letter grades, and percentage formats |
-| Extracurricular activities logging (role, org, dates, description) | University applications expect activity history; careers advisors compile this manually today | Low | Common App fields provide good data model: position, org, hours/week, weeks/year, description |
-| Awards and achievements logging (title, issuer, date, level) | Every professional transcript includes honours; staff currently hunt through emails to find these | Low | Level matters: school, regional, state, national |
-| Work experience entries (employer, role, dates, description) | Expected for employer-facing and university transcripts; distinguishes serious applicants | Low | Part-time jobs, internships, and formal placements all belong |
-| Career interests and goals capture | Careers team's core purpose; needed to personalise transcript narrative | Low | Free-text goals + structured interest areas (e.g., STEM, Law, Commerce) |
-| Staff notes / observations per student | Advisors need a running log; paper notes are lost | Low | Timestamped, attributed to the entering staff member |
-| Student list search and filter (name, year, status) | Users need to reach a specific student quickly out of 200–600 | Low | Year level and "transcript status" filters have immediate utility |
-| Bulk student view / cohort overview | Staff manage full year groups, not individuals in isolation | Low | Table view with inline status indicators |
+| Share folder reconnaissance and documented layout | Cannot auto-match without knowing how files are organised; PROJECT.md gates discovery on this | Low (one-time) | Walk `\\spcs-fs\Private\Administration\Office\Student`, document hierarchy, naming conventions, file types; output `shareLayout.ts` config — prerequisite for all discovery |
+| Background discovery scan (scheduled or admin-triggered) | Staff expect files to appear without manual registration; enterprise DMS products (DocumentLOK IdentiFile, OpenEduCat import) index existing shares rather than re-upload | Medium | Walk share tree via service account; upsert `LinkedDocument` rows by normalized relative path; idempotent rescans; run as PM2 worker, not HTTP thread |
+| Automated student matching from path/filename rules | School shares typically use per-student folders or student-ID-in-filename patterns (OpenEduCat: "one folder per student"; rule-based renamers match `{studentId}.jpg`) | Medium | Primary anchor: `Student.schoolStudentId` (unique in schema); secondary: normalized name tokens from folder/filename; rules live in config, not hardcoded |
+| Unmatched/orphan file queue | Auto-match will fail for ambiguous names, typos, new students not yet in system; staff need a place to resolve | Medium | Status `ORPHAN` / `DISCOVERED`; admin/staff UI to manually assign to student or dismiss; without this, trust in automation erodes quickly |
+| Stale/missing file detection on rescan | Files move, rename, or delete on share; app must not show ghost documents | Low–Medium | Compare scan results to DB; mark `STALE` when path absent; optional: detect mtime/size change for "file updated on share" indicator |
+| Manual link and unlink override | Staff know the share better than any rule engine; mis-matches are inevitable at 200–600 students | Low | Override auto-match; audit who linked/unlinked; does not move files on share — metadata only |
 
-#### Document Management
+#### Student Profile Document List
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| PDF upload per student (report cards, certificates, award letters) | Evidence documents exist as PDFs today; staff need them centralised with the record | Low–Med | Multi-file upload per student; need storage quota awareness |
-| Uploaded document listing and download | Staff need to retrieve originals for verification | Low | File name, upload date, uploader, file size |
-| Document deletion / replacement | Mistakes happen; wrong version gets uploaded | Low | Soft-delete preferred; keep audit trail |
-| Document labelling / type tagging | "Report card", "Certificate", "Reference letter" — without tagging, documents become an unorganised pile | Low | Predefined types + custom label |
+| Per-student linked document list on profile | Core v2 deliverable — replaces v1 DOC-02 upload list; staff open student record and see their share files | Low | Columns: file name, inferred type, last modified (share mtime), link status, open action; depends on `Student` entity (Phase 2) |
+| Document type classification | v1 DOC-04 tags (Report Card, Certificate, Award Letter, etc.) still expected; staff filter mentally by type | Low–Medium | Infer from folder segment, filename keywords, or extension heuristics before manual override; no upload step — classification is metadata on link row |
+| Sort/filter document list (name, date, type) | Table stakes for any document list UI at this scale | Low | Client-side sufficient for ~5–30 docs per student |
 
-#### Transcript Generation
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Structured template with fillable narrative sections | Staff need to author the written commentary; template ensures consistency and completeness | Med | Sections mirror the data types: academics, activities, awards, work, goals, staff endorsement |
-| Template auto-population from stored records | Pulling grades and activity entries into the template removes copy-paste errors | Med | Must render cleanly even when sections have no entries |
-| PDF export of completed transcript | Universities, employers, and students receive a PDF; no other format is acceptable to recipients | Med | Must be print-ready: correct margins, fonts, school branding |
-| Transcript status tracking (draft / finalised) | Staff need to know which transcripts are approved for sending vs in progress | Low | Simple two-state flag per transcript instance |
-
-#### Access Control
+#### Authenticated Access
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Microsoft Entra ID (Azure AD) SSO login | School is on M365; staff expect to use their school account; no password management overhead | Med | MSAL / OAuth 2.0 PKCE; no custom username/password |
-| Role-based access (admin vs standard staff) | Not all staff should be able to delete records or manage templates | Low | Two roles are enough: Admin and Staff |
-| Audit trail of record changes | School data governance requires knowing who changed what and when | Low–Med | Who, what, when on all create/update/delete operations |
+| Open/download through authenticated app (proxy stream) | Browsers cannot open raw UNC from HTTPS app; staff must not copy-paste `\\spcs-fs\...` paths; school DMS products serve files through app layer with permission checks | Medium | `GET /api/documents/:id/content` streams via server-side UNC read; inherits JWT auth (`validateJwt` → `resolveUser`); never expose absolute paths to client |
+| Read-only share access from app | Explicit PROJECT.md constraint; authoritative files stay on file server | Low (policy) | Service account granted read-only ACL; no delete/rename/write SMB operations in app code; staff manage files in Explorer |
+| Access audit logging | Student records governance; who opened which document when | Low–Medium | Extend existing `AuditLog` pattern — log document views/downloads and evidence link changes with acting user |
 
-#### PDF Handling
+#### Dependencies on Existing Platform
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Structured data extraction from uploaded PDFs | Report cards and certificates arrive as PDFs; re-keying data is error-prone and time-consuming | High | Must handle varied layouts without a fixed source template; OCR + layout analysis required |
-| Extraction result review and editing by staff | Extracted data will have errors; staff must confirm before it enters the record | Med | Side-by-side: extracted data on left, source PDF on right |
-| Store original PDF alongside extracted data | Extracted data is a derivative; the original is the authoritative evidence | Low | Original is never discarded |
+| Requires authenticated staff (Entra ID SSO) | All document endpoints must be gated same as student records | — (built) | AUTH-01/02 already planned; document routes mount under `/api` with same middleware stack |
+| Requires student profile entity | Nothing to match or list without `Student` rows | — (Phase 2) | Matching key: `schoolStudentId`; FK `LinkedDocument.studentId → Student.id` |
+| Requires audit infrastructure | Document access is sensitive; reuse AUTH-03 pattern | — (Phase 1) | New audit models: `LinkedDocument`, `ShareScanRun`, `DocumentEvidence` |
 
 ---
 
 ### Differentiators (Competitive Advantage)
 
+Features that deliver the Core Value — *open student record, produce transcript in one session without hunting folders* — beyond bare file listing.
+
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| Evidence linking (attach a specific uploaded PDF to a specific award or activity record) | Lets staff say "this certificate proves this award"; gives recipients confidence in the data | Low–Med | Many-to-many: one PDF can support multiple record entries |
-| Multi-recipient transcript variants (university, employer, student) | A university transcript emphasises academic results and leadership; an employer transcript emphasises work experience; a student copy is the full record. Different audiences need different emphasis | Med | Could be template variants rather than dynamic filtering |
-| Record completeness indicators per student | Signals which students have sparse records needing attention before transcript season | Low | "Missing: work experience, career goals" callout on profile |
-| Transcript version history (multiple generated transcripts per student) | Transcripts are produced at different points in the school year; staff need to recall what was sent last time | Low | Immutable archived renders with date, generator, recipient type |
-| School branding in transcript output (logo, colours, letterhead) | Recipients expect official school letterhead; unbranded output looks unofficial | Low–Med | Logo upload + header/footer configuration |
-| Bulk / cohort transcript generation | At ATAR/university application season, staff generate 50+ transcripts; one-by-one is impractical | Med | Queue-based generation; zip download |
-| Draft sharing / internal review before finalisation | Two-staff review before sending prevents errors on formal documents | Low | "Send for review" flag + reviewer can add comments |
+| Evidence linking (network document → specific record entry) | Staff prove "this certificate supports this award"; recipients trust transcript data; DBOMS-style "link once, reference everywhere" without duplicating files on share | Medium | Many-to-many join: one `LinkedDocument` → multiple awards/activities/work entries; visible badge on record entry and in document list; **v2 core** per PROJECT.md (replaces deferred v1.x evidence feature) |
+| Match confidence indicator | Staff quickly spot uncertain auto-links before relying on them for evidence | Low | Store `matchRule` + `matchConfidence` (0–1); surface "Auto-linked (high)" vs "Needs review" in UI |
+| Unmatched files dashboard (cohort-wide) | Careers team sees "12 new files couldn't be matched" after scan — proactive cleanup vs per-student archaeology | Medium | Aggregate `ORPHAN`/`DISCOVERED` rows; filter by folder, date, extension; bulk assign to student |
+| Scan run history and stats | IT/admin visibility: files seen, linked, orphaned, errors — operational confidence | Low | `ShareScanRun` model: started/completed, counts, error message; admin-only view |
+| In-app PDF preview (inline) | Faster verification than download-open cycle when linking evidence | Medium | Proxy stream with `Content-Disposition: inline`; browser PDF viewer; fallback to download for non-PDF |
+| "Open containing folder" hint (not raw UNC) | Helps staff who need to fix files on share — show human-readable relative path or last-known folder name without exposing server internals | Low | Display share-relative path sanitized for staff context; optional copy of folder segment only |
+| Rescan-on-demand for one student | After staff reorganise a student's share folder, refresh without full-tree scan | Medium | Scope scan to student's known folder prefix once layout documented; nice accelerator, not day-one |
 
 ---
 
 ### Anti-Features (Commonly Requested, Often Problematic)
 
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| Student self-service portal (students log in, view/request their own records) | Doubles auth complexity, raises privacy governance requirements, creates parent-notification workflows; scope explicitly ruled out | Staff download PDF and deliver it; student receives a file, not system access |
-| AI-generated narrative text | LLM output for formal university/employer documents creates liability; staff must own tone and content; explicitly out of scope | Template sections with staff-authored prose |
-| Email delivery from within the system (send transcript directly to university) | Adds SMTP/API configuration, delivery tracking, bounce handling, security review; 3–8 staff can simply email the exported PDF themselves | Export PDF → staff email it |
-| Digital signature / QR verification codes on transcripts | Valuable for high-volume credential exchange (Parchment, Transcend); overkill for a school sending ~500 documents/year directly from known staff | School letterhead + staff name is sufficient for this scale and recipient type |
-| Payment processing for transcript requests | Not applicable — staff-initiated, no student-facing request flow, no fee model | Not needed |
-| SIS integration (SIMON, Compass, etc.) | Each SIS has a different API; mapping is fragile; data governance questions; explicitly out of scope for v1 | Manual entry or PDF upload extraction; revisit in v2 if demand validated |
-| Notification / reminder email system | 3–8 staff in the same office; internal coordination does not require in-system messaging; adds complexity and M365 mail integration | Staff communicate out-of-band |
-| Parent/guardian portal | Adds identity, consent, and privacy layer; not in the careers team's remit | Transcripts go to student, not parent, unless staff decide otherwise |
-| Attendance and discipline records | SIS domain, not careers team domain; inclusion bloats the record with data careers staff do not use | Keep focus on post-school destination data |
-| Analytics dashboards / cohort reporting | For 3–8 staff managing 200–600 students, a filtered list view is enough; dashboards add build time with low payoff | Sortable list with filters; defer reporting to v2+ if requested |
-| Multi-school / multi-campus support | Adds tenant isolation, billing, cross-school admin; explicitly out of scope | Single-school deployment only |
-| Bulk student import via CSV or SIS export | Creates data quality problems (mismatched fields, duplicates, missing year levels); manual entry is low-burden at this scale | Manual entry at enrolment; revisit if school size grows |
+Features that seem natural but conflict with v2.0 scope, school constraints, or the read-only share model.
+
+| Anti-Feature | Why Requested | Why Problematic | Alternative |
+|--------------|---------------|-----------------|-------------|
+| Upload/copy files into app storage (v1 DOC-01 model) | Familiar web-app pattern; staff have a stray PDF in email | Duplicates authoritative share; doubles storage; contradicts v2.0 milestone goal | Link from share only; staff save file to correct share folder, next scan picks it up |
+| Delete or replace files on share from app | Mistake correction; "wrong version uploaded" | One mis-click destroys authoritative school records; read-only is explicit safety decision | Staff delete/replace in File Explorer on share; rescan updates app metadata |
+| Expose raw UNC paths in browser UI or API responses | Power users want direct path | Security leak (server topology); browsers can't open UNC from web anyway; bypasses auth audit | Proxy download only; show sanitized relative path if needed |
+| Real-time filesystem watch (inotify/FSEvents on share) | Instant updates when file lands | SMB watch unreliable at scale; network churn; complex on Windows shares | Scheduled scan (nightly + admin trigger) — sufficient for 3–8 staff, low doc velocity |
+| Full share browser (navigate entire tree in app) | "Just let me browse the share" | Scope creep into generic file manager; permission model differs from student-scoped view; Glance/smb-browser is a different product | Student-scoped list + orphan queue only |
+| Automatic OCR / data extraction from share files (EXT-01..03) | Eliminate manual record entry | High complexity; varied PDF layouts; explicitly deferred in PROJECT.md | Manual record entry + evidence link to source PDF on share; revisit extraction later if pain validated |
+| Automatic evidence linking (AI guesses which award a cert belongs to) | Saves clicks | Wrong links on formal documents worse than no links; staff must own traceability | Staff-initiated link via picker UI; system suggests at most, never auto-commits |
+| Two-way sync (app metadata writes back to share) | Sidecar metadata files next to documents | Share becomes dependency of app writes; breaks other departments' folder conventions; backup/ACL complexity | Database is metadata source of truth; share holds bytes only |
+| Public or unauthenticated share links | Easy sharing with external recipients | Student data exposure; no audit trail; smb-browser-style anonymous links inappropriate for student records | Staff download via auth proxy, email PDF themselves (existing out-of-scope for SMTP) |
+| Student self-service document access | Students want portal | Explicitly out of scope; doubles auth/privacy surface | Staff deliver exported transcript PDF |
+| Version history stored in app | Track document revisions | Share may not have versioning; app doesn't own files; versioning belongs on file server or DMS | Show share `fileModifiedAt`; note "file changed on share" after rescan |
+| Replacing SIS / becoming full DMS | Centralise all school documents | OpenEduCat/DocumentLOK scope; careers team needs ~6 record types + evidence, not institution-wide ECM | Stay scoped to careers transcript workflow and one share root |
 
 ---
 
 ## Feature Dependencies
 
 ```
-Azure AD SSO
-  └─ All other features (nothing works without authentication)
+Microsoft Entra ID SSO (AUTH-01)
+  └─ All document API routes (JWT validation)
 
-Student Profile (create)
-  ├─ Academic Results (requires a student to attach to)
-  ├─ Extracurricular Activities
-  ├─ Awards / Achievements
-  ├─ Work Experience
-  ├─ Career Goals
-  ├─ Staff Notes
-  └─ PDF Document Uploads
-        └─ PDF Data Extraction
-              └─ Extraction Review + Edit by Staff
+Student Profile (STU-01, schoolStudentId)
+  ├─ Automated matching (anchor on schoolStudentId)
+  ├─ Per-student document list
+  └─ Evidence linking (record entries require student context)
 
-Transcript Template Definition
-  └─ Template Assembly (auto-populate from records)
-        └─ Transcript Status (draft / finalised)
-              └─ PDF Export
-                    └─ Transcript Version Archive
+Audit Logging (AUTH-03)
+  └─ Document view/download + link/unlink + scan trigger events
 
-Evidence Linking (PDF → Record)
-  └─ requires: PDF Document Uploads + at least one Record Type
+Share Folder Reconnaissance (Phase 0 / pre-discovery)
+  └─ shareLayout config (folder depth, naming patterns)
+        └─ Discovery Scan Job
+              ├─ LinkedDocument rows (DISCOVERED → LINKED | ORPHAN)
+              ├─ Stale detection (rescan)
+              └─ Unmatched files dashboard
 
-Multi-recipient Transcript Variants
-  └─ requires: Transcript Template Definition (variant templates)
+LinkedDocument (matched to student)
+  ├─ Student profile document list
+  ├─ Authenticated proxy open/download
+  └─ Evidence Linking (DocumentEvidence join)
+        └─ requires: Record entries (STU-03..06 awards, activities, work exp)
 
-School Branding Configuration
-  └─ requires: PDF Export (branding only surfaces in output)
+Record Type Entries (Phase 3)
+  └─ Evidence picker target entities (Award, Activity, WorkExperience, etc.)
 
-Record Completeness Indicators
-  └─ requires: Student Profile + at least two Record Types to be meaningful
+Evidence Linking
+  └─ enhances: Transcript assembly (staff verify claims against linked PDFs)
 
-Role-Based Access (Admin / Staff)
-  └─ requires: Azure AD SSO (roles assigned to Entra ID accounts)
-
-Audit Trail
-  └─ requires: Azure AD SSO (audit entries are attributed to authenticated users)
+Discovery Scan Job
+  └─ conflicts-with: v1 Upload Model (DOC-01..04) — v2 replaces upload path
 ```
+
+### Dependency Notes
+
+- **Matching requires Student.schoolStudentId:** The schema already defines `schoolStudentId String @unique` — matching rules should prefer this over fuzzy name match. Name-based fallback needs confidence scoring and staff review queue.
+- **Document list requires linked row, not live share read:** UI reads from PostgreSQL; share is consulted only on scan and on download stream — keeps profile page fast and works when share is briefly offline (show stale badge).
+- **Evidence linking requires both LinkedDocument and record entries:** Cannot attach evidence until Phase 3 record types exist; document discovery can ship earlier and stand alone.
+- **Proxy download requires service account ACL:** Deployment dependency — Windows service account with read access to share root; documented in runbook, not a code feature but a launch blocker.
+- **v2 document features supersede v1 DOC-* upload features:** Roadmap should swap Phase 4 from upload/storage to share linking; do not build both paths.
 
 ---
 
 ## MVP Definition
 
-### Launch With (v1)
+### Launch With (v2.0)
 
-Deliver the core value proposition: *a staff member opens a student record and produces a completed professional transcript PDF in a single session.*
+Minimum to validate: *staff open a student profile and see/share-linked documents from the file server, open them with auth, and attach one as evidence for a record entry.*
 
-**Access Control**
-- Azure AD SSO (MSAL / OAuth 2.0 PKCE)
-- Admin and Staff roles
-- Audit trail for all record changes
+**Pre-requisite (not optional)**
+- [ ] Share folder inspection and documented layout rules — gate before first scan
 
-**Student Records**
-- Student profile CRUD (name, year level, contact)
-- Academic results (subject, grade, year, notes)
-- Extracurricular activities (org, role, dates, hours, description)
-- Awards and achievements (title, issuer, date, level, description)
-- Work experience (employer, role, start/end dates, description)
-- Career interests and goals (structured interest areas + free-text)
-- Staff notes (timestamped, attributed)
+**Discovery & Matching**
+- [ ] Background discovery scan (scheduled + admin manual trigger)
+- [ ] Rule-based auto-match to student via `schoolStudentId` / folder / filename patterns
+- [ ] Orphan/unmatched queue with manual link to student
+- [ ] Stale file marking on rescan
 
-**PDF Handling**
-- PDF upload per student (multiple files)
-- Document listing, download, deletion
-- Document type tagging
-- PDF data extraction (OCR + layout analysis; handles varied formats)
-- Side-by-side extraction review and edit before committing to record
+**Student Profile Documents**
+- [ ] Document list on student profile (name, type inference, modified date, status)
+- [ ] Authenticated open/download via server proxy (read-only)
 
-**Transcript Generation**
-- Template with fillable narrative sections (per data type)
-- Auto-population of structured data from stored records
-- Draft / finalised status flag
-- PDF export with school branding (logo, header)
+**Evidence & Governance**
+- [ ] Staff attach linked document as evidence on a record entry (award, activity, work experience)
+- [ ] Evidence visible on record entry view
+- [ ] Audit log for document access and evidence link/unlink
+- [ ] Read-only enforcement — no write/delete to share from app
 
-**Search and Navigation**
-- Student list with search (name) and filter (year level, transcript status)
-- Cohort overview table
+### Add After Validation (v2.x)
 
-### Add After Validation (v1.x)
+- [ ] Match confidence UI and bulk review workflow for low-confidence links
+- [ ] Cohort-wide unmatched files dashboard with filters
+- [ ] Inline PDF preview in browser
+- [ ] Scoped rescan for single student folder
+- [ ] Manual document type override when inference wrong
+- [ ] Scan run history dashboard for admins
 
-Features with clear value but requiring validated usage patterns before building:
+### Future Consideration (v3+ / if validated)
 
-- **Evidence linking** — attach uploaded PDFs as evidence for specific record entries; validate that staff actually want this traceability before adding the UI cost
-- **Transcript version archive** — store prior generated PDFs per student; validate whether staff need to recall old versions or simply regenerate
-- **Record completeness indicators** — flag students with sparse records; validate whether careers staff want system-driven reminders or self-manage
-- **Bulk / cohort transcript generation** — queue-based generation for ATAR season; validate after first transcript season to confirm the one-by-one flow is the actual bottleneck
-- **Internal draft review** — "send for review" flag for two-staff sign-off on sensitive transcripts; validate whether team of 3–8 needs in-system workflow or handles this out-of-band
-
-### Future Consideration (v2+)
-
-- **Multi-recipient transcript variants** — separate university, employer, and student templates; only worth building once the single-template version has been used enough to surface what each recipient actually needs differently
-- **SIS integration** — data import from SIMON / Compass; defer until manual entry pain is confirmed and school IT is ready to negotiate API access
-- **Reporting and analytics** — cohort-level views, completion statistics; low priority for a team this size
-- **Custom template editor (staff-configurable)** — currently IT/admin configures the template; a visual editor for non-technical staff is high complexity for modest gain at this scale
-- **Bulk student import (CSV)** — only if school size grows or annual re-enrolment becomes a burden
+- [ ] OCR / structured extraction from share-linked PDFs (EXT-01..03) — high cost; only if manual entry pain persists
+- [ ] Content-hash deduplication across paths (same file copied to two folders)
+- [ ] Email notification when scan finds new unmatched files — small team may not need
+- [ ] SharePoint/OneDrive connector — school uses on-prem SMB; defer unless IT migrates share
 
 ---
 
 ## Feature Prioritization Matrix
 
-| Feature | Impact | Effort | Priority | Phase |
-|---------|--------|--------|----------|-------|
-| Azure AD SSO | Critical — gate | Med | Must-have | v1 |
-| Student profile CRUD | Critical — foundation | Low | Must-have | v1 |
-| Academic results entry | High | Low | Must-have | v1 |
-| Extracurriculars, awards, work exp, goals | High | Low (per type) | Must-have | v1 |
-| Staff notes | High | Low | Must-have | v1 |
-| PDF upload + storage | High | Low–Med | Must-have | v1 |
-| PDF data extraction (OCR) | High — key differentiator for data entry pain | High | Must-have | v1 |
-| Extraction review UI | High — extraction without review is dangerous | Med | Must-have | v1 |
-| Template assembly + PDF export | Critical — core output | Med–High | Must-have | v1 |
-| School branding in PDF | Med | Low–Med | Must-have | v1 |
-| Search and filter | High — 200–600 students | Low | Must-have | v1 |
-| Audit trail | Med (governance) | Low | Must-have | v1 |
-| Role-based access | Med | Low | Must-have | v1 |
-| Draft / finalised status | Med | Low | Must-have | v1 |
-| Document type tagging | Med | Low | Must-have | v1 |
-| Evidence linking | Med | Low–Med | v1.x | After validation |
-| Transcript version archive | Med | Low | v1.x | After validation |
-| Record completeness indicators | Med | Low | v1.x | After validation |
-| Bulk transcript generation | Med | Med | v1.x | After ATAR season |
-| Internal draft review workflow | Low–Med | Low | v1.x | After validation |
-| Multi-recipient template variants | Med | Med | v2 | After usage data |
-| SIS integration | Med | High | v2 | After manual entry pain validated |
-| Reporting / analytics | Low | Med | v2 | Small team; low ROI |
-| Custom template editor | Low | High | v2 | Complexity vs benefit |
-| Bulk student CSV import | Low | Med | v2 | Only if enrolment burden confirmed |
+| Feature | User Value | Implementation Cost | Priority |
+|---------|------------|----------------------|----------|
+| Share folder reconnaissance + layout doc | Critical — blocker | Low | P0 |
+| Discovery scan job | Critical | Medium | P1 |
+| Auto-match to student (schoolStudentId rules) | Critical | Medium | P1 |
+| Student profile document list | Critical | Low | P1 |
+| Auth proxy open/download | Critical | Medium | P1 |
+| Read-only share enforcement | Critical (safety) | Low | P1 |
+| Manual link/unlink override | High | Low | P1 |
+| Orphan queue (basic) | High | Medium | P1 |
+| Stale detection on rescan | High | Low–Medium | P1 |
+| Evidence linking to record entries | High — core value | Medium | P1 |
+| Document type inference | Medium | Low–Medium | P2 |
+| Audit log for doc access | Medium (governance) | Low | P2 |
+| Match confidence display | Medium | Low | P2 |
+| Unmatched files dashboard (cohort) | Medium | Medium | P2 |
+| Scan run history (admin) | Medium | Low | P2 |
+| Inline PDF preview | Medium | Medium | P3 |
+| Per-student scoped rescan | Low–Medium | Medium | P3 |
+| OCR/extraction from share files | High (long-term) | High | Deferred |
+
+**Priority key:**
+- P0: Prerequisite before any code
+- P1: Must have for v2.0 launch
+- P2: Should have soon after launch
+- P3: Nice to have
+
+---
+
+## Competitor Feature Analysis
+
+How enterprise/school document systems handle the same problem — and how SPCS v2.0 differs.
+
+| Feature | DocumentLOK (SIS plugin) | OpenEduCat DMS | Generic ECM (SharePoint/Dokmee) | SPCS v2.0 Approach |
+|---------|--------------------------|----------------|-----------------------------------|---------------------|
+| Document source | Central DMS repository; import from shares | Central store; migration from file servers | Central store; automated indexing (OCR/AI) | **Share remains authoritative**; app holds references only |
+| Student association | Index/burst by student ID; embedded in SIS | Attach docs to student profile | Metadata tags + folder hierarchy | Auto-discovery + rule match on `schoolStudentId`; manual override |
+| Auto-filing | IdentiFile: burst mass PDFs into student folders | Bulk import preserving folder structure | AI indexing from content | Folder/filename rules from documented share layout — no content OCR at launch |
+| Evidence linking | Query completeness ("which docs missing") | Attach to student profile | Link to requirements/assets (DBOMS pattern) | Link share doc → specific award/activity/work record entry |
+| Access model | Role-based inside SIS | Role-based DMS permissions | ECM governance + audit | Entra SSO + app proxy stream; read-only SMB service account |
+| Write-back to files | DMS owns writes | DMS owns writes | ECM owns versioning | **Read-only** — staff edit share directly |
+| Completeness reporting | Built-in missing-doc queries | Category/folder views | Compliance dashboards | Defer — STU-09 completeness is record entries, not share docs |
+
+**Positioning:** SPCS v2.0 is not a DMS replacement. It is a **thin linking layer** that connects an existing SMB share to the transcript workflow — closer to DocumentLOK's "access from within the system" embed pattern than to OpenEduCat's full central repository, but without copying files.
 
 ---
 
 ## Sources
 
-- Research synthesis from: Parchment credential management platform, Transcend records management, SchoolPoint (Ontario private schools), Rediker AdminPlus e-portfolios, Symplicity CSM career services, OpenEduCat transcript system, ampEducator SIS, CoreCampus advising software, Prentus advisor suite, Evocos evidence portfolio tool
-- Common App Activities section data model (field structure for extracurriculars) — collegetransitions.com, orieladmissions.com
-- University application activities résumé expectations — collegesofdistinction.com, ucps.k12.nc.us
-- Anti-feature rationale derived from project constraints (PROJECT.md) and domain scale analysis (200–600 students, 3–8 staff, on-premise, single school)
+- [OpenEduCat DMS — student file organization, share migration](https://newdocs.openeducat.org/features/advanced/documents/) — HIGH confidence (official product docs)
+- [DocumentLOK — IdentiFile auto-indexing, SIS-embedded access, completeness queries](https://www.documentlok.com/) — MEDIUM confidence (vendor marketing; patterns confirmed across school DMS category)
+- [DBOMS evidence linking — master file linked to multiple records](https://dboms.com/solutions/evidence-linking) — MEDIUM confidence (compliance DMS; linking pattern transferable)
+- [Dokmee — automated document indexing via folder + metadata](https://www.dokmee.com/blog/document-indexing) — MEDIUM confidence
+- [Microsoft Learn — SMB file sharing overview](https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-smb-overview) — HIGH confidence (official)
+- [DEV — database as source of truth, files as assets pattern](https://dev.to/mehartung/keep-your-source-of-truth-in-the-database-not-in-files-a-pattern-for-document-heavy-apps-546g) — MEDIUM confidence (architecture pattern)
+- Project context: `.planning/PROJECT.md`, `.planning/REQUIREMENTS.md`, `.planning/research/ARCHITECTURE.md` — HIGH confidence (project-specific)
+- Prisma schema: `Student.schoolStudentId`, auth/audit models — HIGH confidence (codebase)
+
+---
+*Feature research for: SPCS v2.0 Network Document Linking*
+*Researched: 2026-06-16*

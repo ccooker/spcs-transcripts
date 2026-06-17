@@ -1,366 +1,402 @@
 # Pitfalls Research
 
-**Domain:** School careers transcript web app
-**Researched:** 2026-06-11
-**Confidence:** HIGH (Azure AD, file security, PDF generation) / MEDIUM (PDF extraction, on-premise ops)
+**Domain:** Adding SMB network-share document discovery and linking to an existing Node.js school records web app (v2.0 milestone)
+**Researched:** 2026-06-16
+**Confidence:** HIGH (Windows SMB service identity, browser UNC restrictions, path traversal) / MEDIUM (SPCS share layout unknown — matching pitfalls validated against school DMS patterns, not this specific share)
 
 ---
 
 ## Critical Pitfalls
 
-### Pitfall 1: PDF Extraction Over-Promise
+### Pitfall 1: Discovery Before Share Layout Is Documented
 
-**What goes wrong:** The system is built with an assumption that automated data extraction from uploaded school documents (report cards, award letters, certificates) will reliably produce structured, usable data. In practice, school documents vary enormously: report cards use different grid layouts per school year, certificates have varied typography, award letters are free-text. Naive extractors produce garbled or empty output. Staff lose trust in the feature and stop using it.
+**What goes wrong:**
+The team runs an auto-discovery scan against `\\spcs-fs\Private\Administration\Office\Student` before anyone has walked the folder tree with careers staff. Matching rules are guessed (e.g. "folder name = student name") but the share uses student IDs, year-level groupings, or inconsistent legacy naming. Hundreds of files link to wrong students or land in `ORPHAN` status. Staff lose trust in the feature and revert to File Explorer.
 
-**Why it happens:** PDF is a visual presentation format, not a data format. There is no semantic layer — text rendering order may bear no relationship to reading order. Tables without visible borders become invisible to rule-based parsers. Scanned documents (common for older certificates) have no selectable text at all. Developers test against one or two sample documents, which happen to work, and ship confident the feature is solid.
+**Why it happens:**
+Developers treat the share as a clean API with a predictable schema. School shares accumulate years of manual filing — mixed conventions, duplicate names, archived cohort folders, and non-student administrative files in the same tree. PROJECT.md explicitly gates discovery on documented layout; teams skip reconnaissance because "we'll figure it out from the scan output."
 
 **How to avoid:**
-- Explicitly distinguish between digital-native PDFs and scanned images in the extraction pipeline; scanned documents require OCR before any extraction attempt.
-- Use magic-byte detection (`%PDF` header) plus heuristics to classify documents before attempting extraction.
-- Treat all extraction results as **suggestions requiring staff review**, never as authoritative data. Build a "review and accept" UI, not a silent auto-fill.
-- Set staff expectations clearly in the UI: "We've found what looks like grades — please check before saving."
-- Design the feature so that extraction failure gracefully falls back to manual entry, without losing the uploaded document.
+- Phase 6 must produce a written layout spec: folder depth, naming patterns, file types, edge cases (twins, hyphenated names, preferred names vs legal names).
+- Derive matching rules from real samples — not assumptions. Primary key should be `Student.schoolStudentId` if the share uses IDs; name-based rules are secondary and low-confidence only.
+- Run a **read-only recon script** that outputs statistics (folder count, naming pattern frequency, unmatched samples) before any production linking.
+- Get careers staff sign-off on matching rules before the first auto-link commit.
 
-**Warning signs:** "It works on the samples we tested"; extraction UI auto-saves without a review step; no handling for scanned PDFs; extraction triggered synchronously on the HTTP request thread.
+**Warning signs:**
+- Matching logic hardcoded before anyone has opened the share on a staff PC; no `shareLayout` config file; first scan links >10% of files to the same student; staff say "that's not how our folders work."
 
-**Phase to address:** PDF Upload & Extraction phase. Must be designed with the review/fallback workflow from day one — it cannot be bolted on after.
+**Phase to address:**
+Phase 6 — Share Reconnaissance & Matching Rules
 
 ---
 
-### Pitfall 2: Azure AD Tenant Consent Block
+### Pitfall 2: PM2 / LocalSystem Cannot See the Network Share
 
-**What goes wrong:** Development and testing work fine against the developer's Azure tenant, but when the app is deployed to the school's M365 tenant, staff cannot log in. The error is `AADSTS65001` (consent required) or `AADSTS650056` (misconfigured application). School IT administrators must explicitly grant tenant-wide admin consent for the application's permissions — this step is frequently missed, causing a go-live failure.
+**What goes wrong:**
+Discovery works when a developer runs Node from an interactive terminal (logged-in user has share access) but fails in production under PM2 with `ENOENT`, `EACCES`, or `UNKNOWN` on `\\spcs-fs\...`. The app ships; document lists are empty; logs show intermittent access denied.
 
-**Why it happens:** Education tenants (M365 EDU licensing) commonly have user consent disabled at the tenant level, meaning no individual user can consent to an app's permissions on their own behalf — only a Global Administrator can. This is intentional school policy to prevent staff installing unapproved apps. The app registration and code may be correct; the deployment simply requires an admin consent step that is undocumented.
+**Why it happens:**
+Windows services and PM2 processes often run as `LocalSystem` or a user without share ACLs. Mapped drive letters (`S:\Student`) exist only in the interactive desktop session — invisible to background services. Node.js uses the **process identity's** credentials for UNC access; there is no built-in API to pass username/password per `fs.readFile` call.
 
 **How to avoid:**
-- Document the **admin consent URL** as a required deployment step: `https://login.microsoftonline.com/{tenant-id}/adminconsent?client_id={app-id}`. This must be opened by a Global Administrator of the school's Azure tenant.
-- Request only the minimal permissions needed (`openid`, `profile`, `email`, `User.Read`) — the fewer permissions, the easier consent approval.
-- Include tenant-specific configuration (Tenant ID, Client ID) in environment variables, not hardcoded.
-- Test against a trial M365 EDU tenant, not a personal developer tenant — they have different consent policies.
+- Create a dedicated AD service account (e.g. `svc-spcs-transcripts`) with **read-only** share + NTFS permissions on the target path.
+- Configure PM2 / Windows Service to run as that account — not `LocalSystem`, not the developer's personal account.
+- Use full UNC paths (`\\spcs-fs\Private\...`) — never mapped drive letters in code or config.
+- Smoke test from the **same account PM2 uses**: `fs.readdirSync(process.env.SHARE_ROOT)` in a startup health check.
+- Document credential setup in the deployment runbook; school IT provisions the account before go-live.
 
-**Warning signs:** Tested only against a personal Azure subscription; redirect URIs registered only for `localhost`; no deployment runbook for school IT.
+**Warning signs:**
+- "Works on my machine" but fails after IIS/PM2 deploy; code references `Z:` or `S:` drive; PM2 logon shows `Local System`; share access tested only from RDP as admin.
 
-**Phase to address:** Auth phase — admin consent workflow must be documented and tested as a deployment prerequisite.
+**Phase to address:**
+Phase 7 — SMB Service Identity & Share Access
 
 ---
 
-### Pitfall 3: MSAL Token Lifecycle Mishandled
+### Pitfall 3: Exposing UNC Paths or Open Redirects in the Document Proxy
 
-**What goes wrong:** Staff are logged in but after ~1 hour of inactivity they start receiving errors when saving data or generating transcripts. The app fails silently, or worse, loses unsaved form data when it redirects to a login screen mid-session. In some configurations (particularly Safari or browsers with third-party cookie restrictions), SSO silent refresh fails entirely.
+**What goes wrong:**
+API responses include `\\spcs-fs\Private\...` paths; staff bookmark or share them; attackers enumerate server topology. Worse: the download endpoint accepts a `path` query parameter and streams any file the service account can read — classic path traversal (`..\..\..\Windows\...`) or lateral movement across the share.
 
-**Why it happens:** Access tokens expire (typically 60–75 minutes). Applications that skip the silent-first acquisition pattern (`acquireTokenSilent` → fallback to interactive) call interactive flows immediately on every API request, causing disruptive redirect flows. Multiple `PublicClientApplication` instances cause cache corruption and race conditions. Concurrent interactive requests fail with `interaction_in_progress` errors that surface as cryptic UI errors.
+**Why it happens:**
+Teams conflate "staff already have share access in Explorer" with "it's fine to leak paths in the API." Browsers cannot reliably open `file://` or UNC links from HTTPS pages anyway, so raw paths fail UX while still leaking infrastructure. Proxy endpoints built quickly often take client-supplied paths instead of opaque document IDs.
 
 **How to avoid:**
-- Always follow the MSAL pattern: `acquireTokenSilent` first; only fall back to `loginRedirect`/`loginPopup` on `InteractionRequiredAuthError`.
-- Create exactly **one** `PublicClientApplication` instance across the entire app lifecycle.
-- Do not store tokens in `localStorage` (XSS risk) — use MSAL's built-in session storage cache.
-- Handle `interaction_in_progress` errors gracefully — check for an in-flight interaction before starting a new one.
-- Test explicitly against Safari; iframe-based silent refresh fails when third-party cookies are blocked. Use `ssoSilent` with `login_hint` as the fallback.
-- Attach the access token to every API request via an HTTP interceptor/middleware layer, not ad-hoc per endpoint.
+- Store only **normalized relative paths** server-side; never return absolute UNC to the client.
+- Document open flow: `GET /api/documents/:id/content` resolves `LinkedDocument.id` → validated relative path → stream.
+- Implement `resolveSafePath(relativePath)`: reject `..`, absolute paths, alternate separators; verify resolved path stays under `SHARE_ROOT`.
+- Log document views/downloads in `AuditLog` with acting user and document ID — not full path in client-visible errors.
+- Set `Content-Disposition: attachment` or `inline` with sanitized filename; no redirect to `file://` URLs.
 
-**Warning signs:** Token acquisition in each component separately; no error boundary around `InteractionRequiredAuthError`; tokens stored in `localStorage`; no testing on Safari.
+**Warning signs:**
+- JSON includes `sharePath` or `uncPath` fields; download route accepts `?path=` parameter; error messages echo full filesystem paths; no audit entries for document access.
 
-**Phase to address:** Auth phase. Token handling must be centralised before any protected API endpoints are built.
+**Phase to address:**
+Phase 9 — Auth Proxy & Document UI
 
 ---
 
-### Pitfall 4: Insecure Direct Object Reference on Student Records
+### Pitfall 4: Aggressive Fuzzy Name Matching Without Disambiguation
 
-**What goes wrong:** Staff can access any student's record by guessing or incrementing the ID in the URL (`/students/123`, `/students/124`). Since all staff share the same role ("careers staff"), this may not be caught during testing — everyone who can log in should see all students. But if a guest account, a substitute teacher, or an erroneously provisioned account gains access, they can enumerate every student record.
+**What goes wrong:**
+Auto-matcher links `Smith_John_Report.pdf` to the wrong John Smith (two students share a common surname and first name). Staff attach evidence to incorrect records; transcript errors reach universities. Low-confidence matches look identical to high-confidence matches in the UI.
 
-**Why it happens:** Sequential integer primary keys exposed in URLs are the default in most frameworks. Authorization is checked at login but not per-resource. The small user base (3–8 staff) creates false confidence that there's no exposure.
+**Why it happens:**
+Folder-per-student layouts are not guaranteed. Filename token matching feels like a quick win. Fuzzy libraries (`token_set_ratio`, Levenshtein) score "Jon Smith" and "John Smith" highly but cannot distinguish homonyms without a secondary key (student ID, year level, date of birth).
 
 **How to avoid:**
-- Use UUIDs (not sequential integers) as public-facing student identifiers in URLs and APIs.
-- Enforce server-side authorization on every data endpoint — not just at the route level but in the data access layer: every query should scope to records the current user is permitted to see.
-- Treat the student list as the authorisation boundary: if a user can see the student list, they can see individual records. This is correct for this app, but it must be enforced consistently.
-- Never expose internal database PKs in URLs, API responses, or browser history.
+- Match priority order: (1) exact `schoolStudentId` in folder name or filename, (2) exact normalized full name in dedicated folder, (3) fuzzy name — **never auto-link**, flag for manual review only.
+- Persist `matchRule` and `matchConfidence` on every `LinkedDocument`; surface "Needs review" vs "Auto-linked (ID match)" in UI.
+- Block auto-link when multiple students score above threshold — force orphan queue resolution.
+- Normalize names consistently: lowercase, collapse whitespace, strip punctuation except hyphen/apostrophe, handle "Surname, Firstname" vs "Firstname Surname" folder patterns.
 
-**Warning signs:** URLs like `/api/students/1`, `/api/students/2`; authorization only checked on the login route; no middleware that validates resource ownership per request.
+**Warning signs:**
+- Single fuzzy threshold auto-assigns without human gate; no duplicate-name test cases; twins or same-surname cohort not discussed with staff; match confidence not stored.
 
-**Phase to address:** Student record management phase. Apply from the first API endpoint, never retrofit.
+**Phase to address:**
+Phase 6 (rules design) and Phase 8 (matching engine)
 
 ---
 
-### Pitfall 5: No Immutable Audit Trail
+### Pitfall 5: Synchronous Full-Share Scan Inside HTTP Request
 
-**What goes wrong:** A student disputes the contents of their transcript. A parent asks who added a particular note. A staff member leaves and their changes cannot be traced. There is no record of who changed what, or when.
+**What goes wrong:**
+Admin clicks "Scan now"; IIS/Express walks the entire share tree synchronously; request times out at 120 seconds; partial DB state; other staff requests hang; PM2 marks process unhealthy.
 
-**Why it happens:** Audit logging feels like a "we'll add it later" feature. It requires thought about what constitutes a loggable event, who the actor is, and how to store logs in a tamper-evident way. Development teams ship the happy path first and never return.
+**Why it happens:**
+Simplest implementation: `POST /scan` → `fs.readdir` recursive → return 200. Works on a dev folder with 50 files; fails on a school share with thousands of files and high SMB latency (each directory listing is a network round-trip).
 
 **How to avoid:**
-- Log every create/update/delete of student data records with: timestamp, actor (user ID + display name from Azure AD), record type, record ID, and a before/after snapshot (for updates).
-- Store audit logs in a separate table that application code **cannot update or delete** — only append.
-- Log document uploads and PDF exports: who uploaded what, and who generated which transcript for which student.
-- Expose a read-only audit log view in the admin section.
-- This is a legal/governance requirement for student records in most jurisdictions, not a nice-to-have.
+- Separate **worker process** (second PM2 entry) for discovery — same service account, not the HTTP thread pool.
+- `POST /api/admin/scans` enqueues job, returns `202 { scanRunId }`; UI polls status.
+- Use streaming enumeration (`fs.readdir` with `{ withFileTypes: true }`, async iteration) — never load entire tree into memory.
+- Schedule scans off-peak (nightly cron); admin trigger for urgent rescan.
+- Record `ShareScanRun` with counts, duration, errors — operational visibility.
 
-**Warning signs:** No `created_by`/`updated_by` columns; no audit log table in the schema; audit log added as a TODO comment.
+**Warning signs:**
+- Scan endpoint blocks until complete; no `ShareScanRun` model; scan triggered on every page load; Express event loop lag during scan.
 
-**Phase to address:** Student record management phase — must be in the schema from day one. Retrofitting audit trails requires re-examining every write path.
+**Phase to address:**
+Phase 8 — Discovery Engine & Link Persistence
 
 ---
 
-### Pitfall 6: PDF Upload Security Failures
+### Pitfall 6: Copying Share Files into App Upload Storage
 
-**What goes wrong:** An uploaded "PDF" is actually a PHP script, an HTML file with embedded JavaScript, or a ZIP bomb. Files are stored with their original filename, enabling path traversal. Uploaded files are served directly from the web root, making them executable by the server.
+**What goes wrong:**
+Discovery downloads each file to `/uploads/` "for reliability." Storage doubles; staff edit the share copy but the app serves stale local copies; v2.0 goal (authoritative share, path references only) is undermined. Backup scope expands unexpectedly.
 
-**Why it happens:** "It's a school, who's going to attack it?" — the threat model ignores student-facing systems (even though students don't use this app directly, staff may accidentally open a malicious file they received via email and re-upload it). MIME type validation trusts the browser's `Content-Type` header, which is trivially spoofed.
+**Why it happens:**
+v1 Phase 4 designed around local upload storage. Developers extend the existing `documents` table and upload pipeline rather than introducing `LinkedDocument` with path references. Offline-access anxiety pushes toward local copies.
 
 **How to avoid:**
-- Validate files by **magic bytes** (`%PDF` header = `25 50 44 46`) on the server, not by file extension or `Content-Type`.
-- Rename every uploaded file to a UUID on storage — never preserve the original filename on disk.
-- Store uploaded files **outside the web root** in a directory the web server cannot serve directly. Serve files via a dedicated controller endpoint that streams the file with appropriate headers (`Content-Disposition: attachment`).
-- Enforce a maximum file size (e.g., 20 MB) to prevent denial-of-service via large uploads.
-- Set a strict `Content-Security-Policy` header so that even if a malicious HTML file is somehow served, it cannot run scripts.
-- Consider scanning uploads with ClamAV (installable on-premise, free) for known malware signatures.
+- DB stores metadata + normalized relative path only — no binary column, no local copy.
+- Proxy reads live from share at open time; handle missing file gracefully (`410 Gone` + "file removed from share" UI).
+- Explicitly deprecate v1 upload endpoints for v2 milestone — migration plan for any existing uploaded docs, separate from share links.
+- Mark stale links when rescan finds path absent — do not retain ghost binaries locally.
 
-**Warning signs:** Files stored in `public/uploads/`; original filenames preserved on disk; file size limit not enforced; no magic-byte validation.
+**Warning signs:**
+- Discovery job includes `fs.copyFile`; `stored_path` points to `/uploads/`; disk usage grows with share size; mtime on app copy diverges from share.
 
-**Phase to address:** PDF Upload & Extraction phase.
+**Phase to address:**
+Phase 8 (discovery) and Phase 10 (v1 migration)
 
 ---
 
-### Pitfall 7: Transcript PDF Page Break Failures
+### Pitfall 7: Matching Before Student Directory Is Populated
 
-**What goes wrong:** Generated transcripts look correct in browser preview but the PDF has student names split across pages, sections bisected mid-sentence, tables that span pages incorrectly, or blank pages in the middle. Staff discover this after sending the transcript to a university.
+**What goes wrong:**
+First production scan runs when only 20 test students exist in the DB but the share holds files for 400 students. Everything unmatched goes to orphan queue at once; staff overwhelmed; they conclude discovery is broken.
 
-**Why it happens:** HTML-to-PDF rendering (Puppeteer/headless Chromium, or wkhtmltopdf) does not handle CSS page breaks reliably. `page-break-inside: avoid` is deprecated and inconsistently supported. `overflow: auto` on parent elements silently disables `break-inside: avoid` on children. wkhtmltopdf uses a stale WebKit engine that does not support modern CSS Flexbox/Grid layouts correctly.
+**Why it happens:**
+Discovery is built and tested before Phase 2 student import completes. Demo environment has sparse data; production share is full.
 
 **How to avoid:**
-- Use Puppeteer (headless Chromium) over wkhtmltopdf — wkhtmltopdf is effectively end-of-life and does not support modern CSS.
-- Use `break-inside: avoid` (not the deprecated `page-break-inside`) on every logical section of the transcript.
-- Avoid `overflow: auto` or `overflow: hidden` on any container that wraps content you want to keep on one page.
-- Embed fonts as base64 data URIs in the HTML template — do not reference external font URLs that may not be reachable at render time.
-- Use `waitUntil: 'load'` when rendering with Puppeteer, not `networkidle` (which hangs if any asset fails to load).
-- Test PDF output explicitly: generate with real data including very long extracurricular lists, many awards, and long narrative text.
-- Reuse a single Chromium instance (singleton) across renders; don't spawn a new browser per request.
+- Gate first full auto-match on student directory completeness check (count threshold or staff confirmation).
+- Support **re-match only** job: re-run matching rules against existing `LinkedDocument` rows when students are bulk-imported — no full tree walk required.
+- Show scan stats: "412 files seen, 380 unmatched — 350 students not in system" to set expectations.
 
-**Warning signs:** Using wkhtmltopdf; page breaks not explicitly tested; template only tested with short sample data; fonts loaded from external CDN URLs.
+**Warning signs:**
+- Orphan count ≈ file count after first scan; no re-match command; student import scheduled after discovery go-live.
 
-**Phase to address:** Transcript Assembly & Export phase.
+**Phase to address:**
+Phase 8 — Discovery Engine (depends on Phase 2 student data)
 
 ---
 
-### Pitfall 8: On-Premise Deployment "Works on My Machine" Failure
+### Pitfall 8: No Stale / Missing File Handling on Rescan
 
-**What goes wrong:** The application runs fine in development and on a cloud VM, but fails when deployed to the school's Windows Server because: the school uses IIS as a reverse proxy (causing 500.52 errors from compressed responses); the server has no internet access so npm/pip dependencies cannot be fetched at runtime; the SSL certificate is self-signed and the browser rejects it; file paths are hardcoded to the developer's machine structure; the Node.js / Python runtime is not installed on the server.
+**What goes wrong:**
+Staff delete or rename files on the share; app still lists old documents; open/download fails with opaque 500 errors; staff cannot tell whether the app or the share is wrong.
 
-**Why it happens:** Development environments are developer laptops with internet access. On-premise school servers are hardened, managed by IT, may have Group Policy restrictions, and may be air-gapped from the internet. The deployment process is not designed for this environment.
+**Why it happens:**
+Discovery only inserts new rows — never marks removed paths. Open handler throws raw `ENOENT` without updating link status.
 
 **How to avoid:**
-- Bundle all runtime dependencies into the deployment package — no `npm install` at deploy time. Use a build step that produces a self-contained artifact.
-- All file paths (upload storage directory, database connection strings, PDF output path) must be **environment variables**, not hardcoded.
-- Document IIS ARR configuration explicitly: disable `Accept-Encoding` forwarding from IIS to the backend to prevent 500.52 compression errors; configure `preserveHostHeader`.
-- Plan for an internal TLS certificate issued by the school's AD Certificate Services (not Let's Encrypt, which requires internet validation). Document this in the deployment guide.
-- Provide a Docker-based deployment option as an alternative to IIS if the school IT team prefers it.
-- Create a deployment checklist that the school IT admin can follow without developer involvement.
+- Each scan assigns `lastSeenScanId`; paths not seen in latest scan → status `STALE`.
+- Open handler: if file missing, update status, return structured error, log audit event.
+- UI badge: "Removed from share" / "Path changed — rescan pending."
+- Optional: detect mtime/size change for "Updated on share" indicator without re-upload.
 
-**Warning signs:** No deployment runbook; connection strings in code; no environment variable documentation; tested only on developer machine.
+**Warning signs:**
+- Deleted share files still appear as linkable; no `STALE` status; rescan is insert-only; open errors are generic 500.
 
-**Phase to address:** Infrastructure/Deployment phase — must be designed before any feature phases begin.
+**Phase to address:**
+Phase 8 — Discovery Engine & Link Persistence
 
 ---
 
-### Pitfall 9: Data Sent to Cloud Services Without Consent
+### Pitfall 9: IDOR on Document Endpoints
 
-**What goes wrong:** The PDF extraction library or an analytics/error tracking tool sends student document content or identifiable student data (names, grades) to a third-party cloud service. This violates the school's data residency requirement ("no data may be stored in third-party cloud services") and potentially breaches local privacy legislation.
+**What goes wrong:**
+Any authenticated staff member accesses any document by guessing `LinkedDocument` UUID, even for students they should not see (or in a future role model, restricted records). Document proxy becomes a read gateway to the entire share tree if IDs are enumerable.
 
-**Why it happens:** Developers reach for the most capable extraction tool (e.g., a cloud OCR API, a SaaS PDF parser, a hosted error tracking service like Sentry with full payload logging) without realising that student data is passing through it. Application error logs that capture request payloads may also contain student names.
+**Why it happens:**
+Authorization stops at "valid JWT" without verifying the document belongs to a student the user may access. UUIDs are not secret — they're opaque identifiers, not access controls.
 
 **How to avoid:**
-- Audit every dependency and service: does it transmit data off the school network? Cloud OCR APIs, analytics SDKs, crash reporting tools, CDN font loading — all are potential leakage points.
-- PDF extraction must use only libraries that run on-premise: Apache Tika, pdfplumber, pdf-parse, or equivalent self-hosted tools.
-- If error tracking is used, configure it to scrub PII from payloads before transmission, or use a self-hosted instance.
-- Application logs must not include student names, IDs, or document content — use opaque record IDs in log statements.
-- Include a data flow diagram in the design documentation that shows every network boundary data crosses.
+- Every document route: load `LinkedDocument` → verify `studentId` → apply same authorization as `GET /api/students/:id`.
+- Reject documents with null `studentId` (orphans) for non-admin roles.
+- Admin orphan queue uses separate `/api/admin/orphans` routes with `requireRole('Admin')`.
+- Never use sequential IDs for documents.
 
-**Warning signs:** PDF extraction sending files to a cloud API; Sentry/Datadog with full request logging; Google Fonts CDN (technically off-premises); no data flow audit.
+**Warning signs:**
+- Document route only checks JWT; no `studentId` join in authorization middleware; orphan files downloadable by any staff.
 
-**Phase to address:** Architecture/Infrastructure design phase. Review again before each feature that touches student data.
+**Phase to address:**
+Phase 9 — Auth Proxy & Document UI
+
+---
+
+### Pitfall 10: Write Access to the Share "For Convenience"
+
+**What goes wrong:**
+A "replace document" or "rename on share" feature is added to fix staff mistakes. A bug or bad deploy deletes or overwrites authoritative school files. Recovery requires backup restore and careers team downtime.
+
+**Why it happens:**
+Staff ask to fix filenames from the app; developers add SMB write operations to reduce support burden. v2.0 read-only constraint is treated as temporary.
+
+**How to avoid:**
+- Service account: read-only ACL at share and NTFS level — physically cannot write even if code tries.
+- No write SMB APIs in codebase; code review gate for `fs.writeFile`, `fs.unlink`, `fs.rename` on share paths.
+- Staff workflow: fix files in Explorer → trigger rescan. Document this in staff training.
+
+**Warning signs:**
+- Service account in `Domain Admins`; write methods in `shareAccess` service; "upload to share" feature request accepted into v2 scope.
+
+**Phase to address:**
+Phase 7 — SMB Service Identity (ACL design)
 
 ---
 
 ## Technical Debt Patterns
 
-### Monolithic Student Record Table
-Putting all student data in a single wide table makes it impossible to apply granular access controls, retention policies, or encryption at column level. When a new category is needed (e.g. counsellor notes requiring stricter access than general career goals), there is nowhere clean to put it. **Prevention:** Segment by category from the start: separate tables for academic results, extracurriculars, awards, work experience, documents, notes.
+Shortcuts that seem reasonable when adding share linking but create long-term problems.
 
-### Hard-Coded Curriculum Assumptions
-Building in assumptions about specific subject names, year-level labels ("Year 10", "VCE", "HSC"), or grade formats (A–E, percentage, %) makes the system fragile when the school changes curriculum or the system is used by another school. **Prevention:** Store subject names, grade scales, and year levels as configurable reference data, not enum values in code.
-
-### Template Versioning Ignored
-If the transcript template is modified after transcripts have been generated, previously generated transcripts cannot be reproduced exactly. Staff expect that regenerating a transcript for an old student produces the same document. **Prevention:** Store a version identifier with each generated transcript and archive template versions. Consider storing the rendered HTML alongside the PDF.
-
-### Extraction "Best Effort" Accepted as Ground Truth
-Automatically saving extraction results without human confirmation creates a data quality debt that compounds over time. By the time staff notice inaccuracies, dozens of records are wrong. **Prevention:** All extracted data must go through a review-and-confirm step before being committed to the student record.
-
-### Missing Soft Delete
-Hard-deleting student records, uploaded documents, or transcript drafts removes data that may be needed for compliance, audit, or dispute resolution. **Prevention:** Implement soft delete (`deleted_at` timestamp) from day one. Expose a separate "archive" action in the UI.
+| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
+|----------|-------------------|----------------|-----------------|
+| Hardcode matching rules in TypeScript | Faster first scan | Every layout change requires deploy | Never — use config derived from Phase 6 recon |
+| Store absolute UNC in DB | Simpler open handler | Breaks if share moves or server renamed | Never — normalized relative path + env `SHARE_ROOT` |
+| `net use` with password in startup script | Quick credential fix | Password rotation pain; secrets in config; unreliable in services | Never in production — AD service account logon |
+| Reuse v1 `documents` table for share links | Less schema work | Mixes upload metadata with share paths; confuses soft-delete semantics | Never — separate `LinkedDocument` model |
+| Skip orphan queue — show all files on admin page | One less UI | Unmatched files invisible; staff can't fix misfiled docs | Never at 200–600 students |
+| Full tree scan on every student profile open | "Always fresh" list | Share latency kills page load | Never — scan on schedule + manual trigger |
+| Client-side PDF fetch without auth header | Simpler `<a href>` | Token not sent; 401 or open redirect hacks | Never — `apiFetch` → blob → object URL |
+| Fuzzy auto-link for all unmatched files | Higher link rate | Wrong-student evidence on formal transcripts | Never for production — manual review only |
 
 ---
 
 ## Integration Gotchas
 
+Common mistakes when connecting the existing Express + MSAL app to the SMB share.
+
 | Integration | Common Mistake | Correct Approach |
-|-------------|---------------|-----------------|
-| Azure AD / MSAL | Creating multiple `PublicClientApplication` instances | Create exactly one instance, share it across the app via a singleton/context |
-| Azure AD / MSAL | Calling `loginRedirect` directly without trying `acquireTokenSilent` first | Always: `acquireTokenSilent` → catch `InteractionRequiredAuthError` → then interactive |
-| Azure AD / MSAL | Redirect URI registered only for `localhost` | Register all deployment URIs (dev, staging, prod internal hostname) in the app registration |
-| Azure AD tenant | Deploying without admin consent | Document and run the admin consent URL with a Global Administrator before go-live |
-| Azure AD tenant | Testing against a personal/developer Azure tenant | Test against a trial M365 EDU tenant — consent policies differ |
-| PDF parsing library | Using a cloud PDF API (AWS Textract, Azure Form Recognizer) | Use only on-premise libraries (pdfplumber, Apache Tika, pdf-parse) |
-| PDF parsing | Treating extraction output as accurate | All extraction results are suggestions; require staff review before saving |
-| PDF parsing | Assuming all uploads are digital-native PDFs | Detect scanned documents; route them through OCR before text extraction |
-| On-premise file storage | Hardcoding the upload directory path | Configure via environment variable; default to a path outside the web root |
-| On-premise file storage | Forgetting backup integration | Upload directory must be included in school's backup schedule — document this explicitly |
-| IIS reverse proxy | Backend returns compressed responses | Disable `Accept-Encoding` forwarding in ARR, or disable compression on the Node backend |
-| IIS reverse proxy | `preserveHostHeader` not set | Enable in ARR settings; many auth flows depend on the original Host header |
-| Puppeteer / PDF generation | Spawning a new Chromium instance per render request | Maintain a singleton Chromium browser; open/close pages per request |
-| Puppeteer / PDF generation | Loading fonts from a CDN URL | Embed fonts as base64 data URIs in the HTML template |
-| Puppeteer / PDF generation | Using `waitUntil: 'networkidle'` | Use `waitUntil: 'load'`; `networkidle` hangs if any asset 404s slowly |
-| wkhtmltopdf | Using it for new projects | It is effectively end-of-life; use Puppeteer with headless Chromium instead |
+|-------------|----------------|------------------|
+| Windows SMB / UNC | Use mapped drive letter `S:\Student` in config | Full UNC `\\spcs-fs\Private\Administration\Office\Student`; env var `SHARE_ROOT` |
+| Windows SMB / UNC | Run PM2 as LocalSystem; assume share "just works" | Dedicated AD service account with read-only ACL; PM2 runs as that account |
+| Windows SMB / UNC | Call `net use \\share /user:... /pass:...` per HTTP request | Process-level identity only; optional `@cityssm/windows-unc-path-connect` at startup if domain requires explicit connect |
+| Node.js `fs` on SMB | `fs.readFile` entire 20 MB PDF into memory for proxy | `fs.createReadStream` piped to response; set `Content-Length` when known |
+| Node.js `fs` on SMB | Synchronous `readdirSync` walk on API thread | Async worker; streaming directory iteration |
+| Microsoft Entra ID (existing) | Assume share respects per-user AD permissions via impersonation | App uses service account; **all staff see same share slice** the account can read — scope is app authorization, not SMB impersonation |
+| Microsoft Entra ID (existing) | Pass staff token to SMB layer | JWT validates app access only; SMB uses service account — two separate auth domains |
+| PostgreSQL / Prisma (existing) | Store file binary in BYTEA "for backup" | Path metadata only; share is authoritative store |
+| IIS / PM2 (existing) | Long-running scan in same process as API | Second PM2 worker entry in `ecosystem.config.js` |
+| v1 Phase 4 upload model | Keep upload and share link side-by-side indefinitely | Migration plan: new students share-only; legacy uploads read-only until migrated |
+| AuditLog (existing) | Log only link create/delete | Also log document view/download and scan run completion |
 
 ---
 
 ## Performance Traps
 
-### Synchronous PDF Extraction on Upload
-Running PDF parsing synchronously inside the HTTP request handler blocks the server thread for the duration of extraction (which can be 5–30 seconds for a large report card). For a small school this will appear to work, but any concurrent upload will time out. **Fix:** Queue extraction as a background job; return an immediate acknowledgment to the UI and poll for completion.
+Patterns that work in dev or small folders but fail on a school SMB share.
 
-### PDF Generation on Every Preview
-If staff can preview the transcript before final export, generating a full PDF on every preview click is wasteful and slow. **Fix:** Serve an HTML preview for the in-app view; only generate the PDF on explicit export. Cache the last-generated PDF and invalidate only when the underlying data changes.
-
-### No Pagination on Student List
-Loading all 600 students on page load works fine at 50 students during development; at 600 it becomes noticeably slow and wastes bandwidth. **Fix:** Server-side pagination from the first implementation, not as a retrofit.
-
-### File Serving Through App Server
-Streaming uploaded PDFs through the application server (reading file → sending bytes in Node.js) puts avoidable load on the app process. **Fix:** Serve uploaded files via a static file server or a streaming endpoint that bypasses the application business logic layer. On IIS, configure a separate static site pointing at the upload directory (still protected by auth middleware).
-
-### N+1 Queries on Transcript Assembly
-Fetching a student's full record for transcript generation by making separate database queries for each data category (results, extracurriculars, awards, work experience, documents) produces N+1 queries. **Fix:** Fetch the complete student record in a single query with JOINs or a single batch of parallel queries at assembly time.
+| Trap | Symptoms | Prevention | When It Breaks |
+|------|----------|------------|------------------|
+| Serial directory walk on high-latency SMB | Scan takes 30+ minutes; blocks worker | Async iteration; optional bounded concurrency for `readdir`; off-peak schedule | >2,000 folders or deep trees |
+| Stat every file on every scan | Scan time scales with file count even when unchanged | First scan: full stat; subsequent: mtime/size comparison; skip unchanged | >5,000 files |
+| Load full document list for all students on dashboard | Slow home page | Per-student fetch on profile mount only | Never needed at this scale — still avoid global prefetch |
+| Proxy stream without timeout | Hung requests if share offline | Stream timeout; circuit breaker; friendly "share unavailable" | Share maintenance windows |
+| N+1 queries listing documents + evidence counts | Profile page lag | Single query with `_count` or JOIN | >20 docs per student with evidence badges |
+| Antivirus scan on every read through proxy | Double latency (server AV + share AV) | Coordinate with IT on AV exclusions for service account read pattern | Large PDFs (>5 MB) |
 
 ---
 
 ## Security Mistakes
 
-### No HTTPS on the Internal Network
-Teams assume that because the app is internal ("only school staff can access it"), HTTP is acceptable. But staff may access the app over school Wi-Fi, and student records transmitted over HTTP are visible to anyone on the network. **Fix:** Always use HTTPS, even internally. Use the school's AD Certificate Services to issue an internal TLS certificate for the application hostname.
+Domain-specific security issues when bridging a web app to an internal file share.
 
-### Uploaded PDFs Served from Web Root
-Files in `public/uploads/` are served directly by the web server, bypassing authentication. Any URL-guessable filename is publicly accessible. **Fix:** Store files outside the web root. Serve them only through an authenticated endpoint that verifies the requesting user has access to that student's record before streaming the file.
-
-### Tokens in localStorage
-Storing the MSAL access token in `localStorage` exposes it to any JavaScript running on the page (XSS risk). **Fix:** Use MSAL's session storage cache (the library default); do not manually extract and store tokens.
-
-### Student Names in Error Logs / Stack Traces
-Application error logs that capture request bodies or URL parameters may include student names, year levels, or grades. These logs may be shipped to a cloud logging service, violating data residency. **Fix:** Log only opaque record IDs in application logs. Configure error tracking to scrub request bodies. Test logging output explicitly with real data.
-
-### Sequential Student IDs in URLs (IDOR)
-See Critical Pitfall 4. Additionally: never include student identifiers in URL query strings (they appear in server access logs and browser history).
-
-### No File Size or Rate Limits on Upload
-Without limits, a staff member can accidentally (or a malicious actor intentionally) upload thousands of large files, exhausting disk space. **Fix:** Enforce a maximum file size per upload (20 MB is reasonable for school documents) and a maximum storage quota per student record.
-
-### PDF Embedded JavaScript Execution
-PDFs can contain embedded JavaScript, form actions, and hyperlinks to external URIs. A malicious PDF opened in an in-browser PDF viewer (e.g., Chrome's built-in viewer) can execute scripts. **Fix:** Validate PDF structure on upload. Consider using a CDR (Content Disarm and Reconstruction) step that re-renders the PDF to a clean copy, stripping active content. At minimum, serve PDFs with `Content-Disposition: attachment` to force download rather than browser rendering.
-
-### Missing Role Boundary for Future Expansion
-Currently all staff have identical access. But if a counsellor role is added later with access to sensitive notes, or read-only student teacher access is needed, there is no RBAC infrastructure to build on. **Fix:** Implement a simple role system from day one (even if only one role is active), so that adding a new role does not require architectural changes.
+| Mistake | Risk | Prevention |
+|---------|------|------------|
+| Client-supplied path in download API | Read any file service account can access; path traversal | Opaque document ID only; server-side path resolution with `..` rejection |
+| Returning full UNC in API/errors | Infrastructure disclosure; aids lateral movement planning | Relative path internally; generic errors to client |
+| Service account with write or excessive read ACL | Bug becomes data destruction or exposure of non-student admin folders | Read-only on `...\Student` subtree only — not entire `Private` share |
+| Credentials in `.env` committed to repo | Share compromise | AD gMSA or managed service account; secrets in school vault; never commit |
+| Document proxy without audit trail | Cannot answer "who accessed this student's certificate?" | `logAudit` on every content stream |
+| Embedding share paths in client-side React state/logs | Browser extensions, crash reports leak paths | Send display filename only |
+| Assuming HTTPS intranet = no TLS for share hop | Misconfiguration exposes metadata on network | SMB3 signing enabled; document content stays on internal network — acceptable; still protect app layer |
+| Orphan documents downloadable by all staff | Pre-match files may belong to wrong context or contain other students' data in misfiled folders | Orphans admin-only until manually assigned |
 
 ---
 
 ## UX Pitfalls
 
-### No "Transcript Preview Before Export"
-Staff generate a PDF, open it, discover a missing section or formatting problem, go back to edit, and regenerate. Without an accurate in-app preview, this cycle is repeated multiple times. The preview must accurately represent what the PDF will look like (especially page breaks and section ordering).
+Common user experience mistakes when staff move from File Explorer to in-app document linking.
 
-### Extraction Results Auto-Saved Without Review
-Presenting extracted data as "done" without a clear review step erodes staff trust when they later discover incorrect grades or misread dates. Staff need a side-by-side view: the original document on one side, the extracted fields on the other, with explicit "Accept" / "Edit" actions per field.
-
-### No Completeness Indicator
-Staff approach transcript generation without knowing which data categories are missing for a student. The transcript is generated with empty sections, which looks unprofessional. **Fix:** Show a completeness status on the student profile (e.g., a checklist of required sections: Academic Results ✓, Work Experience ✗, Career Goals ✗).
-
-### No Bulk / Year-End Workflow
-At end of year, staff may need to generate transcripts for a full cohort. A one-by-one workflow does not scale. Even if bulk generation is out of scope for v1, the architecture should not make it hard to add (e.g., PDF generation must be callable without a user session, via a background job).
-
-### Destructive Actions Without Confirmation
-Deleting a student record, removing an uploaded document, or clearing extraction results should require an explicit confirmation. Accidental deletion of a student's certificate PDF cannot be undone without a backup.
-
-### Transcript Template Locked in Code
-If the transcript template is hard-coded in the application, every formatting change requires a developer, a deployment, and a restart. Staff expectations for control over "their" transcript layout will conflict with this model. **Fix:** Store at least the text/narrative portions of the template as editable data; consider a simple template editor for non-developer staff.
+| Pitfall | User Impact | Better Approach |
+|---------|-------------|-----------------|
+| No visibility into scan progress | "Is it working?" — staff refresh repeatedly | Scan status panel: running / complete / last run time / counts |
+| Auto-linked files look authoritative | Staff attach wrong evidence to transcript | Confidence badge + review queue for low-confidence matches |
+| Open button opens new tab with 401 | Token not attached to navigation | In-app open via authenticated fetch → blob URL |
+| Ghost documents still listed | Click → error; trust erodes | `STALE` badge; hide from default list or show greyed with explanation |
+| No orphan resolution workflow | Unmatched files never appear in student profiles | Cohort-wide orphan inbox; assign-to-student picker |
+| Expecting instant update after saving to share | "I just filed it — where is it?" | Set expectation: next scan cycle; offer "Refresh documents" (scoped rescan) |
+| Showing raw server error on open failure | Technical errno scares non-technical staff | "This file is no longer on the school share. It may have been moved or renamed." |
+| Replacing v1 upload without migration messaging | Staff try to upload PDFs; feature gone | Clear banner: "Documents are linked from the school file share"; link to staff guide |
+| Evidence linking buried in settings | Feature unused | Prominent "Attach document" on award/activity rows using linked doc picker |
 
 ---
 
 ## "Looks Done But Isn't" Checklist
 
-- [ ] **Login works, but session expiry is not handled** — Token expires after 1 hour; no graceful re-authentication; user loses unsaved form data.
-- [ ] **PDF uploads work, but extraction is not reviewed** — Extraction runs and saves results silently; no review step; incorrect data accumulates.
-- [ ] **Transcript generates, but page breaks are wrong** — Sample data is short; production data with long extracurricular lists or many awards breaks across pages incorrectly.
-- [ ] **HTTPS is configured, but certificate is self-signed** — Browser warning deters staff; IT team has not provisioned an internal CA-signed cert.
-- [ ] **Files upload successfully, but they're in the web root** — No authentication required to access the file if the URL is known.
-- [ ] **Data saves, but there's no audit trail** — "Who changed this?" cannot be answered.
-- [ ] **Student IDs are integers in URLs** — IDOR vulnerability; sequential enumeration possible.
-- [ ] **App runs in dev, but deployment to school server fails** — IIS configuration, file paths, or missing runtime on school server not tested.
-- [ ] **Admin consent not set up** — App registration works for the developer; school staff cannot log in on go-live day.
-- [ ] **Uploaded PDFs back up with the application** — DB is backed up; the uploads directory is not included in the backup schedule.
-- [ ] **Student data not in application error logs** — Error tracking configured but request bodies containing student names are logged to a cloud service.
-- [ ] **Empty template sections look fine in HTML preview** — PDF output shows "Work Experience: (none entered)" rather than omitting the section gracefully.
+Things that appear complete but are missing critical pieces for production share linking.
+
+- [ ] **Discovery runs:** But only from developer's interactive login — not verified under PM2 service account on Windows Server.
+- [ ] **Documents list on profile:** But opens fail because `SHARE_ROOT` differs between dev and prod env.
+- [ ] **Download works for admin:** But orphan files accessible to all staff — IDOR on unassigned links.
+- [ ] **Auto-match implemented:** But no duplicate-name test — two "Emma Wilson" students exist.
+- [ ] **Scan completes:** But no `STALE` handling — deleted share files still listed.
+- [ ] **Proxy streams PDF:** But entire file loaded into memory — large report cards OOM the Node process.
+- [ ] **Read-only enforced in UI:** But service account has write ACL — UI is not the security boundary.
+- [ ] **Audit log for links:** But document **views** not logged — access trail incomplete for governance.
+- [ ] **Share layout documented:** But rules not updated when staff reorganise folders — silent match drift.
+- [ ] **v2 document feature shipped:** But v1 upload code still primary in UI — staff create duplicates on share and in `/uploads/`.
+- [ ] **HTTPS app works:** But staff expect clicking a path opens Explorer — UNC links deliberately not supported; training missing.
+- [ ] **First scan succeeded:** But student import incomplete — 90% orphan rate treated as bug instead of data readiness.
 
 ---
 
 ## Recovery Strategies
 
-### If Extraction Results Are Wrong in Production
-Stop trusting extraction output immediately. Add a "mark as manually verified" flag to every extracted field. Provide staff a "re-review" workflow that shows the original document alongside current field values. Treat this as a data quality project, not a bug fix — systematic manual review of affected records.
+When pitfalls occur despite prevention, how to recover.
 
-### If Azure AD Consent Was Not Set Up Correctly
-The school IT Global Administrator must visit the admin consent URL. No code change is needed. If the IT admin is unavailable, the workaround is to temporarily set `prompt=consent` in the login request so each individual user can consent (only works if per-user consent is permitted in the tenant — unlikely in EDU tenants).
-
-### If the On-Premise Deployment Is Broken
-Have a deployment runbook with a rollback step (previous deployment artifact + database migration down script). Do not deploy on a Friday. Test the deployment in a staging environment on equivalent school hardware before production.
-
-### If Page Breaks Are Wrong in Production PDFs
-If using Puppeteer, update CSS `break-inside: avoid` on all section containers and verify no `overflow: auto` parents exist. Test with the worst-case real data (student with most extracurricular entries). If urgent, provide a short-term workaround: export as HTML and let staff print to PDF from their browser as a stopgap.
-
-### If Student Data Is Discovered in Cloud Logs
-Rotate all credentials immediately. Purge the relevant log entries from the external service (request this from the vendor). Notify the school's privacy officer. Review all other integrations for similar leakage. Add automated log scrubbing to the build pipeline.
+| Pitfall | Recovery Cost | Recovery Steps |
+|---------|---------------|----------------|
+| Mass wrong auto-links | MEDIUM | Halt matching job; set affected rows to `ORPHAN`; staff bulk-review queue; tighten rules; re-match with ID-only auto-link |
+| Service account cannot access share | LOW (if caught pre-go-live) | School IT fixes ACL; verify with PM2 smoke test; no code change if UNC correct |
+| Path traversal vulnerability found | HIGH | Emergency patch: ID-only resolution; rotate service account password; audit access logs for anomalous paths |
+| Ghost documents after share cleanup | LOW | Run rescan; `STALE` sweep; UI already handles if status model exists |
+| Full share copied to `/uploads/` | MEDIUM | Stop copy job; delete local duplicates; switch to path-reference model; rescan metadata |
+| Staff rejected feature ("just use Explorer") | MEDIUM | Fix orphan queue UX; add confidence indicators; careers champion session; scoped rescan after they file correctly |
+| Discovery timeouts in production | LOW–MEDIUM | Move scan to worker; increase schedule interval; scope scan to known subtrees after Phase 6 recon |
 
 ---
 
 ## Pitfall-to-Phase Mapping
 
-| Phase | Pitfall to Watch | Pre-emptive Action |
-|-------|-----------------|-------------------|
-| Infrastructure / Deployment | On-premise deployment failure (Pitfall 8) | Write deployment runbook before any feature work; test on Windows Server |
-| Infrastructure / Deployment | Data sent to cloud services (Pitfall 9) | Audit all dependencies for network calls; document data flow |
-| Auth | Azure AD tenant consent block (Pitfall 2) | Document admin consent URL; test against M365 EDU trial tenant |
-| Auth | MSAL token lifecycle mishandled (Pitfall 3) | Centralise token acquisition; test on Safari; handle `InteractionRequiredAuthError` |
-| Student Record Management | IDOR on student records (Pitfall 4) | Use UUIDs for public IDs; server-side auth on every endpoint |
-| Student Record Management | No immutable audit trail (Pitfall 5) | Audit log table in schema from day one |
-| PDF Upload & Extraction | PDF extraction over-promise (Pitfall 1) | Build review/accept UI; handle scanned docs; fail gracefully |
-| PDF Upload & Extraction | File upload security failures (Pitfall 6) | Magic-byte validation; UUID rename; store outside web root |
-| Transcript Assembly & Export | Transcript PDF page break failures (Pitfall 7) | Use Puppeteer; break-inside CSS; embed fonts; test with real data |
-| All phases | Student names in error logs | Configure log scrubbing; no PII in log statements |
-| All phases | Sequential IDs in URLs (IDOR) | UUID from schema design; never expose integer PKs |
+How v2.0 roadmap phases (starting at Phase 6) should prevent these pitfalls.
+
+| Pitfall | Prevention Phase | Verification |
+|---------|------------------|--------------|
+| Discovery before layout documented | Phase 6 | Written layout spec + staff sign-off; matching rules in config file |
+| PM2/LocalSystem share access failure | Phase 7 | Health check `readdir(SHARE_ROOT)` passes under PM2 service account on prod server |
+| UNC exposure / path traversal | Phase 9 | Pen test: `../` rejected; API never returns `\\spcs-fs`; IDOR test on document UUID |
+| Fuzzy match wrong student | Phase 6 + 8 | Test suite with duplicate names; low-confidence never auto-links |
+| Synchronous scan in HTTP | Phase 8 | Scan returns 202; worker process handles walk; IIS no timeout during scan |
+| Copying files to app storage | Phase 8 + 10 | No files in `/uploads/` from discovery; DB rows have `relativePath` only |
+| Matching before students exist | Phase 8 | Re-match job documented; first production match gated on student count |
+| No stale file handling | Phase 8 | Delete file on share → rescan → `STALE` status → UI message |
+| Document IDOR | Phase 9 | Request doc for student A using staff session — must fail if not authorized |
+| Write access to share | Phase 7 | Service account ACL audit: read-only; grep codebase for share write ops |
+| No scan visibility (UX) | Phase 9 | Admin scan history with counts and duration |
+| Orphan queue missing (UX) | Phase 9 | Unmatched files visible and assignable |
+| v1 upload confusion | Phase 10 | Upload UI removed or deprecated; migration path documented |
+| Evidence link without doc picker | Phase 10 | Award row → attach linked document → appears in both views |
+| Document view audit gap | Phase 9 | AuditLog entry on every content stream |
+| Memory exhaustion on large PDF | Phase 9 | Stream proxy; no `readFile` for document content endpoint |
+
+### Suggested phase order (dependency-aware)
+
+1. **Phase 6 — Share Reconnaissance & Matching Rules** — Prevents Pitfalls 1, 4 (rules); outputs config before any code walks production share.
+2. **Phase 7 — SMB Service Identity & Share Access** — Prevents Pitfalls 2, 10; unblocks all filesystem operations.
+3. **Phase 8 — Discovery Engine & Link Persistence** — Prevents Pitfalls 5, 6, 7, 8; worker scan + match pipeline.
+4. **Phase 9 — Auth Proxy & Student Document UI** — Prevents Pitfalls 3, 9; staff-facing list, open, download, orphan UX.
+5. **Phase 10 — Evidence Linking & v1 Migration** — Prevents Pitfall 6 (continued); evidence joins; deprecate upload model safely.
 
 ---
 
 ## Sources
 
-- MSAL.js acquire token documentation and FAQ: https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-browser/FAQ.md (HIGH confidence — official Microsoft source)
-- MSAL error handling — Microsoft Learn: https://learn.microsoft.com/en-us/entra/identity-platform/msal-error-handling-js (HIGH confidence)
-- Azure AD redirect URI best practices: https://learn.microsoft.com/en-us/entra/identity-platform/reply-url (HIGH confidence)
-- AADSTS error codes reference: https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes (HIGH confidence)
-- OWASP File Upload Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet (HIGH confidence)
-- PortSwigger Web Security Academy — File Uploads: https://portswigger.net/web-security/file-upload (HIGH confidence)
-- FPF EdTech Service Provider's Guide to Student Privacy (2025): https://fpf.org (HIGH confidence — authoritative privacy guidance)
-- Building FERPA-Ready Applications: https://www.hireplicity.com/blog/building-ferpa-ready-applications-a-technical-checklist (MEDIUM confidence — practitioner guidance)
-- FERPA compliance for LMS architecture: https://www.ofashandfire.com/blog/ferpa-compliant-lms-architecture-k12 (MEDIUM confidence)
-- PDF generation best practices for production: https://pdf4.dev/blog/pdf-generation-best-practices (MEDIUM confidence — practitioner)
-- Puppeteer vs wkhtmltopdf comparison: https://autype.com/blog/autype-vs-puppeteer-vs-wkhtmltopdf-which-tool-is-right-for-you (MEDIUM confidence)
-- PDF data extraction developer guide: https://www.nutrient.io/blog/pdf-data-extraction-developer-guide/ (MEDIUM confidence)
-- "I Tested 12 Best-in-Class PDF Table Extraction Tools": https://medium.com/@kramermark/i-tested-12-best-in-class-pdf-table-extraction-tools-and-the-results-were-appalling-f8a9991d972e (MEDIUM confidence — empirical test)
-- IIS reverse proxy pitfalls: https://techcommunity.microsoft.com/t5/iis-support-blog/iis-acting-as-reverse-proxy-where-the-problems-start/ba-p/846259 (HIGH confidence — Microsoft official)
-- SentinelOne IDOR explainer: https://www.sentinelone.com/cybersecurity-101/cybersecurity/insecure-direct-object-reference/ (MEDIUM confidence)
+- Node.js UNC/network share access limitations: [nodejs/help#4390](https://github.com/nodejs/help/issues/4390) (MEDIUM — community; confirms process-identity model)
+- PM2 / Windows service mapped drive invisibility: [node-windows#326](https://github.com/coreybutler/node-windows/discussions/326) (MEDIUM)
+- Task Scheduler / service account SMB access: [Microsoft Q&A — SMB share service account](https://learn.microsoft.com/en-us/answers/questions/5830388/how-to-get-a-task-scheduler-task-to-access-an-smb) (HIGH — Microsoft)
+- Browsers cannot open UNC from web apps: [Microsoft Q&A — UNC from ASPX](https://learn.microsoft.com/en-gb/answers/questions/1233970/how-to-open-unc-directory-which-residing-into-netw) (HIGH — Microsoft)
+- Secure file proxy pattern: [Stack Overflow — intranet file download via backend](https://stackoverflow.com/questions/57868614/how-to-download-intranet-files-with-users-permissions-from-browser) (MEDIUM)
+- SMB directory scan latency: [Microsoft Q&A — Directory.GetFiles on shared drive](https://learn.microsoft.com/en-my/answers/questions/5624740/accessing-shared-drive-using-directory-getfiles()) (HIGH — Microsoft)
+- Concurrent directory traversal on network mounts: [dscanpy README](https://github.com/hanso-dev/dscanpy) (MEDIUM — pattern applicable to Node worker design)
+- School records fuzzy matching practices: [heat-helper — student matching](https://github.com/hammezii/heat-helper) (MEDIUM — domain pattern)
+- Project context: `.planning/PROJECT.md`, `.planning/research/ARCHITECTURE.md`, `.planning/research/FEATURES.md` (HIGH — project-specific)
+- Deployment patterns: `.planning/STATE.md` PM2 service account decisions from Phase 1 (HIGH)
+
+---
+*Pitfalls research for: v2.0 Network Document Linking — SMB share discovery and auth proxy integration*
+*Researched: 2026-06-16*

@@ -1,33 +1,33 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-current_phase: 05
-status: Awaiting next milestone
-last_updated: "2026-06-14T14:09:58.565Z"
-last_activity: 2026-06-14 — Milestone v1.0 completed and archived
+milestone: v2.0
+milestone_name: Network Document Linking
+status: planning
+last_updated: "2026-06-16"
+last_activity: 2026-06-16
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 22
-  completed_plans: 22
-  percent: 100
+  total_phases: 6
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-14)
+See: .planning/PROJECT.md (updated 2026-06-16)
 
 **Core value:** A careers staff member can open any student's record and produce a completed, professional transcript PDF in a single session — no hunting through spreadsheets, emails, or paper.
-**Current focus:** Planning next milestone (`/gsd-new-milestone`)
+**Current milestone:** v2.0 Network Document Linking
+**Current focus:** Phase 6 — Share Reconnaissance & Path Configuration
 
 ## Current Status
 
-- Roadmap: created
-- Active phase: Phase 5 — transcript assembly & export (complete)
-- Last action: Phase 5 Plan 05 complete 2026-06-14 — SettingsPage branding form, Admin Settings nav, XHR logo upload, blob preview
+- Roadmap: v2.0 phases 6–11 defined
+- Active phase: Phase 6 — Share Reconnaissance & Path Configuration (ready to plan)
+- Last action: Milestone v2.0 requirements and roadmap approved
 
 ## Phase History
 
@@ -102,7 +102,7 @@ Items acknowledged and deferred at milestone close on 2026-06-14:
 
 ---
 *State initialised: 2026-06-11*
-*Last updated: 2026-06-14 after Phase 5 Plan 05 — settings admin client slice complete; Phase 5 complete*
+*Last updated: 2026-06-16 after milestone v2.0 started*
 
 ## Performance Metrics
 
@@ -190,11 +190,7 @@ Items acknowledged and deferred at milestone close on 2026-06-14:
 
 ## Current Position
 
-Phase: Milestone v1.0 complete
+Phase: 6 of 11 (Share Reconnaissance & Path Configuration)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-06-14 — Milestone v1.0 completed and archived
-
-## Operator Next Steps
-
-- Start the next milestone with /gsd-new-milestone
+Status: Ready to plan
+Last activity: 2026-06-16 — Milestone v2.0 Network Document Linking started
