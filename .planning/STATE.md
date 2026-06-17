@@ -193,4 +193,25 @@ Items acknowledged and deferred at milestone close on 2026-06-14:
 Phase: 6 of 11 (Share Reconnaissance & Path Configuration)
 Plan: —
 Status: Ready to plan
-Last activity: 2026-06-16 — Milestone v2.0 Network Document Linking started
+Last activity: 2026-06-16 — v2.0 roadmap created (Phases 6–11)
+
+## v2.0 Context
+
+### Decisions
+
+- v1 Phase 4 (DOC-01..04 upload model) superseded by v2.0 network share linking — do not build dual storage
+- Phase 6 is human-first: share layout documented and admin path verified before any discovery code runs
+- Admin can configure share root path (SHR-04) and test connectivity (SHR-05) before discovery
+- Phase 11 (EV-*) depends on v1 Phase 3 record entry types (awards, activities, work experience)
+- Phase 9 matching depends on v1 Phase 2 Student rows with `schoolStudentId`
+
+### Blockers/Concerns
+
+- Share folder layout unknown until Phase 6 on-site reconnaissance with careers staff
+- School IT must provision read-only AD service account before Phase 7 go-live
+
+## Session Continuity
+
+Last session: 2026-06-16
+Stopped at: v2.0 roadmap created — ready for `/gsd-plan-phase 6`
+Resume file: None
